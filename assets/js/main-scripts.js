@@ -1,1 +1,1 @@
-console.log('plugin js loaded');
+console.log('FD plugin js loaded');

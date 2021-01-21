@@ -41,3 +41,8 @@ if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
     }//class end
 
 }//if end
+
+/**
+ * Main Plugin instance
+ */
+new FD_SITE_CORE_FUNCTIONALITY();
