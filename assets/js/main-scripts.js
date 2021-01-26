@@ -1,1 +1,0 @@
-console.log('FD plugin js loaded');
