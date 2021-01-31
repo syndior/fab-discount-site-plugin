@@ -27,6 +27,15 @@ if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
              * Include js and css files
              */
             add_action( 'wp_enqueue_scripts', array($this, 'fdscf_includes_resources') );
+
+            /**
+             * Includes
+             */
+            if ( is_admin() ) {
+				include_once ( 'includes/admin/class-fd-admin-dashboard.php' );
+			}
+			include_once ( 'includes/dokan/class-fd-dokan-modification.php' );
+			include_once ( 'includes/woocommerce/class-fd-woocommerce-modifications.php' );
         }
 
         public function fdscf_includes_resources()
