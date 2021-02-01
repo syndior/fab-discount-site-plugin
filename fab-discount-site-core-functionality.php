@@ -47,6 +47,21 @@ if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
             add_action( 'edit_user_profile_update', array($this,'fdscf_save_extra_profile_fields') );
 
             //*****adding extra fileds in dokan seller signup form end*****//   
+            
+            // *************************--------------------------***********************//
+            
+            //*****Extra field on the seller settings and show the value on the store banner -Dokan start*****//
+    
+            ////// Add extra field in seller settings //////
+            add_filter( 'dokan_settings_form_bottom', array($this,'fdscf_extra_seller_setting_fields'), 10, 2);
+
+            ////// save extra field in seller settings //////
+            add_action( 'dokan_store_profile_saved',array($this,'fdscf_save_extra_seller_setting_fields'), 15 );
+
+            //*****Extra field on the seller settings and show the value on the store banner -Dokan start*****//
+
+            // *************************--------------------------***********************//
+
         }
 
         public function fdscf_includes_resources()
@@ -180,6 +195,75 @@ if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
 
 //*****adding extra fileds in dokan seller signup form end*****//        
 
+
+//*****Extra field on the seller settings and show the value on the store banner -Dokan start*****//
+
+// Add extra field in seller settings
+ public function fdscf_extra_seller_setting_fields( $user_ID, $profile_info ){
+    //  var_dump($user);
+    $shop_vat_number  = get_user_meta( $user_ID, 'dokan_seller_shop_vat_number', true );
+    $company_reg_number  = get_user_meta( $user_ID, 'dokan_seller_company_reg_number', true );
+    $company_website  = get_user_meta( $user_ID, 'dokan_seller_company_website', true );
+
+//  $shop_vat_number= isset( $profile_info['dokan_seller_shop_vat_number'] ) ? $profile_info['dokan_seller_shop_vat_number'] : '';
+//  $company_reg_number= isset( $profile_info['dokan_seller_shop_vat_number'] ) ? $profile_info['dokan_seller_shop_vat_number'] : '';
+//  $company_website= isset( $profile_info['dokan_seller_shop_vat_number'] ) ? $profile_info['dokan_seller_shop_vat_number'] : '';
+?>
+ <div class="gregcustom dokan-form-group">
+        <label class="dokan-w3 dokan-control-label" for="vat number">
+            <?php _e( 'Company VAT Number', 'dokan' ); ?>
+        </label>
+        <div class="dokan-w5">
+            <input type="text" class="dokan-form-control input-md valid" name="shop_vat_number" id="shop_vat_number" value="<?php echo $shop_vat_number; ?>" />
+        </div>
+    </div>
+    <div class="gregcustom dokan-form-group">
+        <label class="dokan-w3 dokan-control-label" for="reg number">
+            <?php _e( 'Company Registration Number', 'dokan' ); ?>
+        </label>
+        <div class="dokan-w5">
+            <input type="text" class="dokan-form-control input-md valid" name="company_reg_number" id="company_reg_number" value="<?php echo $company_reg_number; ?>" />
+        </div>
+    </div>
+
+    <div class="gregcustom dokan-form-group">
+        <label class="dokan-w3 dokan-control-label" for="website">
+            <?php _e( 'Company Website', 'dokan' ); ?>
+        </label>
+        <div class="dokan-w5">
+            <input type="text" class="dokan-form-control input-md valid" name="company_website" id="company_website" value="<?php echo $company_website; ?>" />
+        </div>
+    </div>
+    <?php
+}
+
+    
+//save the field value
+function fdscf_save_extra_seller_setting_fields( $store_id ) {
+    $dokan_settings = dokan_get_store_info($store_id);
+    if ( isset( $_POST['seller_url'] ) ) {
+        $dokan_settings['seller_url'] = $_POST['seller_url'];
+    }
+ update_user_meta( $store_id, 'dokan_profile_settings', $dokan_settings );
+}
+
+// show on the store page
+// add_action( 'dokan_store_header_info_fields', 'save_seller_url', 10);
+
+function save_seller_url($store_user){
+
+    $store_info    = dokan_get_store_info( $store_user);
+
+   ?>
+        <?php if ( isset( $store_info['seller_url'] ) && !empty( $store_info['seller_url'] ) ) { ?>
+            <i class="fa fa-globe"></i>
+            <a href="<?php echo esc_html( $store_info['seller_url'] ); ?>"><?php echo esc_html( $store_info['seller_url'] ); ?></a>
+    
+    <?php } ?>
+       
+  <?php
+}
+//*****Extra field on the seller settings and show the value on the store banner -Dokan end*****//
 
 
     }//class end
