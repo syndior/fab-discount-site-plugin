@@ -12,7 +12,10 @@ final class Init
 		return [
 			Base\Enqueue::class,
             Base\SettingsLinks::class,
-            Admin\AdminPages::class
+            Admin\AdminPages::class,
+            Refunds\RefundsController::class,
+            Vouchers\VouchersController::class,
+            Woocommerce\WoocommerceController::class,
 		];
     }
     
