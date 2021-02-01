@@ -17,14 +17,37 @@
  */
 defined('ABSPATH') or die('This path is not accessible');
 
-if( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ){
-    require_once dirname( __FILE__ ) . '/vendor/autoload.php';
-}
+define( 'fdscf_url', plugin_dir_url( __FILE__ ) );
+define( 'fdscf_path', plugin_dir_path( __FILE__ ) );
+define( 'fdscf_plugin', plugin_basename( __FILE__ ) );
 
-use Inc\Base\Activate;
-use Inc\Base\Deactivate;
-use Inc\Base\Enqueue;
+if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
 
-if ( class_exists( 'Inc\\Init' ) ) {
-    Inc\Init::register_services();
+    class FD_CORE_PLUGIN_CLASS
+    {
+        public function __construct()
+        {
+            if( is_admin() ){
+                require_once ( fdscf_path . './includes/admin/class-admin-pages.php' );
+            }
+            require_once ( fdscf_path . './includes/base/class-activate.php' );
+            require_once ( fdscf_path . './includes/base/class-deactivate.php' );
+            require_once ( fdscf_path . './includes/base/class-enqueue.php' );
+            require_once ( fdscf_path . './includes/base/class-settings-links.php' );
+            require_once ( fdscf_path . './includes/dokan/class-dokan-controller.php' );
+            require_once ( fdscf_path . './includes/refunds/class-refunds-controller.php' );
+            require_once ( fdscf_path . './includes/vouchers/class-vouchers-controller.php' );
+            
+            // add_action( 'woocommerce_loaded', array( $this, 'load_wc_class_controllers' ) );
+            add_action( 'plugins_loaded', array( $this, 'load_wc_class_controllers' ) );
+        }
+        
+        public function load_wc_class_controllers()
+        {
+            require_once ( fdscf_path . './includes/woocommerce/class-wc-custom-product-type.php' );
+            require_once ( fdscf_path . './includes/woocommerce/class-wc-controller.php' );
+        }
+    }
+
+    new FD_CORE_PLUGIN_CLASS();
 }

@@ -1,10 +1,8 @@
-<?php
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
 
-namespace Inc\Admin;
-
-class AdminPages
+class FD_Admin_Pages
 {
-    public function register()
+    public function __construct()
     {
         if( function_exists('acf_add_options_page') ){
             acf_add_options_page(array(
@@ -35,3 +33,5 @@ class AdminPages
         }
     }
 }
+
+new FD_Admin_Pages();

@@ -1,7 +1,8 @@
-<?php
-namespace Inc;
+<?php 
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-final class Init
+
+class Init
 {
     /**
 	 * Store all the classes inside an array
@@ -15,6 +16,7 @@ final class Init
             Admin\AdminPages::class,
             Refunds\RefundsController::class,
             Vouchers\VouchersController::class,
+            Dokan\DokanController::class,
             Woocommerce\WoocommerceController::class,
 		];
     }

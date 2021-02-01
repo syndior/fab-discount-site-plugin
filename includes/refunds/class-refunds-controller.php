@@ -1,11 +1,8 @@
-<?php
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
 
-namespace Inc\Refunds;
-use \Inc\Base\BaseController;
-
-class RefundsController extends BaseController
+class FD_Refunds_Controller
 {
-    public function register()
+    public function __construct()
     {
         add_action( 'init', array( $this, 'activate' ) );
     }
@@ -15,3 +12,5 @@ class RefundsController extends BaseController
         echo '<script>console.log("RefundsController activated")</script>';
     }
 }
+
+new FD_Refunds_Controller();

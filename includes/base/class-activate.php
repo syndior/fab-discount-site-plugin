@@ -1,10 +1,11 @@
-<?php
-namespace Inc\Base;
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Activate
+class FD_Activate
 {
     public static function activate()
     {
         flush_rewrite_rules();
     }
 }
+
+new FD_Activate();
