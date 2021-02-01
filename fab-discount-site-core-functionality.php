@@ -17,41 +17,14 @@
  */
 defined('ABSPATH') or die('This path is not accessible');
 
-if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
+if( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ){
+    require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+}
 
-    class FD_SITE_CORE_FUNCTIONALITY{
+use Inc\Base\Activate;
+use Inc\Base\Deactivate;
+use Inc\Base\Enqueue;
 
-        public function __construct()
-        {
-            /**
-             * Include js and css files
-             */
-            add_action( 'wp_enqueue_scripts', array($this, 'fdscf_includes_resources') );
-
-            /**
-             * Includes
-             */
-            if ( is_admin() ) {
-				include_once ( 'includes/admin/class-fd-admin-dashboard.php' );
-			}
-			include_once ( 'includes/dokan/class-fd-dokan-modification.php' );
-			include_once ( 'includes/woocommerce/class-fd-woocommerce-modifications.php' );
-        }
-
-        public function fdscf_includes_resources()
-        {
-            //plugin styles
-            wp_enqueue_style( 'fdscf-styles', plugins_url( 'assets/css/main-styles.css', __FILE__ ),array(), '1.0.0');
-            
-            //plugin scripts
-            wp_enqueue_script( 'fdscf-script', plugins_url( 'assets/js/main-scripts.js', __FILE__ ), array('jquery'),'1.0.0',true);
-        }
-
-    }//class end
-
-}//if end
-
-/**
- * Main Plugin instance
- */
-new FD_SITE_CORE_FUNCTIONALITY();
+if ( class_exists( 'Inc\\Init' ) ) {
+    Inc\Init::register_services();
+}

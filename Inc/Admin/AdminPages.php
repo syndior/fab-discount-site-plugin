@@ -1,11 +1,10 @@
 <?php
-if ( !defined( 'ABSPATH' ) ) {
-	exit;
-}
 
-class FD_ADMIN_DAHSBOARD
+namespace Inc\Admin;
+
+class AdminPages
 {
-    function __construct()
+    public function register()
     {
         if( function_exists('acf_add_options_page') ){
             acf_add_options_page(array(
@@ -27,8 +26,12 @@ class FD_ADMIN_DAHSBOARD
                 'menu_title'	=> 'Vednor Settings',
                 'parent_slug'	=> 'fd-site-settings',
             ));
+
+            acf_add_options_sub_page(array(
+                'page_title' 	=> 'Voucher Settings',
+                'menu_title'	=> 'Voucher Settings',
+                'parent_slug'	=> 'fd-site-settings',
+            ));
         }
     }
 }
-
-new FD_ADMIN_DAHSBOARD();
