@@ -21,6 +21,10 @@ class FD_Woocommerce_Controller
         
         /* saves our custom fields with our custom product type*/
         add_action( 'woocommerce_process_product_meta', array( $this, 'process_product_meta') );
+        
+        /* adds custom button before the add to cart button to pay with store credit */
+        add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_functionality_before_add_to_cart_button') );
+        
     }
 
     public function add_product_type_filter( $types )
@@ -109,6 +113,11 @@ class FD_Woocommerce_Controller
 
             $product->save();
         }
+    }
+
+    public function add_functionality_before_add_to_cart_button()
+    {
+        echo '<a href="#">here</a>';
     }
 
 
