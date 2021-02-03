@@ -21,9 +21,15 @@ class FD_Woocommerce_Controller
         
         /* saves our custom fields with our custom product type*/
         add_action( 'woocommerce_process_product_meta', array( $this, 'process_product_meta') );
+
+        /* adds back the add to cart buttons and product summary sections */
+        add_action( 'woocommerce_fd_wc_voucher_add_to_cart', array( $this, 'add_to_cart_template_include') );
         
         /* adds custom button before the add to cart button to pay with store credit */
         add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_functionality_before_add_to_cart_button') );
+
+        /* inlude page js that logs users product view */
+        add_action( 'woocommerce_after_single_product', array( $this, 'enqueue_user_product_view_log_script' ) );
         
     }
 
@@ -115,9 +121,20 @@ class FD_Woocommerce_Controller
         }
     }
 
+    public function add_to_cart_template_include()
+    {
+        do_action( 'woocommerce_simple_add_to_cart' );
+    }
+
+
     public function add_functionality_before_add_to_cart_button()
     {
-        echo '<a href="#">here</a>';
+        require_once ( fdscf_path . './templates/fd-html-before-add-to-cart-custom-options.php' );
+    }
+
+    public function enqueue_user_product_view_log_script()
+    {
+        require_once ( fdscf_path . './templates/fd-html-porduct-page-end-js-script-enqueue.php' );
     }
 
 

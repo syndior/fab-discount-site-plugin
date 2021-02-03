@@ -9,7 +9,7 @@ class FD_Refunds_Controller
 
     public function activate()
     {
-        echo '<script>console.log("RefundsController activated")</script>';
+        //code...
     }
 }
 

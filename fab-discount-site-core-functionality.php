@@ -35,6 +35,7 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
             require_once ( fdscf_path . './includes/base/class-enqueue.php' );
             require_once ( fdscf_path . './includes/base/class-settings-links.php' );
             require_once ( fdscf_path . './includes/base/class-wp-cron.php' );
+            require_once ( fdscf_path . './includes/user/class-user-controller.php' );
             require_once ( fdscf_path . './includes/dokan/class-dokan-controller.php' );
             require_once ( fdscf_path . './includes/refunds/class-refunds-controller.php' );
             require_once ( fdscf_path . './includes/vouchers/class-vouchers-controller.php' );

@@ -9,7 +9,7 @@ class FD_Vouchers_Controller
 
     public function activate()
     {
-        echo '<script>console.log("FD_Vouchers_Controller activated")</script>';
+       //code...
     }
 }
 

@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
     global $post;
     $product = wc_get_product( $post->ID );
 

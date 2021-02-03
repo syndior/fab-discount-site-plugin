@@ -9,7 +9,7 @@ class FD_Dokan_Controller
 
     public function activate()
     {
-        echo '<script>console.log("FD_Dokan_Controller activated")</script>';
+        //code...
     }
 }
 
