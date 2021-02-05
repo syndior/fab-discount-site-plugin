@@ -40,6 +40,10 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
             require_once ( fdscf_path . './includes/refunds/class-refunds-controller.php' );
             require_once ( fdscf_path . './includes/vouchers/class-vouchers-controller.php' );
             
+
+            /**
+             * Loads WC script classes after plugins have loaded
+             */
             add_action( 'plugins_loaded', array( $this, 'load_wc_class_controllers' ) );
         }
         

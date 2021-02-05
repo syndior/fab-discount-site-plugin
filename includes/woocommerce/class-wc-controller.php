@@ -30,6 +30,21 @@ class FD_Woocommerce_Controller
 
         /* inlude page js that logs users product view */
         add_action( 'woocommerce_after_single_product', array( $this, 'enqueue_user_product_view_log_script' ) );
+
+        /* Register new endpoint to use for My Account pages */
+        add_action( 'init', array( $this, 'register_custom_page_endpoints' ) );
+
+        /* Add a new query var for custom my account pages */
+        add_filter( 'query_vars', array( $this, 'add_custom_query_vars_for_my_acccuont_pages' ), 0 );
+
+        /* Hook custom endpoint in  WC my account area*/
+        add_filter( 'woocommerce_account_menu_items', array( $this, 'hook_custom_endpoints_with_woocommerce' ) );
+
+        /* load custom markup for the newly added endpoints */
+        add_action( 'woocommerce_account_fd-my-vouchers_endpoint', array( $this, 'load_wc_my_vouchers_page_markup' ) );
+        add_action( 'woocommerce_account_fd-my-transactions_endpoint', array( $this, 'load_wc_my_transactions_page_markup' ) );
+        add_action( 'woocommerce_account_fd-my-wallet_endpoint', array( $this, 'load_wc_my_wallet_page_markup' ) );
+        add_action( 'woocommerce_account_fd-my-viewed-items_endpoint', array( $this, 'load_wc_previously_viewed_items_page_markup' ) );
         
     }
 
@@ -58,10 +73,7 @@ class FD_Woocommerce_Controller
             'class' => 'show_if_fd_wc_voucher'
         );
 
-        $insert_at_position = 0;
-        $tabs = array_slice( $original_tabs, 0, $insert_at_position, true );
-        $tabs = array_merge( $tabs, $fd_wc_voucher_tab );
-        $tabs = array_merge( $tabs, array_slice( $original_tabs, $insert_at_position, null, true ) );
+        $tabs = $this->insert_item_at_array_position( 0, $fd_wc_voucher_tab, $original_tabs );
 
         return $tabs;
     }
@@ -132,11 +144,83 @@ class FD_Woocommerce_Controller
         require_once ( fdscf_path . './templates/fd-html-before-add-to-cart-custom-options.php' );
     }
 
+
     public function enqueue_user_product_view_log_script()
     {
         require_once ( fdscf_path . './templates/fd-html-porduct-page-end-js-script-enqueue.php' );
     }
+    
+    
+    public function register_custom_page_endpoints()
+    {
+        add_rewrite_endpoint( 'fd-my-vouchers', EP_ROOT | EP_PAGES );
+        add_rewrite_endpoint( 'fd-my-transactions', EP_ROOT | EP_PAGES );
+        add_rewrite_endpoint( 'fd-my-wallet', EP_ROOT | EP_PAGES );
+        add_rewrite_endpoint( 'fd-my-viewed-items', EP_ROOT | EP_PAGES );
+    }
+    
+    
+    public function add_custom_query_vars_for_my_acccuont_pages( $vars )
+    {
+        $vars[] = 'fd-my-vouchers';
+        $vars[] = 'fd-my-transactions';
+        $vars[] = 'fd-my-wallet';
+        $vars[] = 'fd-my-viewed-items';
+        return $vars;
+    }
+    
+    public function hook_custom_endpoints_with_woocommerce( $items )
+    {
+        $my_vouchers_page['fd-my-vouchers'] = 'My Vouchers';
+        $items = $this->insert_item_at_array_position( 1, $my_vouchers_page, $items );
 
+        $my_transactions['fd-my-transactions'] = 'My Transactions';
+        $items = $this->insert_item_at_array_position( 2, $my_transactions, $items );
+
+        $my_wallet['fd-my-wallet'] = 'My Wallet';
+        $items = $this->insert_item_at_array_position( 3, $my_wallet, $items );
+        
+        $previously_viewed_items['fd-my-viewed-items'] = 'Previously Viewed Items';
+        $items = $this->insert_item_at_array_position( 4, $previously_viewed_items, $items );
+        
+
+        return $items;
+    }
+    
+    
+    public function load_wc_my_vouchers_page_markup()
+    {
+        require_once ( fdscf_path . './templates/fd-html-wc-account-tabs-my-vouchers-page.php' );
+    }
+    
+    public function load_wc_my_transactions_page_markup()
+    {
+        require_once ( fdscf_path . './templates/fd-html-wc-account-tabs-my-transactions-page.php' );
+    }
+    
+    public function load_wc_my_wallet_page_markup()
+    {
+        require_once ( fdscf_path . './templates/fd-html-wc-account-tabs-my-wallet-page.php' );
+    }
+    
+    public function load_wc_previously_viewed_items_page_markup()
+    {
+        require_once ( fdscf_path . './templates/fd-html-wc-account-tabs-my-previouly-viewed-items-page.php' );
+    }
+
+
+    /**
+     * Helper function: add custom item at the start of an array
+     */
+
+     public static function insert_item_at_array_position( int $insert_position, $custom_item , $original_array)
+     {
+        $items = array_slice( $original_array, 0, $insert_position, true );
+        $items = array_merge( $items, $custom_item );
+        $items = array_merge( $items, array_slice( $original_array, $insert_position, null, true ) );
+
+        return $items;
+     }
 
 }
 
