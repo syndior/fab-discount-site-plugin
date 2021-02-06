@@ -21,6 +21,10 @@ define( 'fdscf_url', plugin_dir_url( __FILE__ ) );
 define( 'fdscf_path', plugin_dir_path( __FILE__ ) );
 define( 'fdscf_plugin', plugin_basename( __FILE__ ) );
 
+global $wpdb;
+$fd_table_name = ( $wpdb->prefix . "fdscf_vouchers" );
+define( 'fdscf_db_table_name', $fd_table_name );
+
 if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
 
     class FD_CORE_PLUGIN_CLASS
@@ -38,6 +42,7 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
             require_once ( fdscf_path . './includes/user/class-user-controller.php' );
             require_once ( fdscf_path . './includes/dokan/class-dokan-controller.php' );
             require_once ( fdscf_path . './includes/refunds/class-refunds-controller.php' );
+            require_once ( fdscf_path . './includes/vouchers/class-fd-voucher.php' );
             require_once ( fdscf_path . './includes/vouchers/class-vouchers-controller.php' );
             
 
@@ -45,12 +50,39 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
              * Loads WC script classes after plugins have loaded
              */
             add_action( 'plugins_loaded', array( $this, 'load_wc_class_controllers' ) );
+
+
+            /**
+             * PLugin activation hook
+             */
+            register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
+
+            
+            /**
+             * PLugin deactivation hook
+             */
+            register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
         }
         
         public function load_wc_class_controllers()
         {
             require_once ( fdscf_path . './includes/woocommerce/class-wc-custom-product-type.php' );
             require_once ( fdscf_path . './includes/woocommerce/class-wc-controller.php' );
+
+        }
+
+        public function plugin_activation()
+        {
+            if( class_exists('FD_Activate') ){
+                FD_Activate::activate();
+            }
+        }
+
+        public function plugin_deactivation()
+        {
+            if( class_exists('FD_Deactivate') ){
+                FD_Deactivate::deactivate();
+            }
         }
     }
 
