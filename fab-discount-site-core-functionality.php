@@ -62,6 +62,10 @@ if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
 
             // *************************--------------------------***********************//
 
+            //*****making wooCommerce form to acept file upload start*****// 
+            add_action( 'woocommerce_register_form_tag', array($this,'fdscf_enctype_custom_registration_forms'));
+            //*****making wooCommerce form to acept file upload END*****// 
+
         }
 
         public function fdscf_includes_resources()
@@ -137,8 +141,18 @@ if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
             $shop_vat_number =  $post_data['shop_vat_number'];
             $company_reg_number =  $post_data['company_reg_number'];
             $company_website =  $post_data['company_website'];
-            // $shop_vat_number =  $post_data['shop_vat_number'];
-           
+            // $identity_doc =  $_FILES['identity_doc'];
+            if ( isset( $_FILES['identity_doc'] ) ) {
+                require_once( ABSPATH . 'wp-admin/includes/image.php' );
+                require_once( ABSPATH . 'wp-admin/includes/file.php' );
+                require_once( ABSPATH . 'wp-admin/includes/media.php' );
+                $attachment_id = media_handle_upload( 'identity_doc', 0 );
+                if ( is_wp_error( $attachment_id ) ) {
+                   update_user_meta( $vendor_id, 'dokan_seller_identity_doc', $_FILES['identity_doc'] . ": " . $attachment_id->get_error_message() );
+                } else {
+                   update_user_meta( $vendor_id, 'dokan_seller_identity_doc', $attachment_id );
+                }
+             }
             update_user_meta( $vendor_id, 'dokan_seller_shop_vat_number', $shop_vat_number );
             update_user_meta( $vendor_id, 'dokan_seller_company_reg_number', $company_reg_number );
             update_user_meta( $vendor_id, 'dokan_seller_company_website', $company_website );
@@ -193,7 +207,14 @@ if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
             update_usermeta( $user_id, 'dokan_seller_company_website', $_POST['company_website'] );
         }
 
-//*****adding extra fileds in dokan seller signup form end*****//        
+        //*****adding extra fileds in dokan seller signup form end*****//        
+
+
+        //*****making wooCommerce form to acept file upload start*****// 
+        public function fdscf_enctype_custom_registration_forms() {
+        echo 'enctype="multipart/form-data"';
+        }
+        //*****making wooCommerce form to acept file upload end*****//
 
 
 //*****Extra field on the seller settings and show the value on the store banner -Dokan start*****//
