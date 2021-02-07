@@ -24,7 +24,8 @@ class FD_Activate
             `expires_at`            TIMESTAMP NULL,
             `will_expire`           INT NOT NULL DEFAULT 0,
             `fd_voucher_status`     VARCHAR(60) NOT NULL DEFAULT 'active',
-            `user_id`               BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+            `vendor_id`             BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+            `customer_id`           BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             `order_id`              BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             `product_id`            BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             PRIMARY KEY  (fd_voucher_id)

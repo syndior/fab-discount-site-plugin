@@ -9,7 +9,8 @@ class FD_Voucher
     private $id;
     private $key;
     private $status;
-    private $user_id;
+    private $vendor_id;
+    private $customer_id;
     private $order_id;
     private $product_id;
     private $created_at;
@@ -26,7 +27,8 @@ class FD_Voucher
                 $this->id                   = $db_result_obj->fd_voucher_id;
                 $this->key                  = $db_result_obj->fd_voucher_key;
                 $this->status               = $db_result_obj->fd_voucher_status;
-                $this->user_id              = $db_result_obj->user_id;
+                $this->vendor_id            = $db_result_obj->vendor_id;
+                $this->customer_id          = $db_result_obj->customer_id;
                 $this->order_id             = $db_result_obj->order_id;
                 $this->product_id           = $db_result_obj->product_id;
                 $this->created_at           = $db_result_obj->created_at;
@@ -48,7 +50,25 @@ class FD_Voucher
     
     public function get_key()
     {
-        return $this->key;
+        $this->key;
+        
+        $key_length         = strlen( $this->key );
+        $key_part_length    = $key_length / 4;
+        $key_parts          = str_split( $this->key, $key_part_length );
+
+        $formated_key       = '';
+
+        for ( $i = 0; $i < count($key_parts); $i++ ) { 
+            if( $i == 0 ){
+                $formated_key = $formated_key . $key_parts[$i];
+            }else{
+                $formated_key = $formated_key . '-' . $key_parts[$i];
+            }
+        }
+
+        $formated_key = strtoupper( $formated_key );
+
+        return $formated_key;
     }
     
     public function get_status()
@@ -56,9 +76,14 @@ class FD_Voucher
         return $this->status;
     }
     
-    public function get_user_id()
+    public function get_vendor_id()
     {
-        return $this->user_id;
+        return $this->vendor_id;
+    }
+
+    public function get_customer_id()
+    {
+        return $this->customer_id;
     }
     
     public function get_order_id()
@@ -103,7 +128,7 @@ class FD_Voucher
     public function update_status(  string $status = '' )
     {
         if( strlen( $status ) > 0 ){
-            if( $status == 'active' || $status == 'expired' || $status == 'blocked' || $status == 'pending' ){
+            if( $status == 'active' || $status == 'redeemed' || $status == 'expired' || $status == 'blocked' || $status == 'pending' ){
                 global $wpdb;
                 $table_name = fdscf_db_table_name;
 
@@ -138,25 +163,125 @@ class FD_Voucher
         return false;
     }
 
+
+    public function set_to_expire(bool $value , string $expiry_date = '' )
+    {
+        if( $this->is_set_to_expire() !== $value ){
+            
+            if( $value == true  && (strlen($expiry_date) > 0) ){
+                
+                $current_date = new DateTime( date("Y-m-d H:i:s") );
+                $expiray_date = DateTime::createFromFormat( "Y-m-d H:i:s", $expiry_date );
+                
+                if( ( $current_date instanceof DateTime ) && ( $expiray_date instanceof DateTime ) ){
+                    
+                    $current_date_timestamp = $current_date->getTimestamp();
+                    $expiray_date_timestamp = $expiray_date->getTimestamp();
+                    
+                    if( $expiray_date_timestamp > $current_date_timestamp ){
+                        global $wpdb;
+                        $table_name = fdscf_db_table_name;
+
+                        $data = array(
+                            'will_expire' => $value,
+                            'expires_at' => $expiray_date->format( "Y-m-d H:i:s" ),
+                        );
+
+                        $where = array(
+                            'fd_voucher_id' => $this->id
+                        );
+
+                        $format = array(
+                            '%d',
+                            '%s'
+                        );
+
+                        $where_format = array(
+                            '%d'
+                        );
+                        
+                        $result = $wpdb->update( $table_name , $data, $where, $format, $where_format );
+                        if( $result !== false ){
+                            $voucher = new FD_Voucher( $this->id );
+                            $update_status = FD_Voucher::update_voucher_properties( $voucher );
+                            if( $voucher !== false && $update_status == true ){
+                                return $voucher;
+                            }  
+                        }
+                    }
+
+                }
+            }elseif ( $value == false ) {
+                global $wpdb;
+                $table_name = fdscf_db_table_name;
+
+                $data = array(
+                    'will_expire' => $value,
+                    'expires_at' => null,
+                );
+
+                $where = array(
+                    'fd_voucher_id' => $this->id
+                );
+
+                $format = array(
+                    '%d'
+                );
+
+                $where_format = array(
+                    '%d'
+                );
+                
+                $result = $wpdb->update( $table_name , $data, $where, $format, $where_format );
+                if( $result !== false ){
+                    $voucher = new FD_Voucher( $this->id );
+                    $update_status = FD_Voucher::update_voucher_properties( $voucher );
+                    if( $voucher !== false && $update_status == true ){
+                        return $voucher;
+                    }  
+                }
+            }
+            return false;
+        }
+
+        return $this;
+
+    }
+
+
     /**
      * Helper function: attempts to creeate a new voucher
      */
-    public static function create_voucher()
+    public static function create_voucher( array $voucher_data )
     {
-        $counter = 0;
-        $max_attempts = 100;
+        if( isset( $voucher_data['customer_id'] ) && 
+            isset( $voucher_data['vendor_id'] ) && 
+            isset( $voucher_data['order_id'] ) && 
+            isset( $voucher_data['product_id'] ) ){
 
-        do{
+                if( ( isset( $voucher_data['will_expire'] ) && $voucher_data['will_expire'] == true ) && !isset( $voucher_data['expires_at'] ) ){
+                    
+                    // if voucher is set to expire, have to provide a expiry date
+                    return false;
+                }
 
-            $voucher = FD_Voucher::insert_voucher_data_in_db();
-
-        } while ( !( $voucher instanceof self ) && $counter < $max_attempts );
-
-        if( $voucher instanceof self ){
-            return $voucher;
-        }else{
-            wp_die( "Error in creating new voucher" );
+            $counter = 0;
+            $max_attempts = 100;
+    
+            do{
+    
+                $voucher = FD_Voucher::insert_voucher_data_in_db( $voucher_data );
+    
+            } while ( !( $voucher instanceof self ) && $counter < $max_attempts );
+    
+            if( $voucher instanceof self ){
+                return $voucher;
+            }else{
+                wp_die( "Error in creating new voucher" );
+            }
         }
+
+        return false;
 
     }
 
@@ -184,10 +309,11 @@ class FD_Voucher
     private function update_voucher_properties( FD_Voucher $voucher = null )
     {
         if( $voucher !== null ){
-            $this->id                   = $voucher->id;
-            $this->key                  = $voucher->key;
-            $this->status               = $voucher->status;
-            $this->user_id              = $voucher->user_id;
+            $this->id                   = $voucher->fd_voucher_id;
+            $this->key                  = $voucher->fd_voucher_key;
+            $this->status               = $voucher->fd_voucher_status;
+            $this->vendor_id            = $voucher->vendor_id;
+            $this->customer_id          = $voucher->customer_id;
             $this->order_id             = $voucher->order_id;
             $this->product_id           = $voucher->product_id;
             $this->created_at           = $voucher->created_at;
@@ -220,26 +346,38 @@ class FD_Voucher
     /**
      * Heper Functions: Insets a new voucher in database
      */
-    private static function insert_voucher_data_in_db()
+    private static function insert_voucher_data_in_db( array $voucher_data = array() )
     {
         global $wpdb;
 
         $key = FD_Voucher::generate_voucher_key();
-        $data = array(
-            'fd_voucher_key'    => $key,
-            'user_id'           => 1,
-            'order_id'          => 1,
-            'product_id'        => 1
+        $defaults = array(
+            'fd_voucher_key'        => $key,
+            'expires_at'            => null,
+            'will_expire'           => 0,
+            'fd_voucher_status'     => 'active',
+            'vendor_id'             => 0,
+            'customer_id'           => 0,
+            'order_id'              => 0,
+            'product_id'            => 0,
         );
 
-        $result = $wpdb->insert( fdscf_db_table_name, $data);
+        $data = wp_parse_args( $voucher_data, $defaults );
 
-        if( $result !== false && $result == 1 ){
-            $voucher = new FD_Voucher( $wpdb->insert_id );
-            return $voucher;
-        }else{
-            return $wpdb->last_error;
+        // checks if table exists in db before inserting
+        $query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( fdscf_db_table_name ) );
+
+        if ( $wpdb->get_var( $query ) == fdscf_db_table_name ){
+            $result = $wpdb->insert( fdscf_db_table_name, $data);
+            if( $result !== false && $result == 1 ){
+                $voucher = new FD_Voucher( $wpdb->insert_id );
+                return $voucher;
+            }else{
+                return $wpdb->last_error;
+            }
         }
+
+        return false;
     }
 
 
@@ -251,6 +389,9 @@ class FD_Voucher
         if( strlen( $voucher_key ) > 0 ){
             global $wpdb;
             $table_name = fdscf_db_table_name;
+
+            $voucher_key = preg_replace('/-/i', '', $voucher_key);
+            $voucher_key = strtolower( $voucher_key );
 
             $result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$table_name}` WHERE `fd_voucher_key` = %s LIMIT 1;", $voucher_key ), OBJECT );
             if( $result !== null ){

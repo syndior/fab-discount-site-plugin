@@ -39,6 +39,17 @@ class FD_Enqueue
                         
                 //admin scripts
                 wp_enqueue_script( 'fdscf-admin-script', fdscf_url . 'assets/js/admin-scripts.js',  array('jquery'),'1.0.0',true);
+
+                //localize script if user logged in
+                //include ajax vars
+                if( is_user_logged_in() ){
+                        $nonce_val = wp_create_nonce('admin_ajax_check');
+                        $admin_js_object = array(
+                                'ajax_url' => admin_url( 'admin-ajax.php' ),
+                                'nonce'    => $nonce_val,
+                        );
+                        wp_localize_script( 'fdscf-admin-script', 'fd_admin_ajax_obj', $admin_js_object);
+                }
                 
         }
 }

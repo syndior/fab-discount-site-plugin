@@ -23,7 +23,8 @@ class FD_Woocommerce_Controller
         add_action( 'woocommerce_process_product_meta', array( $this, 'process_product_meta') );
 
         /* adds back the add to cart buttons and product summary sections */
-        add_action( 'woocommerce_fd_wc_voucher_add_to_cart', array( $this, 'add_to_cart_template_include') );
+        add_action( 'woocommerce_fd_wc_offer_add_to_cart', array( $this, 'add_to_cart_template_include') );
+        add_action( 'woocommerce_fd_wc_offer_variable_add_to_cart', array( $this, 'add_to_cart_template_include') );
         
         /* adds custom button before the add to cart button to pay with store credit */
         add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_functionality_before_add_to_cart_button') );
@@ -46,41 +47,53 @@ class FD_Woocommerce_Controller
         add_action( 'woocommerce_account_fd-my-wallet_endpoint', array( $this, 'load_wc_my_wallet_page_markup' ) );
         add_action( 'woocommerce_account_fd-my-viewed-items_endpoint', array( $this, 'load_wc_previously_viewed_items_page_markup' ) );
         
+        /* ajax handler, returns offer linked variations data*/
+        add_action('wp_ajax_fd_wc_get_linked_variations',  array( $this, 'fd_wc_get_linked_variations' ) );
     }
 
     public function add_product_type_filter( $types )
     {
-        $types[ 'fd_wc_voucher' ] = 'FD Voucher';
+        $types[ 'fd_wc_offer' ]             = 'FD Offer';
+        $types[ 'fd_wc_offer_variable' ]    = 'FD Offer Variable';
         return $types;
     }
 
     public function add_woocommerce_product_class( $classname, $product_type )
     {
-        if ( $product_type == 'fd_wc_voucher' ) {
-            $classname = 'WC_Product_FD_Voucher';
+        if ( $product_type == 'fd_wc_offer' ) {
+            $classname = 'WC_Product_FD_Offer';
         }
+        
+        if ( $product_type == 'fd_wc_offer_variable' ) {
+            $classname = 'WC_Product_FD_Offer_Variable';
+        }
+
         return $classname;
     }
 
     public function modify_woocommerce_product_data_tabs( $original_tabs )
     {
         //hide shipping tab
-        $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_voucher';
+        $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer';
+        $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer_variable';
 
-        $fd_wc_voucher_tab['fd_wc_voucher'] = array(
-            'label' => 'FD Voucher Options',
-            'target' => 'fd_wc_voucher_options',
-            'class' => 'show_if_fd_wc_voucher'
+        //adds back the variations tab
+        $original_tabs['variations']['class'][] = 'show_if_fd_wc_offer_variable';
+
+        $fd_wc_offer_tab['fd_wc_offer'] = array(
+            'label' => 'FD Offer Options',
+            'target' => 'fd_wc_offer_options',
+            'class' => 'show_if_fd_wc_offer show_if_fd_wc_offer_variable'
         );
 
-        $tabs = $this->insert_item_at_array_position( 0, $fd_wc_voucher_tab, $original_tabs );
+        $tabs = $this->insert_item_at_array_position( 0, $fd_wc_offer_tab, $original_tabs );
 
         return $tabs;
     }
 
     public function add_woocommerce_product_data_panels()
     {
-        require_once ( fdscf_path . './templates/fd-html-wc-voucher-product-data-tab.php' );
+        require_once ( fdscf_path . './templates/fd-html-wc-offer-product-data-tab.php' );
     }
 
 
@@ -93,14 +106,22 @@ class FD_Woocommerce_Controller
         <script type='text/javascript'>
             jQuery(document).ready(function () {
                 //for Price tab
-                jQuery('.product_data_tabs .general_tab').addClass('show_if_fd_wc_voucher').show();
-                jQuery('#general_product_data .pricing').addClass('show_if_fd_wc_voucher').show();
+                jQuery('.product_data_tabs .general_tab').addClass('show_if_fd_wc_offer').show();
+                jQuery('#general_product_data .pricing').addClass('show_if_fd_wc_offer_variable').show();
+                
+                jQuery('.product_data_tabs .general_tab').addClass('show_if_fd_wc_offer').show();
+                jQuery('#general_product_data .pricing').addClass('show_if_fd_wc_offer_variable').show();
 
                 //for Inventory tab
-                jQuery('.inventory_options').addClass('show_if_fd_wc_voucher').show();
-                jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_voucher').show();
-                jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_voucher').show();
-                jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_voucher').show();
+                jQuery('.inventory_options').addClass('show_if_fd_wc_offer').show();
+                jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_offer').show();
+                jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer').show();
+                jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer').show();
+                
+                jQuery('.inventory_options').addClass('show_if_fd_wc_offer_variable').show();
+                jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_offer_variable').show();
+                jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer_variable').show();
+                jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer_variable').show();
             });
         </script>
         <?php
@@ -111,14 +132,14 @@ class FD_Woocommerce_Controller
     {
         $fd_product_meta = array();
 
-        $fd_product_meta['fd_wc_corner_banner']             = ( $_POST['fd_wc_corner_banner'] == 'fd_wc_corner_banner_enabled' ) ? $_POST['fd_wc_corner_banner'] : 'fd_wc_corner_banner_disabled';
-        $fd_product_meta['fd_wc_corner_banner_title']       = ( isset( $_POST['fd_wc_corner_banner_title'] ) ) ? $_POST['fd_wc_corner_banner_title'] : '';
-        $fd_product_meta['fd_wc_corner_banner_headind']     = ( isset( $_POST['fd_wc_corner_banner_headind'] ) ) ? $_POST['fd_wc_corner_banner_headind'] : '';
-        
-        $fd_product_meta['fd_wc_voucher_expiry']            = ( $_POST['fd_wc_voucher_expiry'] == 'fd_wc_voucher_expiry_enabled' ) ? $_POST['fd_wc_voucher_expiry'] : 'fd_wc_voucher_expiry_disabled';
-        $fd_product_meta['fd_wc_voucher_use_global_expiry'] = ( $_POST['fd_wc_voucher_use_global_expiry'] == 'fd_wc_voucher_use_global_expiry_enabled' ) ? $_POST['fd_wc_voucher_use_global_expiry'] : 'fd_wc_voucher_use_global_expiry_disabled';
-        
-        $fd_product_meta['fd_wc_voucher_expiry_date']       = ( isset( $_POST['fd_wc_voucher_expiry_date'] ) && $_POST['fd_wc_voucher_expiry_date'] > 0 ) ? $_POST['fd_wc_voucher_expiry_date'] : 0;
+        $fd_product_meta['fd_wc_corner_banner']                  = ( $_POST['fd_wc_corner_banner'] == 'fd_wc_corner_banner_enabled' ) ? $_POST['fd_wc_corner_banner'] : 'fd_wc_corner_banner_disabled';
+        $fd_product_meta['fd_wc_corner_banner_title']            = ( isset( $_POST['fd_wc_corner_banner_title'] ) ) ? $_POST['fd_wc_corner_banner_title'] : '';
+        $fd_product_meta['fd_wc_corner_banner_headind']          = ( isset( $_POST['fd_wc_corner_banner_headind'] ) ) ? $_POST['fd_wc_corner_banner_headind'] : '';
+        $fd_product_meta['fd_wc_offer_expiry']                   = ( $_POST['fd_wc_offer_expiry'] == 'fd_wc_offer_expiry_enabled' ) ? $_POST['fd_wc_offer_expiry'] : 'fd_wc_offer_expiry_disabled';
+        $fd_product_meta['fd_wc_offer_use_global_expiry']        = ( $_POST['fd_wc_offer_use_global_expiry'] == 'fd_wc_offer_use_global_expiry_enabled' ) ? $_POST['fd_wc_offer_use_global_expiry'] : 'fd_wc_offer_use_global_expiry_disabled';
+        $fd_product_meta['fd_wc_offer_expiry_date']              = ( isset( $_POST['fd_wc_offer_expiry_date'] ) && $_POST['fd_wc_offer_expiry_date'] > 0 ) ? $_POST['fd_wc_offer_expiry_date'] : 0;
+        $fd_product_meta['fd_offer_linked_product']              = isset( $_POST['fd_offer_linked_product'] ) ? $_POST['fd_offer_linked_product'] : '';
+        $fd_product_meta['fd_offer_linked_product_variation']    = isset( $_POST['fd_offer_linked_product_variation'] ) ? $_POST['fd_offer_linked_product_variation'] : '';
 
         if( count( $fd_product_meta ) > 0 ){
             $product = wc_get_product( $post_id );
@@ -128,6 +149,8 @@ class FD_Woocommerce_Controller
                 $product->update_meta_data( $meta_field_key,  esc_attr( $meta_field_value ) );
 
             }
+
+            $product->update_meta_data( 'fd_vendor_id',  esc_attr( get_current_user_id() ) );
 
             $product->save();
         }
@@ -221,6 +244,44 @@ class FD_Woocommerce_Controller
 
         return $items;
      }
+
+     /**
+      * Ajax - returns the variable product variations data
+      */
+      public function fd_wc_get_linked_variations()
+      {
+        check_ajax_referer( 'admin_ajax_check', 'security' );
+
+        $response = array(
+            'type' => 'error'
+        );
+
+        if( isset( $_REQUEST['product_id'] ) ){
+            $product_id = $_REQUEST['product_id'];
+            $product = wc_get_product( $product_id );
+            $variations_ids = $product->get_children();
+
+            $variation_products = array();
+
+            foreach( $variations_ids as $product_id ){
+                $variation = wc_get_product( $product_id );
+
+                $option['product_id']           = $variation->get_ID();
+                $option['product_title']        = $variation->get_name();
+
+                $variation_products[] = $option;
+            }
+
+            if( count( $variation_products ) > 0 ){
+                $response['type'] = 'success';
+                $response['variations'] = $variation_products;
+            }
+
+        }
+
+        wp_send_json_success($response);
+        wp_die();
+      }
 
 }
 
