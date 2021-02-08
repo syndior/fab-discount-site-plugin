@@ -12,13 +12,18 @@ class FD_Activate
     private static function generate_custom_database_tables()
     {
         global $wpdb;
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         $charset_collate = $wpdb->get_charset_collate();
 
-        $wpdb->fdscf_vouchers = fdscf_db_table_name;
+        /**
+         * Create Vouchers Table
+         */
+        $wpdb->fdscf_vouchers = fdscf_vouchers_db_table_name;
 
         $SQL = "CREATE TABLE IF NOT EXISTS `{$wpdb->fdscf_vouchers}` (
             `fd_voucher_id`         INT NOT NULL AUTO_INCREMENT,
             `fd_voucher_key`        VARCHAR(60) NOT NULL UNIQUE,
+            `voucher_amount`        DECIMAL(15,6) NULL DEFAULT NULL,
             `created_at`            TIMESTAMP NOT NULL DEFAULT NOW(),
             `updated_at`            TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE now(),
             `expires_at`            TIMESTAMP NULL,
@@ -31,7 +36,25 @@ class FD_Activate
             PRIMARY KEY  (fd_voucher_id)
             ) $charset_collate;";
         
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         dbDelta( $SQL );
+
+        /**
+         * Create Transactions table
+         */
+        $wpdb->fdscf_transactions = fdscf_transactions_db_table_name;
+
+        $SQL = "CREATE TABLE IF NOT EXISTS `{$wpdb->fdscf_transactions}` (
+            `transaction_id`        INT NOT NULL AUTO_INCREMENT,
+            `transaction_type`      VARCHAR(60) NOT NULL DEFAULT 'active',
+            `created_at`            TIMESTAMP NOT NULL DEFAULT NOW(),
+            `voucher_id`            BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+            `order_id`              BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+            `user_id`               BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+            `transaction_amount`    DECIMAL(15,6) NULL DEFAULT NULL,
+            PRIMARY KEY  (transaction_id)
+            ) $charset_collate;";
+        
+        dbDelta( $SQL );
+
     }
 }

@@ -22,8 +22,11 @@ define( 'fdscf_path', plugin_dir_path( __FILE__ ) );
 define( 'fdscf_plugin', plugin_basename( __FILE__ ) );
 
 global $wpdb;
-$fd_table_name = ( $wpdb->prefix . "fdscf_vouchers" );
-define( 'fdscf_db_table_name', $fd_table_name );
+$fdscf_vouchers_db_table_name = ( $wpdb->prefix . "fdscf_vouchers" );
+define( 'fdscf_vouchers_db_table_name', $fdscf_vouchers_db_table_name );
+
+$fdscf_transactions_db_table_name = ( $wpdb->prefix . "fdscf_user_transactions" );
+define( 'fdscf_transactions_db_table_name', $fdscf_transactions_db_table_name );
 
 if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
 

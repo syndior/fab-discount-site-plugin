@@ -27,6 +27,21 @@ window.addEventListener('DOMContentLoaded', function () {
             offerExpiryDuration.style.display = 'none';
         }
 
+        //gide voucher expiry field in page load
+        let voucherExpiryField = fdCustomFieldsWrapper.querySelector('#fd_wc_offer_voucher_expiry');
+        let voucherUseGlobalSettings = fdCustomFieldsWrapper.querySelector('.fd_wc_offer_voucher_use_global_expiry_field');
+        let voucherUseGlobalSettingsField = voucherUseGlobalSettings.querySelector('#fd_wc_offer_voucher_use_global_expiry');
+        let voucherExpiryDuration = fdCustomFieldsWrapper.querySelector('.fd_wc_offer_voucher_expiry_date_field');
+
+        if (!voucherExpiryField.checked == true) {
+            voucherUseGlobalSettings.style.display = 'none';
+            voucherExpiryDuration.style.display = 'none';
+        }
+
+        if (voucherUseGlobalSettingsField.checked == true || !voucherExpiryField.checked == true) {
+            voucherExpiryDuration.style.display = 'none';
+        }
+
         fdCustomFieldsWrapper.addEventListener('click', function () {
             if (!sellingFastField.checked == true) {
                 sellingFastTitle.style.display = 'none';
@@ -36,6 +51,7 @@ window.addEventListener('DOMContentLoaded', function () {
                 sellingFastHeading.style.display = 'block';
             }
 
+            //offer expiry field click logic
             if (!offerExpiryField.checked == true) {
                 offerUseGlobalSettings.style.display = 'none';
                 offerExpiryDuration.style.display = 'none';
@@ -49,6 +65,22 @@ window.addEventListener('DOMContentLoaded', function () {
             } else {
                 offerExpiryDuration.style.display = 'block';
             }
+
+            //voucher expiry click logic
+            if (!voucherExpiryField.checked == true) {
+                voucherUseGlobalSettings.style.display = 'none';
+                voucherExpiryDuration.style.display = 'none';
+            }else{
+                voucherUseGlobalSettings.style.display = 'block';
+                voucherExpiryDuration.style.display = 'block';
+            }
+
+            if ((voucherUseGlobalSettingsField.checked == true) || (!voucherExpiryField.checked == true)) {
+                voucherExpiryDuration.style.display = 'none';
+            } else {
+                voucherExpiryDuration.style.display = 'block';
+            }
+
         }, false);
 
 

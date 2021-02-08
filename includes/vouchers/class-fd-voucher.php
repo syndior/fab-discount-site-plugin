@@ -8,6 +8,7 @@ class FD_Voucher
 
     private $id;
     private $key;
+    private $voucher_amount;
     private $status;
     private $vendor_id;
     private $customer_id;
@@ -26,6 +27,7 @@ class FD_Voucher
             if( $db_result_obj !== false){
                 $this->id                   = $db_result_obj->fd_voucher_id;
                 $this->key                  = $db_result_obj->fd_voucher_key;
+                $this->voucher_amount       = $db_result_obj->voucher_amount;
                 $this->status               = $db_result_obj->fd_voucher_status;
                 $this->vendor_id            = $db_result_obj->vendor_id;
                 $this->customer_id          = $db_result_obj->customer_id;
@@ -130,7 +132,7 @@ class FD_Voucher
         if( strlen( $status ) > 0 ){
             if( $status == 'active' || $status == 'redeemed' || $status == 'expired' || $status == 'blocked' || $status == 'pending' ){
                 global $wpdb;
-                $table_name = fdscf_db_table_name;
+                $table_name = fdscf_vouchers_db_table_name;
 
                 $data = array(
                     'fd_voucher_status' => $status
@@ -180,7 +182,7 @@ class FD_Voucher
                     
                     if( $expiray_date_timestamp > $current_date_timestamp ){
                         global $wpdb;
-                        $table_name = fdscf_db_table_name;
+                        $table_name = fdscf_vouchers_db_table_name;
 
                         $data = array(
                             'will_expire' => $value,
@@ -213,7 +215,7 @@ class FD_Voucher
                 }
             }elseif ( $value == false ) {
                 global $wpdb;
-                $table_name = fdscf_db_table_name;
+                $table_name = fdscf_vouchers_db_table_name;
 
                 $data = array(
                     'will_expire' => $value,
@@ -257,6 +259,7 @@ class FD_Voucher
         if( isset( $voucher_data['customer_id'] ) && 
             isset( $voucher_data['vendor_id'] ) && 
             isset( $voucher_data['order_id'] ) && 
+            isset( $voucher_data['voucher_amount'] ) && 
             isset( $voucher_data['product_id'] ) ){
 
                 if( ( isset( $voucher_data['will_expire'] ) && $voucher_data['will_expire'] == true ) && !isset( $voucher_data['expires_at'] ) ){
@@ -292,7 +295,7 @@ class FD_Voucher
     {
         if( $voucher_id > 0 ){
             global $wpdb;
-            $table_name = fdscf_db_table_name;
+            $table_name = fdscf_vouchers_db_table_name;
             $result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$table_name}` WHERE `fd_voucher_id` = %d LIMIT 1;", absint( $voucher_id ) ), OBJECT );
 
             if( $result !== null ){
@@ -311,6 +314,7 @@ class FD_Voucher
         if( $voucher !== null ){
             $this->id                   = $voucher->fd_voucher_id;
             $this->key                  = $voucher->fd_voucher_key;
+            $this->voucher_amount       = $voucher->voucher_amount;
             $this->status               = $voucher->fd_voucher_status;
             $this->vendor_id            = $voucher->vendor_id;
             $this->customer_id          = $voucher->customer_id;
@@ -354,6 +358,7 @@ class FD_Voucher
         $defaults = array(
             'fd_voucher_key'        => $key,
             'expires_at'            => null,
+            'voucher_amount'        => 0,
             'will_expire'           => 0,
             'fd_voucher_status'     => 'active',
             'vendor_id'             => 0,
@@ -365,10 +370,10 @@ class FD_Voucher
         $data = wp_parse_args( $voucher_data, $defaults );
 
         // checks if table exists in db before inserting
-        $query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( fdscf_db_table_name ) );
+        $query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( fdscf_vouchers_db_table_name ) );
 
-        if ( $wpdb->get_var( $query ) == fdscf_db_table_name ){
-            $result = $wpdb->insert( fdscf_db_table_name, $data);
+        if ( $wpdb->get_var( $query ) == fdscf_vouchers_db_table_name ){
+            $result = $wpdb->insert( fdscf_vouchers_db_table_name, $data);
             if( $result !== false && $result == 1 ){
                 $voucher = new FD_Voucher( $wpdb->insert_id );
                 return $voucher;
@@ -388,7 +393,7 @@ class FD_Voucher
     {
         if( strlen( $voucher_key ) > 0 ){
             global $wpdb;
-            $table_name = fdscf_db_table_name;
+            $table_name = fdscf_vouchers_db_table_name;
 
             $voucher_key = preg_replace('/-/i', '', $voucher_key);
             $voucher_key = strtolower( $voucher_key );
