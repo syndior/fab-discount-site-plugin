@@ -46,5 +46,3 @@
     <?php endif; ?>
 
 </div>
-
-<?php

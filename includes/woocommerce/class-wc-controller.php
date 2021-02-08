@@ -14,7 +14,7 @@ class FD_Woocommerce_Controller
         add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 10, 1 );
 
         /* loads custom product data tab markup */
-        add_action( 'woocommerce_product_data_panels', array( $this, 'add_woocommerce_product_data_panels') );
+        add_action( 'woocommerce_product_data_panels', array( $this, 'add_woocommerce_product_data_panels'), 10 );
         
         /* inserts JS that hides and show the wc default product tabs on our custom product type*/
         add_action( 'admin_footer', array( $this, 'modify_woocommerce_tabs_visibility') );
@@ -27,7 +27,7 @@ class FD_Woocommerce_Controller
         add_action( 'woocommerce_fd_wc_offer_variable_add_to_cart', array( $this, 'add_to_cart_template_include') );
         
         /* adds custom button before the add to cart button to pay with store credit */
-        add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_functionality_before_add_to_cart_button') );
+        add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_functionality_before_add_to_cart_button'), 10 );
 
         /* inlude page js that logs users product view */
         add_action( 'woocommerce_after_single_product', array( $this, 'enqueue_user_product_view_log_script' ) );
@@ -93,7 +93,7 @@ class FD_Woocommerce_Controller
 
     public function add_woocommerce_product_data_panels()
     {
-        require_once ( fdscf_path . './templates/fd-html-wc-offer-product-data-tab.php' );
+        require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab.php' );
     }
 
 
@@ -164,13 +164,13 @@ class FD_Woocommerce_Controller
 
     public function add_functionality_before_add_to_cart_button()
     {
-        require_once ( fdscf_path . './templates/fd-html-before-add-to-cart-custom-options.php' );
+        require_once ( fdscf_path . 'templates/fd-html-before-add-to-cart-custom-options.php' );
     }
 
 
     public function enqueue_user_product_view_log_script()
     {
-        require_once ( fdscf_path . './templates/fd-html-porduct-page-end-js-script-enqueue.php' );
+        require_once ( fdscf_path . 'templates/fd-html-porduct-page-end-js-script-enqueue.php' );
     }
     
     
@@ -213,22 +213,22 @@ class FD_Woocommerce_Controller
     
     public function load_wc_my_vouchers_page_markup()
     {
-        require_once ( fdscf_path . './templates/fd-html-wc-account-tabs-my-vouchers-page.php' );
+        require_once ( fdscf_path . 'templates/fd-html-wc-account-tabs-my-vouchers-page.php' );
     }
     
     public function load_wc_my_transactions_page_markup()
     {
-        require_once ( fdscf_path . './templates/fd-html-wc-account-tabs-my-transactions-page.php' );
+        require_once ( fdscf_path . 'templates/fd-html-wc-account-tabs-my-transactions-page.php' );
     }
     
     public function load_wc_my_wallet_page_markup()
     {
-        require_once ( fdscf_path . './templates/fd-html-wc-account-tabs-my-wallet-page.php' );
+        require_once ( fdscf_path . 'templates/fd-html-wc-account-tabs-my-wallet-page.php' );
     }
     
     public function load_wc_previously_viewed_items_page_markup()
     {
-        require_once ( fdscf_path . './templates/fd-html-wc-account-tabs-my-previouly-viewed-items-page.php' );
+        require_once ( fdscf_path . 'templates/fd-html-wc-account-tabs-my-previouly-viewed-items-page.php' );
     }
 
 

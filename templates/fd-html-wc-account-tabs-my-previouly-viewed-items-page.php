@@ -61,5 +61,3 @@
     <?php endif; ?>
 
 </div>
-
-<?php

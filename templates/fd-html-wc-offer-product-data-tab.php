@@ -78,7 +78,7 @@
                 'value' => ( $fd_wc_offer_expiry == 'fd_wc_offer_expiry_enabled' ? $fd_wc_offer_expiry : 'fd_wc_offer_expiry_disabled' ),
                 'cbvalue' => 'fd_wc_offer_expiry_enabled',
                 'desc_tip' => 'true',
-                'description' => 'If this option is enabled, this offer will expire after the below defined date (Will be converted into customer\'s wallet credit)'
+                'description' => 'If this option is enabled, this offer will expire after the below defined date (won\'t be visiable on the store-front)'
             );
             woocommerce_wp_checkbox( $args );
 
@@ -169,6 +169,57 @@
             </select>
         </p>
 
+        <?php
+
+            /**
+             * Ceckbox, if enabled vouchers generated from this offer will expire after the defined duartion
+             */
+            $args = array(
+                'id' => 'fd_wc_offer_voucher_expiry',
+                'label' => 'Enable Voucher Expiry: ',
+                'value' => ( $fd_wc_offer_voucher_expiry == 'fd_wc_offer_voucher_expiry_enabled' ? $fd_wc_offer_voucher_expiry : 'fd_wc_offer_voucher_expiry_disabled' ),
+                'cbvalue' => 'fd_wc_offer_voucher_expiry_enabled',
+                'desc_tip' => 'true',
+                'description' => 'If this option is enabled, vouchers generated from this offer will expire after the below defined date (Will be converted into customer\'s wallet credit)'
+            );
+            woocommerce_wp_checkbox( $args );
+
+        ?>
+
+        <?php
+
+        /**
+         * Ceckbox, if enabled offer will use global site default settings for expiry
+         */
+        $args = array(
+            'id' => 'fd_wc_offer_voucher_use_global_expiry',
+            'label' => 'Use Global Site Settings: ',
+            'value' => ( $fd_wc_offer_voucher_use_global_expiry == 'fd_wc_offer_voucher_use_global_expiry_enabled' ? $fd_wc_offer_voucher_use_global_expiry : 'fd_wc_offer_voucher_use_global_expiry_disabled' ),
+            'cbvalue' => 'fd_wc_offer_voucher_use_global_expiry_enabled',
+            'desc_tip' => 'true',
+            'description' => 'If this option is enabled, vouchers generated from this offer will use the global site settings for expiry duration calculations'
+        );
+        woocommerce_wp_checkbox( $args );
+
+        ?>
+
+        <?php
+
+        /**
+         * text input, for corner banner heading
+         */
+        $args = array(
+            'id' => 'fd_wc_offer_voucher_expiry_date',
+            'label' => 'Vouchers generated from this offer Expires in: ',
+            'value' => ( isset( $fd_wc_offer_voucher_expiry_date ) && $fd_wc_offer_voucher_expiry_date > 0 ? $fd_wc_offer_voucher_expiry_date : 0 ),
+            'placeholder' => '',
+            'desc_tip' => 'true',
+            'description' => 'Vouchers generated from this offer will expire after this number of Days',
+            'type' => 'number'
+        );
+        woocommerce_wp_text_input($args);
+
+        ?>
+
     </div>
  </div>
- <?php

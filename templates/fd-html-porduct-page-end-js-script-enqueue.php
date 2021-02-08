@@ -17,5 +17,3 @@
     }, false);
 </script>
 <?php endif; ?>
-
-<?php
