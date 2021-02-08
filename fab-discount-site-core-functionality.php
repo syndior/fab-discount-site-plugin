@@ -84,7 +84,7 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
                 FD_Deactivate::deactivate();
             }
         }
-    }
+    }//class
 
     new FD_CORE_PLUGIN_CLASS();
 }
