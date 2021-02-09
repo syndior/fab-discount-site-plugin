@@ -72,6 +72,11 @@ class FD_Voucher
 
         return $formated_key;
     }
+
+    public function get_amount()
+    {
+        return $this->voucher_amount;
+    }
     
     public function get_status()
     {
@@ -130,7 +135,7 @@ class FD_Voucher
     public function update_status(  string $status = '' )
     {
         if( strlen( $status ) > 0 ){
-            if( $status == 'active' || $status == 'redeemed' || $status == 'expired' || $status == 'blocked' || $status == 'pending' ){
+            if( $status == 'active' || $status == 'redeemed' || $status == 'credit_transferred' || $status == 'expired' || $status == 'blocked' ){
                 global $wpdb;
                 $table_name = fdscf_vouchers_db_table_name;
 

@@ -6,6 +6,10 @@ class FD_User_Controller
     {
         /* hook ajax handler to log user's viewed products */
         add_action('wp_ajax_fd_log_user_viewed_product',  array( $this, 'fd_log_user_viewed_product' ) );
+        
+        /* setup initial user wallet meta data */
+        add_action('user_register',  array( $this, 'fd_setup_initial_user_meta_data' ) );
+
     }
 
     public function fd_log_user_viewed_product()
@@ -64,6 +68,21 @@ class FD_User_Controller
 
         wp_send_json_success($response);
         wp_die();
+    }
+
+
+    public function fd_setup_initial_user_meta_data( $user_id )
+    {
+        /**
+         * Wallet default meta
+         */
+        $wallet_status          = 'active';
+        $wallet_balance         = 0.00;
+        $wallet_last_updated    = date("Y-m-d H:i:s") ;
+
+        add_user_meta( $user_id, 'fdscf_user_wallet_status', $wallet_status );
+        add_user_meta( $user_id, 'fdscf_user_wallet_balance', $wallet_balance );
+        add_user_meta( $user_id, 'fdscf_user_wallet_last_updated', $wallet_last_updated );
     }
 }
 
