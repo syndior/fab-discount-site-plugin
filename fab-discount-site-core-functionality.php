@@ -37,6 +37,7 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
             if( is_admin() ){
                 require_once ( fdscf_path . 'includes/admin/class-admin-pages.php' );
             }
+            require_once ( fdscf_path . 'includes/class-fd-functions.php' );
             require_once ( fdscf_path . 'includes/base/class-activate.php' );
             require_once ( fdscf_path . 'includes/base/class-deactivate.php' );
             require_once ( fdscf_path . 'includes/base/class-enqueue.php' );
