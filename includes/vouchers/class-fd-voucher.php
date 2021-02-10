@@ -312,6 +312,48 @@ class FD_Voucher
     }
 
     /**
+     * Helper Function: get all vouchers from DB
+     */
+    public static function get_vouchers( int $page_no = 0, int $items_per_page = 0 )
+    {
+        global $wpdb;
+        $table_name = fdscf_vouchers_db_table_name;
+
+        $items_per_page = ( $items_per_page > 0 ) ? $items_per_page : 10;
+        $page_no        = ( $page_no > 0 ) ? $page_no : 1;
+        $offset         = ( $page_no - 1 ) * $items_per_page;
+
+        $vouchers_count = $wpdb->get_results( "SELECT COUNT(*) FROM `{$table_name}`;", ARRAY_N );
+        if( count( $vouchers_count ) > 0 && (int)$vouchers_count[0][0] > 0 ){
+            $total_records = (int)$vouchers_count[0][0];
+            $total_pages = ceil( $total_records / $items_per_page );
+
+            $query = " SELECT * FROM  `{$table_name}` LIMIT {$offset}, {$items_per_page};";
+            $result = $wpdb->get_results( $query, OBJECT );
+
+            if( !empty( $result ) ){
+                $vouchers_array = array();
+                foreach( $result as $row ){
+                    $voucher = new FD_Voucher( $row->fd_voucher_id );
+                    $vouchers_array[] = $voucher;
+                }
+
+                $data = array(
+                    'vouchers' => $vouchers_array,
+                    'pagination' => array(
+                        'items_per_page'    => $items_per_page,
+                        'page_no'           => $page_no,
+                        'total_pages'       => $total_pages
+                    ),
+                );
+                return $data;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
      * Helper Function: Update Voucher Objects Porpertoes
      */
     private function update_voucher_properties( FD_Voucher $voucher = null )
