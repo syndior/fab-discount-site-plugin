@@ -48,6 +48,8 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
             require_once ( fdscf_path . 'includes/refunds/class-refunds-controller.php' );
             require_once ( fdscf_path . 'includes/vouchers/class-fd-voucher.php' );
             require_once ( fdscf_path . 'includes/vouchers/class-vouchers-controller.php' );
+            require_once ( fdscf_path . 'includes/vendor/class-vendor-controller.php' );
+            require_once ( fdscf_path . 'includes/vendor/class-vendor-product-controller.php' );
             
 
             /**
