@@ -11,10 +11,10 @@ class FD_Woocommerce_Controller
         add_filter( 'woocommerce_product_class', array( $this, 'add_woocommerce_product_class' ), 10, 2 );
 
         /* add custom product product data tab */
-        add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 10, 1 );
+        add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 9999, 1 );
 
         /* loads custom product data tab markup */
-        add_action( 'woocommerce_product_data_panels', array( $this, 'add_woocommerce_product_data_panels'), 10 );
+        add_action( 'woocommerce_product_data_panels', array( $this, 'add_woocommerce_product_data_panels'), 9999 );
         
         /* inserts JS that hides and show the wc default product tabs on our custom product type*/
         add_action( 'admin_footer', array( $this, 'modify_woocommerce_tabs_visibility') );

@@ -4,55 +4,54 @@ class FD_Vouchers_Controller
 {
     public function __construct()
     {
-        /* hook ajax handler to log user's viewed products */
-        // add_action('wp_ajax_fd_create_voucher_ajax',  array( $this, 'fd_create_voucher_ajax' ) );
-
-
-        // $voucher_data = array(
-        //     'customer_id' => 1,
-        //     'vendor_id' => 1,
-        //     'order_id' => 1,
-        //     'product_id' => 1,
-        //     'will_expire' => true,
-        //     'expires_at' => date("Y-m-d H:i:s"),
-        // );
-
-        // $voucher = FD_Voucher::create_voucher( $voucher_data );
-
-        // $voucher_id = 4;
-        // $voucher = new FD_Voucher( $voucher_id );
-        // var_dump( $voucher->get_key() );
-
-        // $key = '4BC38D-EBF3EE-51AC8F-01469F';
-        // $voucher = FD_Voucher::validate_voucher_key( $key );
-        // var_dump( $voucher );
-
+        /* create a new voucher on new order */
+        // add_action('woocommerce_thankyou',  array( $this, 'create_voucher_on_new_order' ) );
+        add_action('init',  array( $this, 'create_voucher_on_new_order' ) );
     }
 
-    public function fd_create_voucher_ajax()
+    public function create_voucher_on_new_order( $order_id )
     {
-        check_ajax_referer( 'ajax_check', 'security' );
+        $order_id = 56;
 
-        $voucher_data = array(
-            'customer_id' => 1,
-            'vendor_id' => 1,
-            'order_id' => 1,
-            'product_id' => 1,
-            'will_expire' => true,
-            'expires_at' => date("Y-m-d H:i:s"),
-        );
+        $order = wc_get_order( $order_id );
 
+        if( $order !== false ){
 
+            // var_dump( $order );
 
-        // $voucher_id = 4;
-        // $voucher = new FD_Voucher( $voucher_id );
+            $voucher_data = array(
+                'customer_id'       => '',
+                'vendor_id'         => '',
+                'order_id'          => '',
+                'voucher_amount'    => '',
+                'product_id'        => ''
+            );
+            // var_dump( $order );
+            // var_dump( $order->get_user_id() );
+            foreach ( $order->get_items() as $item_id => $item ) {
+                // $product_id = $item->get_product_id();
+                // $variation_id = $item->get_variation_id();
+                $product = $item->get_product();
+                // $name = $item->get_name();
+                // $quantity = $item->get_quantity();
+                // $subtotal = $item->get_subtotal();
+                // $total = $item->get_total();
+                // $tax = $item->get_subtotal_tax();
+                // $taxclass = $item->get_tax_class();
+                // $taxstat = $item->get_tax_status();
+                // $allmeta = $item->get_meta_data();
+                // $somemeta = $item->get_meta( '_whatever', true );
+                // $type = $item->get_type();
+                $type = $product->get_type();
+                if( $type == "fd_wc_offer"  || $type == "fd_wc_offer_variable" ){
+                    $product = $item->get_product();
+                    $product_meta = get_post_meta( $product->get_ID() );
+                    $allmeta = $item->get_meta_data();
+                    // var_dump( $product );
+                }
+             }
+        }
 
-        $response = array(
-            'voucher' => $voucher->get_key(),
-        );
-        
-        wp_send_json_success($response);
-        wp_die();
     }
     
 }

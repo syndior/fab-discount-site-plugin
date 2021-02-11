@@ -63,11 +63,22 @@
 .fd_admin_table_pagination{
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
     background-color: #fff;
     margin-top: 5px;
     border: 1px solid #3c3c3c;
     padding: 10px;
+}
+
+.fd_admin_table_pagination_info p{
+    margin: 0;
+    padding: 0;
+}
+
+.fd_admin_table_pagination_btns{
+    display: flex;
+    flex-direction: row;
 }
 
 .fd_pagination_btn{
@@ -78,4 +89,24 @@
     margin-right: 10px;
     color: #3c3c3c;
     text-decoration: none;
+}
+
+.fd_pagination_disabled{
+    background-color: #eee;
+    color: #afafaf;
+    cursor: not-allowed;
+}
+
+.fd_expiry_text{
+    margin-bottom: 10px;
+}
+.fd_set_expiry_form{
+    display: none;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.fd_show_voucher_date_form .fd_set_expiry_form{
+    display: flex;
+    margin-bottom: 5px;
 }

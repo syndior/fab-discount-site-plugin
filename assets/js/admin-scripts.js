@@ -145,8 +145,29 @@ window.addEventListener('DOMContentLoaded', function () {
 
             }, false);
         }
-
     }
+
+
+        /**
+         * toggle voucher expiry date form on the vouchers management page
+         */
+        let voucherDateToggleBtns = document.querySelectorAll('.fd_set_expiry_form_toggle');
+        if( voucherDateToggleBtns.length > 0){
+
+            voucherDateToggleBtns.forEach( function( btn ){
+                btn.addEventListener('click', function(){
+                    btn.parentElement.classList.toggle('fd_show_voucher_date_form');
+                    let btnVal = btn.dataset.btnText;
+                    if( btn.value == 'Set Expiry' ||  btn.value == 'Update Expiry' ){
+                        btn.value = 'Cancel';
+                    }else{
+                        btn.value = btnVal
+                    }
+                }, false);
+            } );
+
+        }
+
 }, false);
 
 
