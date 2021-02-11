@@ -281,6 +281,23 @@ class FD_Voucher
                     return false;
                 }
 
+                if( $voucher_data['will_expire'] == true && isset( $voucher_data['expires_at'] ) ){
+
+                    /**
+                     * @todo get global setting set by the admin for voucher expiry, currently placeholder set
+                     */
+                    $global_expiry_duration_enabled = false;
+
+                    if( $global_expiry_duration_enabled ){
+                        $global_expiry_duration = date('Y-m-d', strtotime(' +14 day'));
+                        $expiry_date = new DateTime( $global_expiry_duration );
+                    }else{
+                        $expiry_date = new DateTime( $voucher_data['expires_at'] );    
+                    }
+                    
+                    $voucher_data['expires_at'] = $expiry_date->format( "Y-m-d H:i:s" );
+                }
+
             $counter = 0;
             $max_attempts = 100;
     

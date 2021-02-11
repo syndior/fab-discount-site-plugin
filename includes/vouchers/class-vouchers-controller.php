@@ -5,50 +5,77 @@ class FD_Vouchers_Controller
     public function __construct()
     {
         /* create a new voucher on new order */
+
+        /**
+         * @todo setup proper hook
+         */
+
         // add_action('woocommerce_thankyou',  array( $this, 'create_voucher_on_new_order' ) );
-        add_action('init',  array( $this, 'create_voucher_on_new_order' ) );
+        // add_action('init',  array( $this, 'create_voucher_on_new_order' ) );
     }
 
     public function create_voucher_on_new_order( $order_id )
     {
         $order_id = 56;
-
         $order = wc_get_order( $order_id );
 
         if( $order !== false ){
 
-            // var_dump( $order );
-
             $voucher_data = array(
-                'customer_id'       => '',
-                'vendor_id'         => '',
-                'order_id'          => '',
-                'voucher_amount'    => '',
-                'product_id'        => ''
+                'customer_id'       => 0,
+                'vendor_id'         => 0,
+                'order_id'          => 0,
+                'voucher_amount'    => 0.00,
+                'product_id'        => 0
             );
-            // var_dump( $order );
-            // var_dump( $order->get_user_id() );
+
             foreach ( $order->get_items() as $item_id => $item ) {
-                // $product_id = $item->get_product_id();
-                // $variation_id = $item->get_variation_id();
                 $product = $item->get_product();
-                // $name = $item->get_name();
-                // $quantity = $item->get_quantity();
-                // $subtotal = $item->get_subtotal();
-                // $total = $item->get_total();
-                // $tax = $item->get_subtotal_tax();
-                // $taxclass = $item->get_tax_class();
-                // $taxstat = $item->get_tax_status();
-                // $allmeta = $item->get_meta_data();
-                // $somemeta = $item->get_meta( '_whatever', true );
-                // $type = $item->get_type();
                 $type = $product->get_type();
+
                 if( $type == "fd_wc_offer"  || $type == "fd_wc_offer_variable" ){
+                    
+                    $product_id = $item->get_product_id();
                     $product = $item->get_product();
-                    $product_meta = get_post_meta( $product->get_ID() );
-                    $allmeta = $item->get_meta_data();
-                    // var_dump( $product );
+                    $author = get_userdata($product->post->post_author);
+
+                    $fd_wc_offer_voucher_expiry             = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry' )[0];
+                    $fd_wc_offer_voucher_use_global_expiry  = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_use_global_expiry' )[0];
+                    $fd_wc_offer_voucher_expiry_date        = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry_date' )[0];
+
+                    if( $fd_wc_offer_voucher_expiry == 'fd_wc_offer_voucher_expiry_enabled' || true ){
+                        $voucher_data['will_expire'] = true;
+
+                        if( $fd_wc_offer_voucher_use_global_expiry == 'fd_wc_offer_voucher_use_global_expiry_enabled' ){
+                            //get global setting set by the admin for voucher expiry
+                            $voucher_data['expires_at'] = date('Y-m-d', strtotime(' +14 day'));
+                        }else{
+                            $fd_wc_offer_voucher_expiry_date = date('Y-m-d', strtotime(' +7 day'));
+                            $voucher_data['expires_at'] = $fd_wc_offer_voucher_expiry_date;
+                        }
+
+                    }
+                    
+
+                    if( in_array( 'seller', $author->roles ) ){
+
+                        $voucher_data['customer_id']        = $order->get_user_id();
+                        $voucher_data['order_id']           = $order_id;
+                        $voucher_data['vendor_id']          = $author->ID;
+                        $voucher_data['voucher_amount']     = $item->get_total();
+                        $voucher_data['product_id']         = $product_id;
+
+                        $status = FD_Voucher::create_voucher($voucher_data);
+
+                        if( $status == false ){
+                            wp_die( 'An error occured while generating the voucher for this order' );
+                        }
+
+                    }
+
+                    break;
                 }
+
              }
         }
 
