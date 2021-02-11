@@ -11,10 +11,10 @@ class FD_Woocommerce_Controller
         add_filter( 'woocommerce_product_class', array( $this, 'add_woocommerce_product_class' ), 10, 2 );
 
         /* add custom product product data tab */
-        add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 10, 1 );
+        add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 9999, 1 );
 
         /* loads custom product data tab markup */
-        add_action( 'woocommerce_product_data_panels', array( $this, 'add_woocommerce_product_data_panels'), 10 );
+        add_action( 'woocommerce_product_data_panels', array( $this, 'add_woocommerce_product_data_panels'), 9999 );
         
         /* inserts JS that hides and show the wc default product tabs on our custom product type*/
         add_action( 'admin_footer', array( $this, 'modify_woocommerce_tabs_visibility') );
@@ -73,6 +73,11 @@ class FD_Woocommerce_Controller
 
     public function modify_woocommerce_product_data_tabs( $original_tabs )
     {
+        //enable the general tab for custom product types
+        $original_tabs['general']['class'][] = 'show_if_simple';
+        $original_tabs['general']['class'][] = 'show_if_fd_wc_offer';
+        $original_tabs['general']['class'][] = 'show_if_fd_wc_offer_variable';
+
         //hide shipping tab
         $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer';
         $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer_variable';

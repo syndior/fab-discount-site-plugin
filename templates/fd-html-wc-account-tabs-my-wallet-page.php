@@ -1,6 +1,13 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit;
 
-    $wallet_credit_exists = true;
+    $wallet_credit_exists = false;
+    if( is_user_logged_in() ){
+        $user_id = get_current_user_id();
+        $wallet = new FD_Wallet( $user_id );
+        if( $wallet->get_balance() > 0 ){
+            $wallet_credit_exists = true;
+        }
+    }
 
 ?>
 
@@ -23,15 +30,19 @@
             <tbody>
                 <tr>
                     <th>Account ID</th>
-                    <td>1234567890</td>
+                    <td><?php echo $wallet->get_user_id(); ?></td>
+                </tr>
+                <tr>
+                    <th>Account Status</th>
+                    <td><?php echo $wallet->get_status(); ?></td>
                 </tr>
                 <tr>
                     <th>Current Balance</th>
-                    <td>19.99$</td>
+                    <td><?php echo wc_price( $wallet->get_balance() ); ?></td>
                 </tr>
                 <tr>
                     <th>Last updated:</th>
-                    <td>Friday 22 Jan, 2021</td>
+                    <td> <?php echo $wallet->get_last_update_date(); ?> </td>
                 </tr>
             </tbody>
         </table>

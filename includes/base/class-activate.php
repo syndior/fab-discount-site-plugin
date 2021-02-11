@@ -45,12 +45,12 @@ class FD_Activate
 
         $SQL = "CREATE TABLE IF NOT EXISTS `{$wpdb->fdscf_transactions}` (
             `transaction_id`        INT NOT NULL AUTO_INCREMENT,
-            `transaction_type`      VARCHAR(60) NOT NULL DEFAULT 'active',
+            `transaction_type`      VARCHAR(60) NULL DEFAULT NULL,
             `created_at`            TIMESTAMP NOT NULL DEFAULT NOW(),
             `voucher_id`            BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             `order_id`              BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             `user_id`               BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
-            `transaction_amount`    DECIMAL(15,6) NULL DEFAULT NULL,
+            `transaction_amount`    DECIMAL(15,6) NOT NULL DEFAULT 0,
             PRIMARY KEY  (transaction_id)
             ) $charset_collate;";
         
