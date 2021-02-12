@@ -5,18 +5,13 @@ class FD_Vouchers_Controller
     public function __construct()
     {
         /* create a new voucher on new order */
+        add_action('woocommerce_checkout_order_processed',  array( $this, 'create_voucher_on_new_order' ) );
 
-        /**
-         * @todo setup proper hook
-         */
-
-        // add_action('woocommerce_thankyou',  array( $this, 'create_voucher_on_new_order' ) );
-        // add_action('init',  array( $this, 'create_voucher_on_new_order' ) );
     }
 
     public function create_voucher_on_new_order( $order_id )
     {
-        $order_id = 56;
+        // $order_id = 56;
         $order = wc_get_order( $order_id );
 
         if( $order !== false ){
@@ -65,18 +60,23 @@ class FD_Vouchers_Controller
                         $voucher_data['voucher_amount']     = $item->get_total();
                         $voucher_data['product_id']         = $product_id;
 
-                        $status = FD_Voucher::create_voucher($voucher_data);
+                        $voucher = FD_Voucher::create_voucher($voucher_data);
 
-                        if( $status == false ){
+                        if( $voucher == false ){
                             wp_die( 'An error occured while generating the voucher for this order' );
+                        }else{
+                            $meta_key       = '_fd_voucher_id';
+                            $meta_value     = $voucher->get_ID();
+                            wc_add_order_item_meta( $item_id, $meta_key ,$meta_value );
                         }
+
+
 
                     }
 
-                    break;
                 }
 
-             }
+            }
         }
 
     }

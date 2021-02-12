@@ -138,20 +138,18 @@ class FD_Voucher
             if( $status == 'active' || $status == 'redeemed' || $status == 'credit_transferred' || $status == 'expired' || $status == 'blocked' ){
                 global $wpdb;
                 $table_name = fdscf_vouchers_db_table_name;
-                $expired_value = false;
-                $expiry_date = null;
+
+                $data = array();
+                $data['fd_voucher_status']  = $status;
+                $data['will_expire']        = ($status == 'active' || $status == 'blocked') ? true : false;
 
                 if( $status == 'expired' ||  $status == 'redeemed'){
                     $expired_value = true;
                     $current_date = new DateTime( date("Y-m-d H:i:s") );
                     $expiry_date = $current_date->format( "Y-m-d H:i:s" );
-                }
 
-                $data = array(
-                    'fd_voucher_status' => $status,
-                    'will_expire' => $expired_value,
-                    'expires_at' => $expiry_date,
-                );
+                    $data['expires_at'] = $expiry_date;
+                }
 
                 $where = array(
                     'fd_voucher_id' => $this->id
@@ -353,7 +351,7 @@ class FD_Voucher
             $total_records = (int)$vouchers_count[0][0];
             $total_pages = ceil( $total_records / $items_per_page );
 
-            $query = " SELECT * FROM  `{$table_name}` LIMIT {$offset}, {$items_per_page};";
+            $query = " SELECT * FROM  `{$table_name}` ORDER BY `created_at` DESC LIMIT {$offset}, {$items_per_page};";
             $result = $wpdb->get_results( $query, OBJECT );
 
             if( !empty( $result ) ){
@@ -368,7 +366,8 @@ class FD_Voucher
                     'pagination' => array(
                         'items_per_page'    => $items_per_page,
                         'page_no'           => $page_no,
-                        'total_pages'       => $total_pages
+                        'total_pages'       => $total_pages,
+                        'total_vouchers'    => $vouchers_count[0][0]
                     ),
                 );
                 return $data;

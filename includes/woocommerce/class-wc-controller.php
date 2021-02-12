@@ -5,16 +5,23 @@ class FD_Woocommerce_Controller
     public function __construct()
     {
         /* adds the custom product type's label in the products type dropdown */
-        add_filter( 'product_type_selector', array( $this, 'add_product_type_filter' ) );
+        add_filter( 'product_type_selector', array( $this, 'add_product_type_filter' ), 10 );
 
         /* adds our custom product type extended class to be used with our product type*/
-        add_filter( 'woocommerce_product_class', array( $this, 'add_woocommerce_product_class' ), 10, 2 );
+        add_filter( 'woocommerce_product_class', array( $this, 'add_woocommerce_product_class' ), 99, 2 );
+        
+        /* Fix Variable product data-store issue */
+        add_filter( 'woocommerce_data_stores', array( $this, 'fix_variable_products_data_store_issue' ), 99, 2 );
+        
 
         /* add custom product product data tab */
         add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 9999, 1 );
 
         /* loads custom product data tab markup */
         add_action( 'woocommerce_product_data_panels', array( $this, 'add_woocommerce_product_data_panels'), 9999 );
+
+        /* general tab fix */
+        add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_woocommerce_general_tab_fix_html'));
         
         /* inserts JS that hides and show the wc default product tabs on our custom product type*/
         add_action( 'admin_footer', array( $this, 'modify_woocommerce_tabs_visibility') );
@@ -49,6 +56,12 @@ class FD_Woocommerce_Controller
         
         /* ajax handler, returns offer linked variations data*/
         add_action('wp_ajax_fd_wc_get_linked_variations',  array( $this, 'fd_wc_get_linked_variations' ) );
+
+        /* Override WC templates from FD Plugin */
+        add_filter( 'woocommerce_locate_template', array( $this, 'fd_load_wc_templates' ), 1, 3 );
+
+        /* Custom Hook: Add in claim offer feater after successfull checkout */
+        add_action( 'fdscf_checkout_order_processed_claim_offer', array( $this, 'add_in_claim_offer_feature' ) );
     }
 
     public function add_product_type_filter( $types )
@@ -71,12 +84,19 @@ class FD_Woocommerce_Controller
         return $classname;
     }
 
+
+    public function fix_variable_products_data_store_issue( $stores )
+    {
+        $stores['product-fd_wc_offer_variable'] = 'WC_Product_Variable_Data_Store_CPT';
+        return $stores;
+    }
+
+
     public function modify_woocommerce_product_data_tabs( $original_tabs )
     {
         //enable the general tab for custom product types
         $original_tabs['general']['class'][] = 'show_if_simple';
         $original_tabs['general']['class'][] = 'show_if_fd_wc_offer';
-        $original_tabs['general']['class'][] = 'show_if_fd_wc_offer_variable';
 
         //hide shipping tab
         $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer';
@@ -102,6 +122,12 @@ class FD_Woocommerce_Controller
     }
 
 
+    public function add_woocommerce_general_tab_fix_html()
+    {
+        echo '<div class="options_group show_if_fd_wc_offer clear"></div>';
+    }
+
+
     public function modify_woocommerce_tabs_visibility()
     {
         if ('product' != get_post_type()) :
@@ -112,10 +138,8 @@ class FD_Woocommerce_Controller
             jQuery(document).ready(function () {
                 //for Price tab
                 jQuery('.product_data_tabs .general_tab').addClass('show_if_fd_wc_offer').show();
-                jQuery('#general_product_data .pricing').addClass('show_if_fd_wc_offer_variable').show();
+                jQuery('#general_product_data .pricing').addClass('show_if_fd_wc_offer').show();
                 
-                jQuery('.product_data_tabs .general_tab').addClass('show_if_fd_wc_offer').show();
-                jQuery('#general_product_data .pricing').addClass('show_if_fd_wc_offer_variable').show();
 
                 //for Inventory tab
                 jQuery('.inventory_options').addClass('show_if_fd_wc_offer').show();
@@ -127,6 +151,10 @@ class FD_Woocommerce_Controller
                 jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_offer_variable').show();
                 jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer_variable').show();
                 jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer_variable').show();
+            });
+
+            jQuery( 'body' ).on( 'woocommerce_added_attribute', function( event ){
+                jQuery('.woocommerce_attribute_data .enable_variation').addClass('show_if_fd_wc_offer_variable').show();
             });
         </script>
         <?php
@@ -244,20 +272,20 @@ class FD_Woocommerce_Controller
      * Helper function: add custom item at the start of an array
      */
 
-     public static function insert_item_at_array_position( int $insert_position, $custom_item , $original_array)
-     {
+    public static function insert_item_at_array_position( int $insert_position, $custom_item , $original_array)
+    {
         $items = array_slice( $original_array, 0, $insert_position, true );
         $items = array_merge( $items, $custom_item );
         $items = array_merge( $items, array_slice( $original_array, $insert_position, null, true ) );
 
         return $items;
-     }
+    }
 
      /**
       * Ajax - returns the variable product variations data
       */
-      public function fd_wc_get_linked_variations()
-      {
+    public function fd_wc_get_linked_variations()
+    {
         check_ajax_referer( 'admin_ajax_check', 'security' );
 
         $response = array(
@@ -289,7 +317,39 @@ class FD_Woocommerce_Controller
 
         wp_send_json_success($response);
         wp_die();
-      }
+    }
+
+      /**
+       * Load custom/override woocommerce templates
+       */
+    public function fd_load_wc_templates( $template, $template_name, $template_path )
+    {
+        /**
+         * array with custom templates with folder names
+         */
+        $custom_templates = array(
+            'checkout' => 'thankyou.php',
+        );
+
+        $wc_template_filename = basename( $template );
+        foreach ( $custom_templates as $custom_template_dir => $custom_template_filename ){
+            if( $custom_template_filename == $wc_template_filename ){
+                
+                $template = fdscf_wc_dir . $custom_template_dir .'/'. $custom_template_filename;
+
+            }
+        }
+
+        return $template;
+    }
+
+    /**
+     * Load templates for claim offer feature
+     */
+    public function add_in_claim_offer_feature( $order_id )
+    {
+        require_once ( fdscf_path . 'templates/fd-html-wc-claim-offer.php' );
+    }
 
 }
 

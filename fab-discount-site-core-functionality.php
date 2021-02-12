@@ -20,6 +20,7 @@ defined('ABSPATH') or die('This path is not accessible');
 define( 'fdscf_url', plugin_dir_url( __FILE__ ) );
 define( 'fdscf_path', plugin_dir_path( __FILE__ ) );
 define( 'fdscf_plugin', plugin_basename( __FILE__ ) );
+define( 'fdscf_wc_dir', plugin_dir_path( __FILE__ ) . 'woocommerce/templates/' );
 
 global $wpdb;
 $fdscf_vouchers_db_table_name = ( $wpdb->prefix . "fdscf_vouchers" );

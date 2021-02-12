@@ -148,25 +148,33 @@ window.addEventListener('DOMContentLoaded', function () {
     }
 
 
-        /**
-         * toggle voucher expiry date form on the vouchers management page
-         */
-        let voucherDateToggleBtns = document.querySelectorAll('.fd_set_expiry_form_toggle');
-        if( voucherDateToggleBtns.length > 0){
+    /**
+     * toggle voucher expiry date form on the vouchers management page
+     */
+    let voucherDateToggleBtns = document.querySelectorAll('.fd_set_expiry_form_toggle');
+    if( voucherDateToggleBtns.length > 0){
 
-            voucherDateToggleBtns.forEach( function( btn ){
-                btn.addEventListener('click', function(){
-                    btn.parentElement.classList.toggle('fd_show_voucher_date_form');
-                    let btnVal = btn.dataset.btnText;
-                    if( btn.value == 'Set Expiry' ||  btn.value == 'Update Expiry' ){
-                        btn.value = 'Cancel';
-                    }else{
-                        btn.value = btnVal
-                    }
-                }, false);
-            } );
+        voucherDateToggleBtns.forEach( function( btn ){
+            btn.addEventListener('click', function(){
+                btn.parentElement.classList.toggle('fd_show_voucher_date_form');
+                let btnVal = btn.dataset.btnText;
+                if( btn.value == 'Set Expiry' ||  btn.value == 'Update Expiry' ){
+                    btn.value = 'Cancel';
+                }else{
+                    btn.value = btnVal
+                }
+            }, false);
+        } );
 
-        }
+    }
+
+    /**
+     * Enable "Use for Variation checkbox for custom product type"
+     */
+    let useForVariationOption = document.querySelector('.enable_variation.show_if_variable');
+    if( useForVariationOption !== null ){
+        console.log(useForVariationOption);
+    }
 
 }, false);
 

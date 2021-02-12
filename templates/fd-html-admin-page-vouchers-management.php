@@ -19,17 +19,13 @@
                     case 'redeemed':
                     case 'blocked':
                     case 'expired':
-                        if( $voucher->update_status( $status ) !== false ){
-                            echo "<script>alert('Voucher Updated!');</script>";
-                        }else{
+                        if( !( $voucher->update_status( $status ) !== false ) ){
                             echo "<script>alert('An Error occured while performing this action');</script>";
                         }
                         break;
                     case 'credit_transferred':
                         $wallet = new FD_Wallet( $voucher->get_customer_id() );
-                        if( $wallet->convert_voucher_to_credit( $voucher->get_ID() ) !== false ){
-                            echo "<script>alert('Voucher Updated!');</script>";
-                        }else{
+                        if( !($wallet->convert_voucher_to_credit( $voucher->get_ID() ) !== false) ){
                             echo "<script>alert('An Error occured while performing this action');</script>";
                         }
                         break;
@@ -110,7 +106,7 @@
                             <td><?php echo $voucher->get_product_id(); ?></td>
                             <td><?php echo $voucher->get_order_id(); ?></td>
                             <td><?php echo $voucher->get_key(); ?></td>
-                            <td><?php echo $voucher->get_amount(); ?></td>
+                            <td><?php echo  get_woocommerce_currency_symbol() . round( $voucher->get_amount(), 2 ); ?></td>
                             <td>
                                 <?php
                                     $status = $voucher->get_status();
@@ -187,7 +183,7 @@
 
             </table>
             <div class="fd_admin_table_pagination">
-                <div class="fd_admin_table_pagination_info"><p><?php echo "Viewing Page: {$pagination['page_no']} of {$pagination['total_pages']} Pages";?></p></div>
+                <div class="fd_admin_table_pagination_info"><p><?php echo "Viewing Page: {$pagination['page_no']} of {$pagination['total_pages']} Pages | Total Vouchers: {$pagination['total_vouchers']}";?></p></div>
                 <div class="fd_admin_table_pagination_btns">
                     <a href="<?=$_SERVER['REQUEST_URI']?>&fd_page_no=1" class="fd_pagination_btn">First</a>
                     <a href="<?=($pagination['page_no'] <= 1) ? '#' : $_SERVER['REQUEST_URI'].'&fd_page_no='. ($pagination['page_no'] - 1)?>" class="fd_pagination_btn <?=($pagination['page_no'] <= 1) ? 'fd_pagination_disabled' : ''?>">Prev</a>

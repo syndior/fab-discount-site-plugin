@@ -2,7 +2,7 @@
 
 class WC_Product_FD_Offer extends  WC_Product
 {
-    public function __construct( $product )
+    public function __construct( $product = 0 )
     {
         $this->product_type = 'fd_wc_offer';
         parent::__construct( $product );
@@ -24,7 +24,7 @@ class WC_Product_FD_Offer extends  WC_Product
 
 class WC_Product_FD_Offer_Variable extends WC_Product_Variable
 {
-    public function __construct( $product )
+    public function __construct( $product = 0 )
     {
         $this->product_type = 'fd_wc_offer_variable';
         parent::__construct( $product );
@@ -32,6 +32,13 @@ class WC_Product_FD_Offer_Variable extends WC_Product_Variable
 
     public function get_type() {
         return 'fd_wc_offer_variable';
+    }
+
+    public function is_type( $type ) {
+        // Some themes/plugins will check to see if this is a Variable type before including files required for
+        // the variable vouchers product to work correctly. By checking for 'variable' we make this compatible with these
+        // types of themes and plugins.
+        return ( $this->get_type() === $type || 'variable' === $type || ( is_array( $type ) && ( in_array( $this->get_type(), $type ) || in_array( 'variable', $type ) ) ));
     }
 
     public function add_to_cart_url() {
