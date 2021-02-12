@@ -45,6 +45,15 @@ class FD_Vendor_Controller
             add_action('user_edit_form_tag', array($this,'fdscf_enctype_custom_registration_forms'),10);
 
             //*****making wooCommerce form to acept file upload END*****// 
+
+            add_action( 'show_user_profile', array($this,'extra_user_profile_fields') );
+            add_action( 'edit_user_profile', array($this,'extra_user_profile_fields') );
+
+            // saving notes for admin
+            add_action( 'personal_options_update', array($this,'save_extra_user_profile_fields') );
+            add_action( 'edit_user_profile_update', array($this,'save_extra_user_profile_fields') );
+
+
     }
 
 
@@ -408,6 +417,29 @@ function save_seller_url($store_user){
   <?php
 }
 //*****Extra field on the seller settings and show the value on the store banner -Dokan end*****//
+
+
+function extra_user_profile_fields( $user ) { 
+
+echo "<h3 style = 'color:red'>Create Notes Regarding Vendor</h3>";
+$content = get_the_author_meta( 'admin_vendor_notes', $user->ID );
+$editor_id = 'admin_vendor_notes';
+$settings = array( 'textarea_name' => 'admin_vendor_notes' );
+wp_editor( $content, $editor_id, $settings );
+
+}
+
+//saving notes for admin
+function save_extra_user_profile_fields( $user_id ) {
+    if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'update-user_' . $user_id ) ) {
+        return;
+    }
+    
+    if ( !current_user_can( 'edit_user', $user_id ) ) { 
+        return false; 
+    }
+    update_user_meta( $user_id, 'admin_vendor_notes', $_POST['admin_vendor_notes'] );
+}
 
 }
 

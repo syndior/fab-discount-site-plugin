@@ -16,3 +16,7 @@
     background-size: cover;
     background-repeat: no-repeat;
 }
+
+.in_active_button{
+    display: none!important;
+}
