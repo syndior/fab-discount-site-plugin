@@ -17,32 +17,86 @@
  */
 defined('ABSPATH') or die('This path is not accessible');
 
-if( !class_exists('FD_SITE_CORE_FUNCTIONALITY') ){
+define( 'fdscf_url', plugin_dir_url( __FILE__ ) );
+define( 'fdscf_path', plugin_dir_path( __FILE__ ) );
+define( 'fdscf_plugin', plugin_basename( __FILE__ ) );
+define( 'fdscf_wc_dir', plugin_dir_path( __FILE__ ) . 'woocommerce/templates/' );
 
-    class FD_SITE_CORE_FUNCTIONALITY{
+global $wpdb;
+$fdscf_vouchers_db_table_name = ( $wpdb->prefix . "fdscf_vouchers" );
+define( 'fdscf_vouchers_db_table_name', $fdscf_vouchers_db_table_name );
 
+$fdscf_transactions_db_table_name = ( $wpdb->prefix . "fdscf_user_transactions" );
+define( 'fdscf_transactions_db_table_name', $fdscf_transactions_db_table_name );
+
+if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
+
+    class FD_CORE_PLUGIN_CLASS
+    {
         public function __construct()
         {
             /**
-             * Include js and css files
+             * Loads FD script classes after plugins have loaded
              */
-            add_action( 'wp_enqueue_scripts', array($this, 'fdscf_includes_resources') );
-        }
+            add_action( 'plugins_loaded', array( $this, 'load_fd_classes' ) );
 
-        public function fdscf_includes_resources()
-        {
-            //plugin styles
-            wp_enqueue_style( 'fdscf-styles', plugins_url( 'assets/css/main-styles.css', __FILE__ ),array(), '1.0.0');
+
+            /**
+             * PLugin activation hook
+             */
+            register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
+
             
-            //plugin scripts
-            wp_enqueue_script( 'fdscf-script', plugins_url( 'assets/js/main-scripts.js', __FILE__ ), array('jquery'),'1.0.0',true);
+            /**
+             * PLugin deactivation hook
+             */
+            register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
+        }
+        
+        public function load_fd_classes()
+        {
+            /* Woocommerce classes */
+            require_once ( fdscf_path . 'includes/woocommerce/class-wc-custom-product-type.php' );
+            require_once ( fdscf_path . 'includes/woocommerce/class-wc-controller.php' );
+
+
+            if( is_admin() ){
+                require_once ( fdscf_path . 'includes/admin/class-admin-pages.php' );
+            }
+            require_once ( fdscf_path . 'includes/class-fd-functions.php' );
+            require_once ( fdscf_path . 'includes/base/class-activate.php' );
+            require_once ( fdscf_path . 'includes/base/class-deactivate.php' );
+            require_once ( fdscf_path . 'includes/base/class-enqueue.php' );
+            require_once ( fdscf_path . 'includes/base/class-settings-links.php' );
+            require_once ( fdscf_path . 'includes/base/class-wp-cron.php' );
+            require_once ( fdscf_path . 'includes/user/class-user-controller.php' );
+            require_once ( fdscf_path . 'includes/dokan/class-dokan-controller.php' );
+            require_once ( fdscf_path . 'includes/refunds/class-refunds-controller.php' );
+            require_once ( fdscf_path . 'includes/vouchers/class-fd-voucher.php' );
+            require_once ( fdscf_path . 'includes/vouchers/class-vouchers-controller.php' );
+            require_once ( fdscf_path . 'includes/wallet-transactions/class-fd-transactions.php' );
+            require_once ( fdscf_path . 'includes/wallet-transactions/class-fd-wallet.php' );
+            require_once ( fdscf_path . 'includes/wallet-transactions/test.php' );
+            require_once ( fdscf_path . 'includes/vendor/class-vendor-controller.php' );
+            require_once ( fdscf_path . 'includes/vendor/class-vendor-product-controller.php' );
+            
+
         }
 
-    }//class end
+        public function plugin_activation()
+        {
+            if( class_exists('FD_Activate') ){
+                FD_Activate::activate();
+            }
+        }
 
-}//if end
+        public function plugin_deactivation()
+        {
+            if( class_exists('FD_Deactivate') ){
+                FD_Deactivate::deactivate();
+            }
+        }
+    }//class
 
-/**
- * Main Plugin instance
- */
-new FD_SITE_CORE_FUNCTIONALITY();
+    new FD_CORE_PLUGIN_CLASS();
+}

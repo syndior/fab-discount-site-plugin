@@ -1,0 +1,112 @@
+/*
+    Vouchers Management Table Styles
+*/
+
+.fd_admin_management_wrapper{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.fd_admin_management_title{
+    padding-bottom: 30px;
+}
+
+.fd_admin_management_title > *{
+    font-size: 30px;
+    text-transform: uppercase;
+}
+
+.fd_admin_management_table_wrapper{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.fd_admin_table{
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #fff;
+}
+
+.fd_admin_table th,
+.fd_admin_table td{
+    padding: 5px;
+}
+
+.fd_admin_table th{
+    text-align-last: left;
+}
+
+.fd_admin_table tbody{
+    height: 600px;
+    overflow: auto;
+}
+
+.fd_voucher_mngmnt_expiry{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.fd_voucher_mngmnt_actions{
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+.fd_voucher_mngmnt_submit{
+    margin-left: 10px;
+}
+
+.fd_admin_table_pagination{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    margin-top: 5px;
+    border: 1px solid #3c3c3c;
+    padding: 10px;
+}
+
+.fd_admin_table_pagination_info p{
+    margin: 0;
+    padding: 0;
+}
+
+.fd_admin_table_pagination_btns{
+    display: flex;
+    flex-direction: row;
+}
+
+.fd_pagination_btn{
+    border: 1px solid #3c3c3c;
+    border-radius: 3px;
+    padding: 6px 10px;
+    line-height: 1em;
+    margin-right: 10px;
+    color: #3c3c3c;
+    text-decoration: none;
+}
+
+.fd_pagination_disabled{
+    background-color: #eee;
+    color: #afafaf;
+    cursor: not-allowed;
+}
+
+.fd_expiry_text{
+    margin-bottom: 5px;
+}
+.fd_set_expiry_form{
+    display: none;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.fd_show_voucher_date_form .fd_set_expiry_form{
+    display: flex;
+    margin-bottom: 5px;
+}
