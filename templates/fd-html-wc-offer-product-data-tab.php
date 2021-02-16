@@ -2,17 +2,17 @@
     global $post;
     $product = wc_get_product( $post->ID );
 
-    $fd_wc_corner_banner                    = get_post_meta( $product->get_id(), 'fd_wc_corner_banner' )[0];
-    $fd_wc_corner_banner_title              = get_post_meta( $product->get_id(), 'fd_wc_corner_banner_title' )[0];
-    $fd_wc_corner_banner_headind            = get_post_meta( $product->get_id(), 'fd_wc_corner_banner_headind' )[0];
-    $fd_wc_offer_expiry                     = get_post_meta( $product->get_id(), 'fd_wc_offer_expiry' )[0];
-    $fd_wc_offer_use_global_expiry          = get_post_meta( $product->get_id(), 'fd_wc_offer_use_global_expiry' )[0];
-    $fd_wc_offer_expiry_date                = get_post_meta( $product->get_id(), 'fd_wc_offer_expiry_date' )[0];
-    $fd_offer_linked_product                = get_post_meta( $product->get_id(), 'fd_offer_linked_product' )[0];
-    $fd_offer_linked_product_variation      = get_post_meta( $product->get_id(), 'fd_offer_linked_product_variation' )[0];
-    $fd_wc_offer_voucher_expiry             = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry' )[0];
-    $fd_wc_offer_voucher_use_global_expiry  = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_use_global_expiry' )[0];
-    $fd_wc_offer_voucher_expiry_date        = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry_date' )[0];
+    $fd_wc_corner_banner                    = get_post_meta( $product->get_id(), 'fd_wc_corner_banner', true );
+    $fd_wc_corner_banner_title              = get_post_meta( $product->get_id(), 'fd_wc_corner_banner_title', true );
+    $fd_wc_corner_banner_headind            = get_post_meta( $product->get_id(), 'fd_wc_corner_banner_headind', true );
+    $fd_wc_offer_expiry                     = get_post_meta( $product->get_id(), 'fd_wc_offer_expiry', true );
+    $fd_wc_offer_use_global_expiry          = get_post_meta( $product->get_id(), 'fd_wc_offer_use_global_expiry', true );
+    $fd_wc_offer_expiry_date                = get_post_meta( $product->get_id(), 'fd_wc_offer_expiry_date', true );
+    $fd_offer_linked_product                = get_post_meta( $product->get_id(), 'fd_offer_linked_product', true );
+    $fd_offer_linked_product_variation      = get_post_meta( $product->get_id(), 'fd_offer_linked_product_variation', true );
+    $fd_wc_offer_voucher_expiry             = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry', true );
+    $fd_wc_offer_voucher_use_global_expiry  = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_use_global_expiry', true );
+    $fd_wc_offer_voucher_expiry_date        = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry_date', true );
 ?>
  <div id='fd_wc_offer_options' class='panel woocommerce_options_panel'>
     <div class='options_group'>
