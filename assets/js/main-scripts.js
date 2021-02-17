@@ -22,6 +22,34 @@ window.addEventListener('DOMContentLoaded', function(){
         }, false );
     }
 
+
+
+    let uploadBtns = document.querySelectorAll('.fd_upload_btn');
+    if( uploadBtns.length > 0 ){
+        uploadBtns.forEach( function(btn){
+            btn.addEventListener( 'click', function(e){
+                e.preventDefault();
+                let button = jQuery(this);
+                custom_uploader = wp.media({
+                    title: 'Insert image',
+                    multiple: false,
+                    library : {
+                        // uploadedTo : wp.media.view.settings.post.id, // attach to the current post?
+                        type : 'image'
+                    },
+                    button: {
+                        text: 'Use this image' // button label text
+                    },
+                    multiple: false
+                }).on('select', function() { // it also has "open" and "close" events
+                    let hiidenInput = document.querySelector(`input[name="${btn.dataset.inputName}"]`);
+                    var attachment = custom_uploader.state().get('selection').first().toJSON();
+                    hiidenInput.value = attachment.id;
+                }).open();
+            }, false );
+        } );
+    }
+
 });
 
 

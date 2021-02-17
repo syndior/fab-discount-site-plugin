@@ -13,6 +13,9 @@ class FD_Enqueue
 	
         public function enqueue_front_end_files() 
         {
+                //wordpress media uploader
+                wp_enqueue_media();
+
                 //plugin styles
                 wp_enqueue_style( 'fdscf-styles', fdscf_url . 'assets/css/main-styles.css', array(), '1.0.0');
                         
