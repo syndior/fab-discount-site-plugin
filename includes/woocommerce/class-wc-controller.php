@@ -13,7 +13,6 @@ class FD_Woocommerce_Controller
         /* Fix Variable product data-store issue */
         add_filter( 'woocommerce_data_stores', array( $this, 'fix_variable_products_data_store_issue' ), 99, 2 );
         
-
         /* add custom product product data tab */
         add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 9999, 1 );
 
@@ -68,6 +67,9 @@ class FD_Woocommerce_Controller
 
         /* Custom Hook: Add in claim offer feater after successfull checkout */
         add_action( 'fdscf_checkout_order_processed_claim_offer', array( $this, 'add_in_claim_offer_feature' ) );
+
+        /* Hook custom product tabs, Displayed on the product page */
+        add_filter( 'woocommerce_product_tabs', array( $this, 'add_new_product_tabs' ) );
     }
 
     public function add_product_type_filter( $types )
@@ -395,8 +397,7 @@ class FD_Woocommerce_Controller
                 foreach( $product_tabs as $tab ){
                     if( $tab['tab_status'] == true){
 
-                        $field_id = preg_replace('/\s+/', '', $tab['tab_title']);
-                        $field_id = $field_id .'_'. $post->ID;
+                        $field_id = $tab['tab_id'] .'_'. $post->ID;
 
                         $field_content = get_post_meta( $post->ID, $field_id, true  );
 
@@ -437,8 +438,8 @@ class FD_Woocommerce_Controller
             if( $product_tabs !== null && !empty($product_tabs)){
 
                 foreach( $product_tabs as $tab ){
-                    $field_id = preg_replace('/\s+/', '', $tab['tab_title']);
-                    $field_id = $field_id .'_'. $post->ID;
+                    
+                    $field_id = $tab['tab_id'] .'_'. $post->ID;
 
                     if( $_POST[$field_id] ){
                         update_post_meta($post_id, $field_id, $_POST[$field_id]);
@@ -450,6 +451,56 @@ class FD_Woocommerce_Controller
             }
 
         }
+    }
+
+
+    /**
+     * Add custom products tabs displayed on the product page. defined in the admin dashboard
+     */
+    public function add_new_product_tabs( $tabs )
+    {
+        if( function_exists('get_field') ){
+            
+            $custom_tabs = array();
+
+            $product_tabs = get_field( 'offer_tabs', 'options' );
+            if( $product_tabs !== null && !empty($product_tabs)){
+                foreach( $product_tabs as $tab ){
+                    if( $tab['tab_status'] == true){
+                        
+                        $custom_tab_item = array(
+                            $tab['tab_id'] => array(
+                                'title'     => $tab['tab_title'],
+                                'priority'  => 10,
+                                'callback' 	=> array( $this, 'custom_product_tab_content_callback' ),
+                            ),
+                        );
+
+                        $custom_tabs = array_merge( $custom_tabs, $custom_tab_item );
+                    }
+                }
+
+                if( !empty( $custom_tabs ) ){
+                    $tabs = array_merge( $tabs, $custom_tabs );
+                }
+            }
+
+        }
+
+        return $tabs;
+    }
+
+    /**
+     * Callback for custom product tabs displayed on the product page
+     */
+    public function custom_product_tab_content_callback( $key, $product_tab )
+    {
+        global $post;
+        $field_id = $key .'_'. $post->ID;
+        $tab_content = get_post_meta( $post->ID , $field_id , true );
+        
+        echo '<h2>' . $product_tab['title'] . '</h2>';
+        echo $tab_content;
     }
 
 }

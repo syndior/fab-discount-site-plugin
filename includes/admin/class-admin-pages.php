@@ -32,14 +32,22 @@ class FD_Admin_Pages
             ));
         }
 
+        /* Load Custom ACF Field / Unique ID */
+        add_action('acf/include_field_types', array($this,'include_field_types_unique_id') );
+
         /* Populates acf field with custom values */
-        add_filter('acf/load_field/name=select_static_product_to_show_on_home_page',array($this,'acf_load_products_field_choices'));
+        add_filter('acf/load_field/name=select_static_product_to_show_on_home_page',array($this,'acf_load_products_field_choices') );
 
         /* Add vouchers management page */
         add_action( 'admin_menu', array( $this, 'add_admin_vouchers_management_page' ) );
 
     }//constructor
 
+
+    public function include_field_types_unique_id()
+    {
+        require_once ( fdscf_path . 'includes/admin/acf-unique_id-v5.php' );
+    }
 
     public function acf_load_products_field_choices( $field ) 
     {
@@ -96,7 +104,6 @@ class FD_Admin_Pages
         require_once ( fdscf_path . 'templates/fd-html-admin-page-vouchers-management.php' );
     }
     
-
 
 }//class
 
