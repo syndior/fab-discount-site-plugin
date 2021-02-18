@@ -36,6 +36,12 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
         public function __construct()
         {
             /**
+             * Load the activate and deactivate files befor the activation_hook/deactivation_hook
+             */
+            require_once ( fdscf_path . 'includes/base/class-activate.php' );
+            require_once ( fdscf_path . 'includes/base/class-deactivate.php' );
+
+            /**
              * Loads FD script classes after plugins have loaded
              */
             add_action( 'plugins_loaded', array( $this, 'load_fd_classes' ) );
@@ -64,8 +70,6 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
                 require_once ( fdscf_path . 'includes/admin/class-admin-pages.php' );
             }
             require_once ( fdscf_path . 'includes/class-fd-functions.php' );
-            require_once ( fdscf_path . 'includes/base/class-activate.php' );
-            require_once ( fdscf_path . 'includes/base/class-deactivate.php' );
             require_once ( fdscf_path . 'includes/base/class-enqueue.php' );
             require_once ( fdscf_path . 'includes/base/class-settings-links.php' );
             require_once ( fdscf_path . 'includes/base/class-wp-cron.php' );
@@ -89,7 +93,7 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
                 FD_Activate::activate();
             }
         }
-
+        
         public function plugin_deactivation()
         {
             if( class_exists('FD_Deactivate') ){
@@ -97,6 +101,5 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
             }
         }
     }//class
-
     new FD_CORE_PLUGIN_CLASS();
 }

@@ -340,7 +340,10 @@ class FD_Vendor_Controller
             <?php _e( 'Identity Doc', 'dokan' ); ?>
         </label>
         <div class="dokan-w5">
-            <input type="file" class="dokan-form-control input-md valid" name="identity_doc" id="identity_doc"/>
+            <input type="hidden" class="dokan-form-control input-md valid" name="identity_doc" id="identity_doc"/>
+            <div class="gravatar-button-area">
+                <a href="#" data-input-name="identity_doc" class="dokan-btn dokan-btn-default fd_upload_btn"><i class="fa fa-cloud-upload"></i> Upload Identity Documents</a>
+            </div>
         </div>
         <?php if($dokan_seller_identity_doc != ""){?>
         <a href="<?php echo $dokan_seller_identity_doc; ?>">Download Attachment</a>
@@ -354,7 +357,10 @@ class FD_Vendor_Controller
             <?php _e( 'Others Doc', 'dokan' ); ?>
         </label>
         <div class="dokan-w5">
-            <input type="file" class="dokan-form-control input-md valid" name="others_doc" id="others_doc"/>
+            <input type="hidden" class="dokan-form-control input-md valid" name="others_doc" id="others_doc"/>
+            <div class="gravatar-button-area">
+                <a href="#" data-input-name="others_doc" class="dokan-btn dokan-btn-default fd_upload_btn"><i class="fa fa-cloud-upload"></i> Upload Other Documents</a>
+            </div>
         </div>
         <?php if($dokan_seller_others_doc != ""){?>
         <a href="<?php echo $dokan_seller_others_doc; ?>">Download Attachment</a>
@@ -369,45 +375,21 @@ class FD_Vendor_Controller
     
 //save the field value
 function fdscf_save_extra_seller_setting_fields( $user_id ) {
-    // $dokan_settings = dokan_get_store_info($store_id);
-    // if ( isset( $_POST['seller_url'] ) ) {
-        // $dokan_settings['seller_url'] = $_POST['seller_url'];
-    // }
+
     update_usermeta( $user_id, 'dokan_seller_shop_vat_number', $_POST['shop_vat_number'] );
     update_usermeta( $user_id, 'dokan_seller_company_reg_number', $_POST['company_reg_number'] );
     update_usermeta( $user_id, 'dokan_seller_company_website', $_POST['company_website'] );
- 
-    // file handeling
-    if ( isset( $_FILES['identity_doc'] ) ) {
-        require_once( ABSPATH . 'wp-admin/includes/image.php' );
-        require_once( ABSPATH . 'wp-admin/includes/file.php' );
-        require_once( ABSPATH . 'wp-admin/includes/media.php' );
-        $attachment_id = media_handle_upload('identity_doc',0);
-        if ( is_wp_error( $attachment_id ) ) {
-           update_user_meta( $user_id, 'dokan_seller_identity_doc', $_FILES['identity_doc'] . ": " . $attachment_id->get_error_message() );
-        } else {
-           update_user_meta( $user_id, 'dokan_seller_identity_doc', $attachment_id );
-        }
-     }
 
-     if ( isset( $_FILES['others_doc'] ) ) {
-        require_once( ABSPATH . 'wp-admin/includes/image.php' );
-        require_once( ABSPATH . 'wp-admin/includes/file.php' );
-        require_once( ABSPATH . 'wp-admin/includes/media.php' );
-        $attachment_id = media_handle_upload( 'others_doc', 0 );
-        if ( is_wp_error( $attachment_id ) ) {
-           update_user_meta( $user_id, 'dokan_seller_others_doc', $_FILES['others_doc'] . ": " . $attachment_id->get_error_message() );
-        } else {
-           update_user_meta( $user_id, 'dokan_seller_others_doc', $attachment_id );
-        }
-     }
-    // file handeling   
-//  update_user_meta( $user_id, 'dokan_profile_settings', $dokan_settings );
+
+    if( isset($_POST['identity_doc']) && isset($_POST['others_doc']) ){
+        update_usermeta( $user_id, 'dokan_seller_identity_doc', $_POST['identity_doc'] );
+        update_usermeta( $user_id, 'dokan_seller_others_doc', $_POST['others_doc'] );
+    }
+
+
 }
 
 // show on the store page
-// add_action( 'dokan_store_header_info_fields', 'save_seller_url', 10);
-
 function save_seller_url($store_user){
 
     $store_info    = dokan_get_store_info( $store_user);

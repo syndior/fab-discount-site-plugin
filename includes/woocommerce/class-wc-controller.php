@@ -19,6 +19,9 @@ class FD_Woocommerce_Controller
 
         /* loads custom product data tab markup */
         add_action( 'woocommerce_product_data_panels', array( $this, 'add_woocommerce_product_data_panels'), 9999 );
+        
+        /* add custom meta boxes */
+        add_action( 'add_meta_boxes', array( $this, 'add_custom_meta_wc_meta_box') );
 
         /* general tab fix */
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_woocommerce_general_tab_fix_html'));
@@ -28,6 +31,9 @@ class FD_Woocommerce_Controller
         
         /* saves our custom fields with our custom product type*/
         add_action( 'woocommerce_process_product_meta', array( $this, 'process_product_meta') );
+
+        /* Save Custom Product/Offer Front-end Tabs Content*/
+        add_action( 'save_post', array( $this, 'process_custom_product_tabs_content'), 10, 3 );
 
         /* adds back the add to cart buttons and product summary sections */
         add_action( 'woocommerce_fd_wc_offer_add_to_cart', array( $this, 'add_to_cart_template_include') );
@@ -366,6 +372,101 @@ class FD_Woocommerce_Controller
     public function add_in_claim_offer_feature( $order_id )
     {
         require_once ( fdscf_path . 'templates/fd-html-wc-claim-offer.php' );
+    }
+
+
+    /**
+     * Adds a custom metabox for the custom front-end product/offer tabs 
+     */
+    public function add_custom_meta_wc_meta_box()
+    {
+        global $post;
+        if( $post->post_type == 'product' ){
+            $product = wc_get_product($post->ID);
+
+            if( $product->get_type() == 'fd_wc_offer' || $product->get_type() == 'fd_wc_offer_variable' ){
+                $id             = 'fdscf_product_meta_box';
+                $title          = 'FD Offer Options';
+                $callback       = array( $this, 'print_meta_box_content');
+                $screen         = 'product';
+                $context        = 'normal';
+                $priority       = 'default';
+        
+                add_meta_box( $id, $title, $callback, $screen, $context, $priority );
+            }
+        }
+    }
+
+    /**
+     * Print HTML for the custom metabox
+     */
+    public function print_meta_box_content($post)
+    {
+        if( function_exists('get_field') ){
+            $product_tabs = get_field( 'offer_tabs', 'options' );
+
+            if( $product_tabs !== null && !empty($product_tabs)){
+                $output = '';
+                $output .= '<div class="fd_meta_box_content_wrapper">';
+                $counter = 0;
+                foreach( $product_tabs as $tab ){
+                    if( $tab['tab_status'] == true){
+
+                        $field_id = preg_replace('/\s+/', '', $tab['tab_title']);
+                        $field_id = $field_id .'_'. $post->ID;
+
+                        $field_content = get_post_meta( $post->ID, $field_id, true  );
+
+                        $content    = $field_content;
+                        $editor_id  = $field_id;
+
+                        ob_start();
+                        wp_editor( $content, $editor_id );
+                        $editor     = ob_get_clean();
+                        $editor     .= _WP_Editors::enqueue_scripts();
+                        $editor     .= _WP_Editors::editor_js();
+
+                        $output .= '<div class="fd_meta_box_item">';
+                        $output .= '<label class="" for="'. $field_id .'">';
+                        $output .= '<h3>' . $tab['tab_title'] . '</h3>';
+                        $output .= '</label>';
+                        $output .= $editor;
+                        $output .= '</div>';
+                    }
+                    $counter++;
+                }
+                $output .= '</div>';
+
+                echo $output;
+            }
+
+        }
+    }
+
+    /**
+     * Save/Process custom tabs wp_editor fields
+     */
+    public function process_custom_product_tabs_content( $post_id, $post, $update )
+    {
+        if( function_exists('get_field') ){
+            $product_tabs = get_field( 'offer_tabs', 'options' );
+
+            if( $product_tabs !== null && !empty($product_tabs)){
+
+                foreach( $product_tabs as $tab ){
+                    $field_id = preg_replace('/\s+/', '', $tab['tab_title']);
+                    $field_id = $field_id .'_'. $post->ID;
+
+                    if( $_POST[$field_id] ){
+                        update_post_meta($post_id, $field_id, $_POST[$field_id]);
+                    }
+
+                }
+
+
+            }
+
+        }
     }
 
 }

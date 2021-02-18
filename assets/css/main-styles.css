@@ -85,9 +85,8 @@
     font-size: 20px;
     color: #3c3c3c;
 }
+
+.in_active_dom,
 .in_active_button{
     display: none!important;
 }
-.in_active_dom{
-    display: none!important;
-} 
