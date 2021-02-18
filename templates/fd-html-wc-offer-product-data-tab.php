@@ -2,9 +2,16 @@
     global $post;
     $product = wc_get_product( $post->ID );
 
+    //banner
     $fd_wc_corner_banner                    = get_post_meta( $product->get_id(), 'fd_wc_corner_banner', true );
     $fd_wc_corner_banner_title              = get_post_meta( $product->get_id(), 'fd_wc_corner_banner_title', true );
     $fd_wc_corner_banner_headind            = get_post_meta( $product->get_id(), 'fd_wc_corner_banner_headind', true );
+    
+    //scheduling 
+    $fd_wc_offer_schedule                   = get_post_meta( $product->get_id(), 'fd_wc_offer_schedule', true );
+    $fd_wc_offer_schedule_date              = get_post_meta( $product->get_id(), 'fd_wc_offer_schedule_date', true );
+    $fd_wc_offer_schedule_time              = get_post_meta( $product->get_id(), 'fd_wc_offer_schedule_time', true );
+    //expiry
     $fd_wc_offer_expiry                     = get_post_meta( $product->get_id(), 'fd_wc_offer_expiry', true );
     $fd_wc_offer_use_global_expiry          = get_post_meta( $product->get_id(), 'fd_wc_offer_use_global_expiry', true );
     $fd_wc_offer_expiry_date                = get_post_meta( $product->get_id(), 'fd_wc_offer_expiry_date', true );
@@ -13,6 +20,12 @@
     $fd_wc_offer_voucher_expiry             = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry', true );
     $fd_wc_offer_voucher_use_global_expiry  = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_use_global_expiry', true );
     $fd_wc_offer_voucher_expiry_date        = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry_date', true );
+
+    $current_date = date('Y-m-d');
+    // $curre_time = date('H');
+
+    $times = array(1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24);
+
 ?>
  <div id='fd_wc_offer_options' class='panel woocommerce_options_panel'>
     <div class='options_group'>
@@ -41,8 +54,8 @@
              */
             $args = array(
                 'id' => 'fd_wc_corner_banner_title',
-                'label' => 'Corner Banner Tille: ',
-                'value' => ( isset( $fd_wc_corner_banner_title) ? $fd_wc_corner_banner_title : '' ),
+                'label' => 'Corner Banner TiTle: ',
+                'value' => (isset( $fd_wc_corner_banner_title) ? $fd_wc_corner_banner_title : ''),
                 'placeholder' => '',
                 'desc_tip' => 'true',
                 'description' => 'Displayed on top of the corner banner as a title',
@@ -69,7 +82,59 @@
             woocommerce_wp_text_input($args);
 
         ?>
+    
+        <?php
 
+            /**
+             * schedule offer to go live
+             */
+            $args = array(
+                'id' => 'fd_wc_offer_schedule',
+                'label' => 'Enable Offer Scheduling: ',
+                'desc_tip' => 'true',
+                'description' => 'Live offer after specific interval.',
+                'value' => ( $fd_wc_offer_schedule=='enabled'?'enabled':'disabled'),
+                'cbvalue' => 'enabled',
+            );
+            woocommerce_wp_checkbox( $args );
+
+            if($fd_wc_offer_schedule=='enabled'){
+                $in_active_dom = 'display:';
+            }else{
+                $in_active_dom = 'display:none!important';
+            }
+
+            //schedule date     
+            $value = isset($fd_wc_offer_schedule_date)?$fd_wc_offer_schedule_date:'';
+            $date_field = '
+            <p class="form-field" id = "schedule_date" style = "'.$in_active_dom.'">
+            <label for="fd_wc_offer_schedule_date">Set Date for offer to go live: </label>
+            <input type="date" class="short " style="" name="fd_wc_offer_schedule_date" id="fd_wc_offer_schedule_date" value="'.$value.'" min="'.$current_date.'">
+            </p>    
+            ';
+             echo $date_field;   
+
+            //schedule time     
+            $select_options="<option value = 0>Select Time</option>";
+            foreach($times as $time){
+                if(isset($fd_wc_offer_schedule_time)){
+                    $fd_wc_offer_schedule_time==$time?$select_options.='<option value='.$time.' selected>'.$time.'</option>':$select_options.='<option value='.$time.'>'.$time.'</option>';
+                }else{
+                    $select_options.='<option value='.$time.'>'.$time.'</option>';
+                }
+            }
+            $value = isset($fd_wc_offer_schedule_time)?$fd_wc_offer_schedule_time:'';
+            $time_field = '
+            <p class="form-field" id = "schedule_time" style = "'.$in_active_dom.'">
+            <label for="fd_wc_offer_schedule_time">Set time for offer to go live: </label>
+            <select name = "fd_wc_offer_schedule_time" id = "fd_wc_offer_schedule_time">
+            '.$select_options.'
+            </select>
+            </p>    
+            ';
+             echo $time_field;   
+
+            ?>
         <?php
 
             /**
