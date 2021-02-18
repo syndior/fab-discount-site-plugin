@@ -344,6 +344,7 @@ class FD_Vendor_Controller
             <div class="gravatar-button-area">
                 <a href="#" data-input-name="identity_doc" class="dokan-btn dokan-btn-default fd_upload_btn"><i class="fa fa-cloud-upload"></i> Upload Identity Documents</a>
             </div>
+            <small class = "green" id = "identity_success_msg"></small>
         </div>
         <?php if($dokan_seller_identity_doc != ""){?>
         <a href="<?php echo $dokan_seller_identity_doc; ?>">Download Attachment</a>
@@ -361,6 +362,8 @@ class FD_Vendor_Controller
             <div class="gravatar-button-area">
                 <a href="#" data-input-name="others_doc" class="dokan-btn dokan-btn-default fd_upload_btn"><i class="fa fa-cloud-upload"></i> Upload Other Documents</a>
             </div>
+            <small class = "green" id = "others_doc_success_msg"></small>
+
         </div>
         <?php if($dokan_seller_others_doc != ""){?>
         <a href="<?php echo $dokan_seller_others_doc; ?>">Download Attachment</a>

@@ -25,6 +25,8 @@ window.addEventListener('DOMContentLoaded', function(){
 
 
     let uploadBtns = document.querySelectorAll('.fd_upload_btn');
+    let identity_success_msg = document.getElementById('identity_success_msg');
+    let others_doc_success_msg = document.getElementById('others_doc_success_msg');
     if( uploadBtns.length > 0 ){
         uploadBtns.forEach( function(btn){
             btn.addEventListener( 'click', function(e){
@@ -35,16 +37,26 @@ window.addEventListener('DOMContentLoaded', function(){
                     multiple: false,
                     library : {
                         // uploadedTo : wp.media.view.settings.post.id, // attach to the current post?
-                        type : 'image'
+                        type : 'media'
                     },
                     button: {
                         text: 'Use this image' // button label text
                     },
                     multiple: false
                 }).on('select', function() { // it also has "open" and "close" events
+                    let message = 'File Selected';
                     let hiidenInput = document.querySelector(`input[name="${btn.dataset.inputName}"]`);
                     var attachment = custom_uploader.state().get('selection').first().toJSON();
                     hiidenInput.value = attachment.id;
+                    if(hiidenInput.value != ""){
+                        // console.log(btn.dataset.inputName);
+                        if(btn.dataset.inputName == "identity_doc"){
+                            identity_success_msg.innerHTML = message;
+                        }else{
+                            others_doc_success_msg.innerHTML = message;
+                        }
+                    }
+
                 }).open();
             }, false );
         } );
