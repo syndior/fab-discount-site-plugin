@@ -98,3 +98,94 @@ const validatorVatCampanyNumber= ()=>{
 }
 
 window.onload = enable_or_disable_register_button();
+
+
+const setOfferOptionsInVendor = ()=>{
+
+    /**
+     * Enable selling fast"
+     */
+    let corner_banner = document.getElementById('fd_wc_corner_banner');
+    let selling_fast_banner_title = document.getElementById('selling_fast_banner_title');
+    let selling_fast_banner_heading = document.getElementById('selling_fast_banner_heading');
+    corner_banner.addEventListener('change',()=>{
+        // var checkbox_schedule = document.getElementById('fd_wc_offer_schedule');
+        if(corner_banner.checked==true){
+            selling_fast_banner_title.style.display = "block";
+            selling_fast_banner_heading.style.display = "block";
+        }else{
+            selling_fast_banner_title.style.display = "none";
+            selling_fast_banner_heading.style.display = "none";
+        }
+    });//event listener for Enable selling fast
+
+
+    /**
+    * Enable "offer Scheduling"
+    */
+    let fd_wc_offer_schedule = document.getElementById('fd_wc_offer_schedule');
+    let schedule_date = document.getElementById('schedule_date');
+    let schedule_time = document.getElementById('schedule_time');
+    fd_wc_offer_schedule.addEventListener('change',()=>{
+        // var checkbox_schedule = document.getElementById('fd_wc_offer_schedule');
+        if(fd_wc_offer_schedule.checked==true){
+            schedule_date.style.display = "block";
+            schedule_time.style.display = "block";
+        }else{
+            schedule_date.style.display = "none";
+            schedule_time.style.display = "none";
+        }
+    });//event listener for offer Scheduling
+
+
+    /**
+    * Enable "offer expiry"
+    */
+   let fd_wc_offer_expiry = document.getElementById('fd_wc_offer_expiry');
+   let global_expiry = document.getElementById('global_expiry');
+   let local_expiry = document.getElementById('local_expiry');
+   fd_wc_offer_expiry.addEventListener('change',()=>{
+       if(fd_wc_offer_expiry.checked==true){
+           global_expiry.style.display = "block";
+           local_expiry.style.display = "block";
+       }else{
+           global_expiry.style.display = "none";
+           local_expiry.style.display = "none";
+       }
+   });//event listener for offer expiry
+   
+
+    /**
+    * Enable "Voucher expiry"
+    */
+   let fd_wc_offer_voucher_expiry = document.getElementById('fd_wc_offer_voucher_expiry');
+   let global_voucher_expiry = document.getElementById('global_voucher_expiry');
+   let local_voucher_expiry = document.getElementById('local_voucher_expiry');
+   fd_wc_offer_voucher_expiry.addEventListener('change',()=>{
+       if(fd_wc_offer_voucher_expiry.checked==true){
+           global_voucher_expiry.style.display = "block";
+           local_voucher_expiry.style.display = "block";
+       }else{
+           global_voucher_expiry.style.display = "none";
+           local_voucher_expiry.style.display = "none";
+       }
+   });//event listener for Voucher expiry
+
+
+   let product_type = document.getElementById('product_type');
+   let fd_wc_offer_options = document.getElementById('fd_wc_offer_options');
+
+   product_type.addEventListener('change',()=>{
+    if(product_type.value == "fd_wc_offer" || product_type.value == "fd_wc_offer_variable"){
+        fd_wc_offer_options.style.display = "block";
+    }else{
+        fd_wc_offer_options.style.display = "none";
+    }
+   });
+
+
+   
+
+}
+
+window.onload = setOfferOptionsInVendor();

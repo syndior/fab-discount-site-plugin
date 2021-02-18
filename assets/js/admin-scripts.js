@@ -176,6 +176,23 @@ window.addEventListener('DOMContentLoaded', function () {
         console.log(useForVariationOption);
     }
 
+    /**
+     * Enable "offer Scheduling"
+     */
+    let checkbox_schedule = document.getElementById('fd_wc_offer_schedule');
+    let schedule_time = document.getElementById('schedule_time');
+    let schedule_date = document.getElementById('schedule_date');
+    checkbox_schedule.addEventListener('change',()=>{
+        // var checkbox_schedule = document.getElementById('fd_wc_offer_schedule');
+        if(checkbox_schedule.checked==true){
+            schedule_time.style.display = "block";
+            schedule_date.style.display = "block";
+        }else{
+            schedule_time.style.display = "none";
+            schedule_date.style.display = "none";
+        }
+    });//event listener for offer Scheduling
+
 }, false);
 
 

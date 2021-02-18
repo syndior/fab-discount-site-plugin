@@ -4,9 +4,9 @@ class FD_Vendor_Controller
 {
     public function __construct()
     {
-        // add_action( 'init', array( $this, 'activate' ) );
+            require_once(ABSPATH.'/wp-content/plugins/dokan-pro/modules/vendor-analytics/tools/src/Dokan/Http/MediaFileUpload.php');
 
-                    //*****adding extra fileds in dokan seller signup form start*****//   
+            //*****adding extra fileds in dokan seller signup form start*****//   
     
             ////// for showing extra fields start //////
             add_action('dokan_seller_registration_field_after',array($this,'fdscf_dokan_seller_extra_fields'),10);
@@ -252,7 +252,7 @@ class FD_Vendor_Controller
                 require_once( ABSPATH . 'wp-admin/includes/image.php' );
                 require_once( ABSPATH . 'wp-admin/includes/file.php' );
                 require_once( ABSPATH . 'wp-admin/includes/media.php' );
-                $attachment_id = media_handle_upload( 'identity_doc', 1 );
+                $attachment_id = media_handle_upload( 'identity_doc', 0 );
                 if ( is_wp_error( $attachment_id ) ) {
                    update_user_meta( $user_id, 'dokan_seller_identity_doc', $_FILES['identity_doc'] . ": " . $attachment_id->get_error_message() );
                 } else {
@@ -291,6 +291,11 @@ class FD_Vendor_Controller
 // Add extra field in seller settings
  public function fdscf_extra_seller_setting_fields( $user_ID, $profile_info ){
     //  var_dump($user);
+    if(class_exists('Dokan_Http_MediaFileUpload')){
+        echo "<h1>exists</h1>";
+    }else{
+        echo "<h1> not exists</h1>";
+    }
     $shop_vat_number  = get_user_meta( $user_ID, 'dokan_seller_shop_vat_number', true );
     $company_reg_number  = get_user_meta( $user_ID, 'dokan_seller_company_reg_number', true );
     $company_website  = get_user_meta( $user_ID, 'dokan_seller_company_website', true );
@@ -371,7 +376,7 @@ function fdscf_save_extra_seller_setting_fields( $user_id ) {
     update_usermeta( $user_id, 'dokan_seller_shop_vat_number', $_POST['shop_vat_number'] );
     update_usermeta( $user_id, 'dokan_seller_company_reg_number', $_POST['company_reg_number'] );
     update_usermeta( $user_id, 'dokan_seller_company_website', $_POST['company_website'] );
-
+ 
     // file handeling
     if ( isset( $_FILES['identity_doc'] ) ) {
         require_once( ABSPATH . 'wp-admin/includes/image.php' );
