@@ -42,7 +42,7 @@ function fdscf_set_option_for_hero_section()
             //     $saving_percentage = (int)(100-(($product_sale_price/$product_actual_price)*100));
             //     $product_sale_price =$currency_symbol.$product_sale_price;
             //     $product_actual_price = $currency_symbol.$product_actual_price;
-            // }elseif($product->is_type('fd_wc_offer')) {
+            // }elseif($product->is_type('fd_wc_offer_variable')) {
             //     //goal is that we have to filter max saving percentage values
             //     $product_actual_price_array = array();// (1) in this we will save all all actual prices
             //     $product_sale_prices_array = array();// (2) in this we will save all all sales prices
