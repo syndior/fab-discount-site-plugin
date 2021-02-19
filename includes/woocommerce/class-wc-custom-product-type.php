@@ -41,6 +41,10 @@ class WC_Product_FD_Offer_Variable extends WC_Product_Variable
         return ( $this->get_type() === $type || 'variable' === $type || ( is_array( $type ) && ( in_array( $this->get_type(), $type ) || in_array( 'variable', $type ) ) ));
     }
 
+    public function get_price_html( $price = '' ) {
+        return parent::get_price_html( $price );
+    }
+
     public function add_to_cart_url() {
         $url = $this->is_purchasable() && $this->is_in_stock() ? remove_query_arg( 'added-to-cart', add_query_arg( 'add-to-cart', $this->id ) ) : get_permalink( $this->id );
         return apply_filters( 'woocommerce_product_add_to_cart_url', $url, $this );

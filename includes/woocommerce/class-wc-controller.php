@@ -36,8 +36,11 @@ class FD_Woocommerce_Controller
 
         /* adds back the add to cart buttons and product summary sections */
         add_action( 'woocommerce_fd_wc_offer_add_to_cart', array( $this, 'add_to_cart_template_include') );
-        add_action( 'woocommerce_fd_wc_offer_variable_add_to_cart', array( $this, 'add_to_cart_template_include') );
         
+        /* load default woo functions for our custom variayion product type */
+        add_action( 'woocommerce_fd_wc_offer_variable_add_to_cart', 'woocommerce_variable_add_to_cart', 9999 );
+        add_action( 'woocommerce_add_to_cart_handler', array( $this, 'modify_add_to_cart_handler_for_variations' ), 9999 );
+
         /* adds custom button before the add to cart button to pay with store credit */
         add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_functionality_before_add_to_cart_button'), 10 );
 
@@ -70,6 +73,11 @@ class FD_Woocommerce_Controller
 
         /* Hook custom product tabs, Displayed on the product page */
         add_filter( 'woocommerce_product_tabs', array( $this, 'add_new_product_tabs' ) );
+
+        /* Fix for variations dropdowns */
+        add_action( 'woocommerce_before_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
+        add_action( 'woocommerce_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
+        add_action( 'woocommerce_after_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
     }
 
     public function add_product_type_filter( $types )
@@ -95,7 +103,9 @@ class FD_Woocommerce_Controller
 
     public function fix_variable_products_data_store_issue( $stores )
     {
-        $stores['product-fd_wc_offer_variable'] = 'WC_Product_Variable_Data_Store_CPT';
+        if( !isset( $stores['product-fd_wc_offer_variable'] ) ){
+            $stores['product-fd_wc_offer_variable'] = 'WC_Product_Variable_Data_Store_CPT';
+        }
         return $stores;
     }
 
@@ -207,21 +217,31 @@ class FD_Woocommerce_Controller
         }
     }
 
+    public function modify_add_to_cart_handler_for_variations( $handler )
+    {
+        if( $handler == 'fd_wc_offer_variable' ){
+            $handler = 'variable';
+        }
+        return $handler;
+    }
+
     public function add_to_cart_template_include()
     {
-        global $posts;
-        $product = $posts[0];
-        // var_dump($product);
-        $product = wc_get_product($product->ID);
-        // fd_wc_offer
-        // fd_wc_offer_variable
-        if($product->get_type()=='fd_wc_offer'){
+        global $post;
+        $product = wc_get_product($post->ID);
+
+        if( $product->get_type() == 'fd_wc_offer' ){
             do_action( 'woocommerce_simple_add_to_cart' );
-        }elseif ($product->get_type()=='fd_wc_offer_variable') {
-            do_action( 'woocommerce_variable_add_to_cart' );
         }
     }
 
+    public function load_woocommerce_variations_hook()
+    {
+        global $product;
+        if($product->get_type() == 'fd_wc_offer_variable'){
+            do_action( 'woocommerce_before_add_to_cart_quantity' );
+        }
+    }
 
     public function add_functionality_before_add_to_cart_button()
     {
