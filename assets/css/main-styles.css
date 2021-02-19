@@ -93,3 +93,9 @@
 .green{
     color: green;
 }
+
+.vendor_dashboard_admin_email{
+    text-align: right!important;
+    padding: 20px!important;
+    width: 100%!important;
+}

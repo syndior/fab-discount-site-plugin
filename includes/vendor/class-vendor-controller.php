@@ -53,6 +53,8 @@ class FD_Vendor_Controller
             add_action( 'personal_options_update', array($this,'save_extra_user_profile_fields') );
             add_action( 'edit_user_profile_update', array($this,'save_extra_user_profile_fields') );
 
+            add_action('dokan_dashboard_content_after',array($this,'admin_contact'),10);
+
 
     }
 
@@ -340,7 +342,7 @@ class FD_Vendor_Controller
             <?php _e( 'Identity Doc', 'dokan' ); ?>
         </label>
         <div class="dokan-w5">
-            <input type="hidden" class="dokan-form-control input-md valid" name="identity_doc" id="identity_doc"/>
+            <input type="hidden" class="dokan-form-control input-md valid" name="identity_doc" id="identity_doc" value = "<?php echo $dokan_seller_identity_doc_attachment_id?>"/>
             <div class="gravatar-button-area">
                 <a href="#" data-input-name="identity_doc" class="dokan-btn dokan-btn-default fd_upload_btn"><i class="fa fa-cloud-upload"></i> Upload Identity Documents</a>
             </div>
@@ -358,7 +360,7 @@ class FD_Vendor_Controller
             <?php _e( 'Others Doc', 'dokan' ); ?>
         </label>
         <div class="dokan-w5">
-            <input type="hidden" class="dokan-form-control input-md valid" name="others_doc" id="others_doc"/>
+            <input type="hidden" class="dokan-form-control input-md valid" name="others_doc" id="others_doc" value = "<?php echo $dokan_seller_others_doc_attachment_id?>"/>
             <div class="gravatar-button-area">
                 <a href="#" data-input-name="others_doc" class="dokan-btn dokan-btn-default fd_upload_btn"><i class="fa fa-cloud-upload"></i> Upload Other Documents</a>
             </div>
@@ -384,10 +386,10 @@ function fdscf_save_extra_seller_setting_fields( $user_id ) {
     update_usermeta( $user_id, 'dokan_seller_company_website', $_POST['company_website'] );
 
 
-    if( isset($_POST['identity_doc']) && isset($_POST['others_doc']) ){
+    // if( isset($_POST['identity_doc']) && isset($_POST['others_doc']) ){
         update_usermeta( $user_id, 'dokan_seller_identity_doc', $_POST['identity_doc'] );
         update_usermeta( $user_id, 'dokan_seller_others_doc', $_POST['others_doc'] );
-    }
+    // }
 
 
 }
@@ -409,7 +411,7 @@ function save_seller_url($store_user){
 //*****Extra field on the seller settings and show the value on the store banner -Dokan end*****//
 
 
-function extra_user_profile_fields( $user ) { 
+public function extra_user_profile_fields( $user ) { 
 
 echo "<h3 style = 'color:red'>Create Notes Regarding Vendor</h3>";
 $content = get_the_author_meta( 'admin_vendor_notes', $user->ID );
@@ -420,7 +422,7 @@ wp_editor( $content, $editor_id, $settings );
 }
 
 //saving notes for admin
-function save_extra_user_profile_fields( $user_id ) {
+public function save_extra_user_profile_fields( $user_id ) {
     if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'update-user_' . $user_id ) ) {
         return;
     }
@@ -431,6 +433,18 @@ function save_extra_user_profile_fields( $user_id ) {
     update_user_meta( $user_id, 'admin_vendor_notes', $_POST['admin_vendor_notes'] );
 }
 
+
+
+/**
+ * setting contact email of admin
+ */
+public function admin_contact(){
+    $email = get_field('acf_main_admin_email', 'option');
+    if($email==""){
+        $email = "admin@example.com";
+    }
+    echo "<p class = 'vendor_dashboard_admin_email'>Contact Admin at <a href='mailto:".$email."'> ".$email." </a></p>";
 }
 
+}//class
 new FD_Vendor_Controller();
