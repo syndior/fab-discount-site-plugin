@@ -183,7 +183,7 @@ class FD_Vendor_Product_Controller{
             $fd_product_id = absint( $fd_product_id );
             $fd_product = wc_get_product( $fd_product_id );
 
-            if( $fd_product !== null && $fd_product !== false ){
+            if( $fd_product !== null && $fd_product !== false && $fd_product->get_id() > 0){
 
                 // if(  $original_product->get_type() === 'variable' ){
                 //     $fd_product->set_type( 'fd_wc_offer_variable' );
@@ -197,44 +197,87 @@ class FD_Vendor_Product_Controller{
                 // die();
                 // // $fd_product->set_name( 'Something Random' );
 
-                $fd_product->set_name( $original_product->get_name() );
-                $fd_product->set_description( $original_product->get_description() );
-                $fd_product->set_short_description( $original_product->get_short_description() );
-                $fd_product->set_status( $original_product->get_status() );
-                $fd_product->set_catalog_visibility( $original_product->get_catalog_visibility() );
-                $fd_product->set_featured( $original_product->get_featured() );
-                $fd_product->set_virtual( $original_product->get_virtual() );
-                $fd_product->set_regular_price( $original_product->get_regular_price() );
-                $fd_product->set_sale_price( $original_product->get_sale_price() );
-                $fd_product->set_date_on_sale_from( $original_product->get_date_on_sale_from() );
-                $fd_product->set_date_on_sale_to( $original_product->get_date_on_sale_to() );
-                $fd_product->set_downloadable( $original_product->get_downloadable() );
-                $fd_product->set_downloads( $original_product->get_downloads() );
-                $fd_product->set_download_limit( $original_product->get_download_limit() );
-                $fd_product->set_download_expiry( $original_product->get_download_expiry() );
-                $fd_product->set_tax_status( $original_product->get_tax_status() );
-                $fd_product->set_tax_class( $original_product->get_tax_class() );
-                $fd_product->set_sku( $original_product->get_sku() );
-                $fd_product->set_manage_stock( $original_product->get_manage_stock() );
-                $fd_product->set_stock_status( $original_product->get_stock_status() );
-                $fd_product->set_backorders( $original_product->get_backorders() );
-                $fd_product->set_sold_individually( $original_product->get_sold_individually() );
-                $fd_product->set_weight( $original_product->get_weight() );
-                $fd_product->set_length( $original_product->get_length() );
-                $fd_product->set_width( $original_product->get_width() );
-                $fd_product->set_height( $original_product->get_height() );
-                $fd_product->set_shipping_class_id( $original_product->get_shipping_class_id() );
-                $fd_product->set_upsell_ids( $original_product->get_upsell_ids() );
-                $fd_product->set_cross_sell_ids( $original_product->get_cross_sell_ids() );
-                $fd_product->set_attributes( $original_product->get_attributes() );
-                $fd_product->set_default_attributes( $original_product->get_default_attributes() );
-                $fd_product->set_reviews_allowed( $original_product->get_reviews_allowed() );
-                $fd_product->set_purchase_note( $original_product->get_purchase_note() );
-                $fd_product->set_menu_order( $original_product->get_menu_order() );
-                $fd_product->set_category_ids( $original_product->get_category_ids() );
-                $fd_product->set_tag_ids( $original_product->get_tag_ids() );
-                $fd_product->set_image_id( $original_product->get_image_id() );
-                $fd_product->set_gallery_image_ids( $original_product->get_gallery_image_ids() );
+                // $fd_product->set_name( $original_product->get_name() );
+                // $fd_product->set_description( $original_product->get_description() );
+                // $fd_product->set_short_description( $original_product->get_short_description() );
+                // $fd_product->set_status( $original_product->get_status() );
+                // $fd_product->set_catalog_visibility( $original_product->get_catalog_visibility() );
+                // $fd_product->set_featured( $original_product->get_featured() );
+                // $fd_product->set_virtual( $original_product->get_virtual() );
+                // $fd_product->set_regular_price( $original_product->get_regular_price() );
+                // $fd_product->set_sale_price( $original_product->get_sale_price() );
+                // $fd_product->set_date_on_sale_from( $original_product->get_date_on_sale_from() );
+                // $fd_product->set_date_on_sale_to( $original_product->get_date_on_sale_to() );
+                // $fd_product->set_downloadable( $original_product->get_downloadable() );
+                // $fd_product->set_downloads( $original_product->get_downloads() );
+                // $fd_product->set_download_limit( $original_product->get_download_limit() );
+                // $fd_product->set_download_expiry( $original_product->get_download_expiry() );
+                // $fd_product->set_tax_status( $original_product->get_tax_status() );
+                // $fd_product->set_tax_class( $original_product->get_tax_class() );
+                // $fd_product->set_sku( $original_product->get_sku() );
+                // $fd_product->set_manage_stock( $original_product->get_manage_stock() );
+                // $fd_product->set_stock_status( $original_product->get_stock_status() );
+                // $fd_product->set_backorders( $original_product->get_backorders() );
+                // $fd_product->set_sold_individually( $original_product->get_sold_individually() );
+                // $fd_product->set_weight( $original_product->get_weight() );
+                // $fd_product->set_length( $original_product->get_length() );
+                // $fd_product->set_width( $original_product->get_width() );
+                // $fd_product->set_height( $original_product->get_height() );
+                // $fd_product->set_shipping_class_id( $original_product->get_shipping_class_id() );
+                // $fd_product->set_upsell_ids( $original_product->get_upsell_ids() );
+                // $fd_product->set_cross_sell_ids( $original_product->get_cross_sell_ids() );
+                // $fd_product->set_attributes( $original_product->get_attributes() );
+                // $fd_product->set_default_attributes( $original_product->get_default_attributes() );
+                // $fd_product->set_reviews_allowed( $original_product->get_reviews_allowed() );
+                // $fd_product->set_purchase_note( $original_product->get_purchase_note() );
+                // $fd_product->set_menu_order( $original_product->get_menu_order() );
+                // $fd_product->set_category_ids( $original_product->get_category_ids() );
+                // $fd_product->set_tag_ids( $original_product->get_tag_ids() );
+                // $fd_product->set_image_id( $original_product->get_image_id() );
+                // $fd_product->set_gallery_image_ids( $original_product->get_gallery_image_ids() );
+
+
+                $fd_product_post_array = array(
+                    'ID'            => $fd_product->get_id(),
+                    'post_title'    => $original_product->get_name(),
+                    'post_content'  => $original_product->get_description(),
+                    'post_status'   => $original_product->get_status(),
+                    'post_author'   => $original_product->post->post_author,
+                );
+
+                wp_update_post( $fd_product_post_array, false, true );
+
+                $fd_product_meta = array(
+                    '_visibility'               => $original_product->get_catalog_visibility() ? $original_product->get_catalog_visibility() : 'visible',
+                    '_stock_status'             => $original_product->get_stock_status() ? $original_product->get_stock_status() : 'instock',
+                    'total_sales'               => $original_product->get_total_sales() ? $original_product->get_total_sales() : '0',
+                    '_downloadable'             => $original_product->get_downloadable() ? $original_product->get_downloadable() : 'no',
+                    '_virtual'                  => $original_product->get_virtual() ? $original_product->get_virtual() : 'no',
+                    '_regular_price'            => $original_product->get_regular_price() ? $original_product->get_regular_price() : '',
+                    '_sale_price'               => $original_product->get_sale_price() ? $original_product->get_sale_price() : '',
+                    '_purchase_note'            => $original_product->get_purchase_note() ? $original_product->get_purchase_note() : '',
+                    '_featured'                 => $original_product->get_featured() ? $original_product->get_featured() : 'no',
+                    '_weight'                   => $original_product->get_weight() ? $original_product->get_weight() : '',
+                    '_length'                   => $original_product->get_length() ? $original_product->get_length() : '',
+                    '_width'                    => $original_product->get_width() ? $original_product->get_width() : '',
+                    '_height'                   => $original_product->get_height() ? $original_product->get_height() : '',
+                    '_sku'                      => $original_product->get_sku() ? $original_product->get_sku() : '',
+                    '_product_attributes'       => $original_product->get_attributes() ? $original_product->get_attributes() : array(),
+                    '_sale_price_dates_from'    => $original_product->get_date_on_sale_from() ? $original_product->get_date_on_sale_from() : '',
+                    '_sale_price_dates_to'      => $original_product->get_date_on_sale_to() ? $original_product->get_date_on_sale_to() : '',
+                    '_price'                    => $original_product->get_price() ? $original_product->get_price() : '',
+                    '_sold_individually'        => $original_product->get_sold_individually() ? $original_product->get_sold_individually() : '',
+                    '_manage_stock'             => $original_product->get_manage_stock() ? $original_product->get_manage_stock() : 'no',
+                    '_backorders'               => $original_product->get_backorders() ? $original_product->get_backorders() : 'no',
+                    '_stock'                    => $original_product->get_stock_quantity() ? $original_product->get_stock_quantity() : '',
+                );
+
+
+
+                foreach ($fd_product_meta as $meta_key => $meta_value) {
+                    update_post_meta( $fd_product->get_id(), $meta_key,  $meta_value);
+                }
+
             }
 
         }
