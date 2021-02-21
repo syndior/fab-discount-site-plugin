@@ -25,7 +25,7 @@
     // $curre_time = date('H');
     $times = array(1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24);
     $display = "display:none";
-    if($product->is_type('fd_wc_offer') || $product->is_type('fd_wc_offer_variable')){
+    if($product->is_type('fd_wc_offer') || $product->is_type('fd_wc_offer_variable') || true){
         $display = "display:block";
     }
 ?>

@@ -78,6 +78,39 @@ class FD_Woocommerce_Controller
         add_action( 'woocommerce_before_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
         add_action( 'woocommerce_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
         add_action( 'woocommerce_after_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
+
+
+        // add_action( 'manage_product_posts_custom_column', array( $this, 'modify_product_titles_for' ), 10, 2);
+
+
+        // add_filter( 'request', array( $this, 'hide_fd_offer_products_from_dashboard' ), 10, 1);
+    }
+
+    public function modify_product_titles_for( $column, $post_id )
+    {
+        if( $column === 'name'){
+            add_filter( 'the_title', function( $title, $id ){
+                $product = wc_get_product($id);
+                if( $product->get_type() === 'fd_wc_offer' || $product->get_type() === 'fd_wc_offer_variable' ){
+                    return 'Offer/Voucher: '. $title;
+                }
+                return $title;
+            },10, 2 );
+        }
+        
+    }
+
+    public function hide_fd_offer_products_from_dashboard( $query_vars )
+    {
+        $query_vars['tax_query'] = array(
+            array(
+                'taxonomy' => 'product_type',
+                'field'    => 'slug',
+                'terms'    => array( 'fd_wc_offer', 'fd_wc_offer_variable' ),
+                'operator' => 'NOT IN',
+            ),
+        );
+        return $query_vars;
     }
 
     public function add_product_type_filter( $types )
