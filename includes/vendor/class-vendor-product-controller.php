@@ -18,6 +18,11 @@ class FD_Vendor_Product_Controller{
     
         add_action('dokan_product_edit_after_product_tags',array($this,'show_vendor_product_extra_fields_edit_page'),99,2);
 
+        /* Filter vendor product dashboard product query */
+        // add_filter( 'dokan_product_listing_arg', array($this,'filter_vendor_dashboard_product_query'), 10, 1 );
+        // add_filter( 'dokan_all_products_query', array($this,'filter_vendor_dashboard_product_query'), 10, 1 );
+        add_filter( 'dokan_product_listing_exclude_type', array($this,'filter_vendor_dashboard_product_query'), 10, 1 );
+
     }
 
 
@@ -338,6 +343,12 @@ class FD_Vendor_Product_Controller{
 
 
         // $this->fd_offer_create_update_handler( $product_id , $original_product, true );
+    }
+
+    public function filter_vendor_dashboard_product_query( $product_type_array  )
+    {
+        $product_type_array = array_merge( $product_type_array, array( 'fd_wc_offer', 'fd_wc_offer_variable' ) );
+        return $product_type_array;
     }
 
 
