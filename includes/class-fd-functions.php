@@ -78,7 +78,7 @@ function fdscf_set_option_for_hero_section()
             //         $product_sale_price='';
             //         $product_actual_price='';
             //     }
-            // }//main else
+            // }//main else to process fd_wc_offer_variable
             
     
         } //if featured product
