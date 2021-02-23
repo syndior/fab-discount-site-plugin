@@ -40,8 +40,6 @@ class FD_Activate
             `customer_id`           BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             `order_id`              BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             `product_id`            BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
-            `variation_id`          BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
-            `product_type`          VARCHAR(60) NULL DEFAULT NULL,
             PRIMARY KEY  (fd_voucher_id)
             ) $charset_collate;";
         
