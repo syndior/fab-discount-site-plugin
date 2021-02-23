@@ -12,17 +12,22 @@ class FD_Vendor_Product_Controller{
     
         add_action('dokan_product_edit_after_product_tags',array($this,'show_vendor_product_extra_fields_edit_page'),99,2);
 
+        /* Filter vendor product dashboard product query */
+        add_filter( 'dokan_product_listing_exclude_type', array($this,'filter_vendor_dashboard_product_query'), 10, 1 );
     }
 
 
     /* Add Custom Product Types to Vednor create new product dropdown */
     public function add_custom_product_type( $product_types )
     {
+        unset( $product_types['grouped'] );
+        $product_types['simple'] =  'Simple Offer Product';
         return $product_types;
     }
 
     //svave extra fields from vendor product
-    public function save_vendor_product_extra_fields($product_id, $postdata){
+    public function save_vendor_product_extra_fields($product_id, $postdata)
+    {
         if ( ! dokan_is_user_seller( get_current_user_id() ) ) {
             return;
         }
@@ -64,7 +69,8 @@ class FD_Vendor_Product_Controller{
     }
 
 
-    public function show_vendor_product_extra_fields_edit_page($post, $post_id){
+    public function show_vendor_product_extra_fields_edit_page($post, $post_id)
+    {
         $fd_product_edit_note         = get_post_meta( $post_id, 'fd_product_edit_note', true );
 
         $fields = '';
@@ -80,7 +86,7 @@ class FD_Vendor_Product_Controller{
 
         ';
         echo $fields;
-        echo require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab_vendor.php' ); 
+        echo require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab-vendor.php' ); 
     }
 
 }//class
