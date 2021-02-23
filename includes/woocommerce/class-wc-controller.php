@@ -64,7 +64,7 @@ class FD_Woocommerce_Controller
 
         /* Custom Hook: Add in claim offer feater after successfull checkout */
         add_action( 'fdscf_checkout_order_processed_claim_offer', array( $this, 'add_in_claim_offer_feature' ) );
-
+        
         /* Hook custom product tabs, Displayed on the product page */
         add_filter( 'woocommerce_product_tabs', array( $this, 'add_new_product_tabs' ) );
     }
@@ -486,7 +486,6 @@ class FD_Woocommerce_Controller
         echo '<h2>' . $product_tab['title'] . '</h2>';
         echo $tab_content;
     }
-
 }
 
 new FD_Woocommerce_Controller();

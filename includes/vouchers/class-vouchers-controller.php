@@ -11,7 +11,6 @@ class FD_Vouchers_Controller
 
     public function create_voucher_on_new_order( $order_id )
     {
-        // $order_id = 56;
         $order = wc_get_order( $order_id );
 
         if( $order !== false ){
@@ -38,9 +37,9 @@ class FD_Vouchers_Controller
                     $fd_offer_linked_product_variation      = get_post_meta( $product->get_id(), 'fd_offer_linked_product_variation' )[0];
 
                     if( isset( $fd_offer_linked_product_variation ) && strlen($fd_offer_linked_product_variation) > 0 ){
-                        $product_id = $fd_offer_linked_product_variation;
+                        $product_id = (int)$fd_offer_linked_product_variation;
                     }else{
-                        $product_id = $fd_offer_linked_product;
+                        $product_id = (int)$fd_offer_linked_product;
                     }
 
 
@@ -62,7 +61,7 @@ class FD_Vouchers_Controller
                     }
                     
 
-                    if( in_array( 'seller', $author->roles ) ){
+                    if( in_array( 'seller', $author->roles ) || in_array( 'administrator', $author->roles ) ){
 
                         $voucher_data['customer_id']        = $order->get_user_id();
                         $voucher_data['order_id']           = $order_id;

@@ -6,10 +6,16 @@ class WC_Product_FD_Offer extends  WC_Product
     {
         $this->product_type = 'fd_wc_offer';
         parent::__construct( $product );
+        $this->set_virtual( true );
     }
 
     public function get_type() {
         return 'fd_wc_offer';
+    }
+
+    public function get_virtual( $context = 'view' )
+    {
+        return true;
     }
 
     public function add_to_cart_url() {
