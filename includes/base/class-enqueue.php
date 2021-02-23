@@ -46,7 +46,7 @@ class FD_Enqueue
                 //localize script if user logged in
                 //include ajax vars
                 if( is_user_logged_in() ){
-                        $nonce_val = wp_create_nonce('admin_ajax_check');
+                        $nonce_val = wp_create_nonce('ajax_check');
                         $admin_js_object = array(
                                 'ajax_url' => admin_url( 'admin-ajax.php' ),
                                 'nonce'    => $nonce_val,

@@ -6,7 +6,7 @@
         $product = $item->get_product();
         $type = $product->get_type();
 
-        if( $type == "fd_wc_offer"  || $type == "fd_wc_offer_variable" ){
+        if( $type == "fd_wc_offer"  ){
             $voucher_id = $item->get_meta('_fd_voucher_id');
             $voucher = new FD_Voucher( $voucher_id );
 
@@ -22,7 +22,7 @@
 
 ?>
 
-<?php if( !empty( $vouchers ) ):?>
+<?php if( !empty( $offer_vouchers ) ):?>
 
 <div class="fd_wc_order_claim_offer_wrapper" >
 

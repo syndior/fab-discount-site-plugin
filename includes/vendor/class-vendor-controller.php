@@ -4,7 +4,7 @@ class FD_Vendor_Controller
 {
     public function __construct()
     {
-            require_once(ABSPATH.'/wp-content/plugins/dokan-pro/modules/vendor-analytics/tools/src/Dokan/Http/MediaFileUpload.php');
+            // require_once(ABSPATH.'/wp-content/plugins/dokan-pro/modules/vendor-analytics/tools/src/Dokan/Http/MediaFileUpload.php');
 
             //*****adding extra fileds in dokan seller signup form start*****//   
     

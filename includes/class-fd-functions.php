@@ -23,10 +23,9 @@ function fdscf_set_option_for_hero_section()
                     array(
                         'taxonomy' => 'product_type',
                         'field'    => 'slug',
-                        'terms'    => array('fd_wc_offer','fd_wc_offer_variable'),
+                        'terms'    => array('fd_wc_offer'),
                     ),
                 ),
-                // 'type' => array('fd_wc_offer','fd_wc_offer_variable'),
             ));
 
             $product = $query->get_products()[0];
