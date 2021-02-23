@@ -30,9 +30,19 @@ class FD_Vouchers_Controller
 
                 if( $type == "fd_wc_offer" ){
                     
-                    $product_id = $item->get_product_id();
                     $product = $item->get_product();
                     $author = get_userdata($product->post->post_author);
+
+
+                    $fd_offer_linked_product                = get_post_meta( $product->get_id(), 'fd_offer_linked_product' )[0];
+                    $fd_offer_linked_product_variation      = get_post_meta( $product->get_id(), 'fd_offer_linked_product_variation' )[0];
+
+                    if( isset( $fd_offer_linked_product_variation ) && strlen($fd_offer_linked_product_variation) > 0 ){
+                        $product_id = $fd_offer_linked_product_variation;
+                    }else{
+                        $product_id = $fd_offer_linked_product;
+                    }
+
 
                     $fd_wc_offer_voucher_expiry             = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry' )[0];
                     $fd_wc_offer_voucher_use_global_expiry  = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_use_global_expiry' )[0];

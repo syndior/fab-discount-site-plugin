@@ -278,7 +278,7 @@ class FD_Woocommerce_Controller
       */
     public function fd_wc_get_linked_variations()
     {
-        check_ajax_referer( 'admin_ajax_check', 'security' );
+        check_ajax_referer( 'ajax_check', 'security' );
 
         $response = array(
             'type' => 'error'

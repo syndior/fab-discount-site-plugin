@@ -12,8 +12,6 @@ class FD_Vendor_Product_Controller{
     
         add_action('dokan_product_edit_after_product_tags',array($this,'show_vendor_product_extra_fields_edit_page'),99,2);
 
-        /* Filter vendor product dashboard product query */
-        add_filter( 'dokan_product_listing_exclude_type', array($this,'filter_vendor_dashboard_product_query'), 10, 1 );
     }
 
 
@@ -21,7 +19,7 @@ class FD_Vendor_Product_Controller{
     public function add_custom_product_type( $product_types )
     {
         unset( $product_types['grouped'] );
-        $product_types['simple'] =  'Simple Offer Product';
+        $product_types['fd_wc_offer'] =  'FD Offer';
         return $product_types;
     }
 
@@ -86,7 +84,7 @@ class FD_Vendor_Product_Controller{
 
         ';
         echo $fields;
-        echo require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab-vendor.php' ); 
+        require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab-vendor.php' ); 
     }
 
 }//class

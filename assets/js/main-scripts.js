@@ -62,6 +62,70 @@ window.addEventListener('DOMContentLoaded', function(){
         } );
     }
 
+
+    /**
+         * Loads variations data in the admin product option offer linked product dropdown
+         */
+        let selectedProduct = document.querySelector('#fd_offer_linked_product');
+        let selectedVariationOptions = document.querySelector('#fd_offer_linked_product_variation_wrapper');
+        if (selectedProduct !== null && selectedVariationOptions !== null) {
+
+            /**
+             * Loads in variations on pageload
+             */
+            let selectedElement = selectedProduct.options[selectedProduct.selectedIndex];
+            if (selectedElement.dataset.productType == 'variable') {
+                let productId = selectedElement.value;
+                getVariationOptionsAjax(productId).then(function (variations) {
+                    let variationsDropdown = selectedVariationOptions.querySelector('#fd_offer_linked_product_variation');
+                    variationsDropdown.innerHTML = '';
+                    let defaultElement = `<option>Select a value</option>`;
+
+                    variationsDropdown.innerHTML += defaultElement;
+                    variations.forEach(function (option) {
+                        let selected = (variationsDropdown.dataset.currentValue == option.product_id) ? 'selected' : '';
+                        let optionELement = `<option value="${option.product_id}" ${selected}>${option.product_title}</option>`;
+                        variationsDropdown.innerHTML += optionELement;
+                    });
+                    selectedVariationOptions.style.display = 'block';
+                }, function (error) {
+                    console.log(error);
+                });
+
+            }
+
+            /**
+             * Makes ajax call on input change event
+             */
+            selectedProduct.addEventListener('change', function () {
+                let selectedElement = selectedProduct.options[selectedProduct.selectedIndex];
+                if (selectedElement.dataset.productType == 'variable') {
+
+                    let productId = selectedElement.value;
+                    getVariationOptionsAjax(productId).then(function (variations) {
+                        let variationsDropdown = selectedVariationOptions.querySelector('#fd_offer_linked_product_variation');
+                        variationsDropdown.innerHTML = '';
+                        let defaultElement = `<option>Select a value</option>`;
+
+                        variationsDropdown.innerHTML += defaultElement;
+                        variations.forEach(function (option) {
+                            let selected = (variationsDropdown.dataset.currentValue == option.product_id) ? 'selected' : '';
+                            let optionELement = `<option value="${option.product_id}" ${selected}>${option.product_title}</option>`;
+                            variationsDropdown.innerHTML += optionELement;
+                        });
+                        selectedVariationOptions.style.display = 'block';
+                    }, function (error) {
+                        console.log(error);
+                    });
+
+                } else {
+                    selectedVariationOptions.style.display = 'none';
+                }
+
+            }, false);
+        }
+
+
 });
 
 
@@ -148,16 +212,20 @@ const setOfferOptionsInVendor = ()=>{
     let corner_banner = document.getElementById('fd_wc_corner_banner');
     let selling_fast_banner_title = document.getElementById('selling_fast_banner_title');
     let selling_fast_banner_heading = document.getElementById('selling_fast_banner_heading');
-    corner_banner.addEventListener('change',()=>{
-        // var checkbox_schedule = document.getElementById('fd_wc_offer_schedule');
-        if(corner_banner.checked==true){
-            selling_fast_banner_title.style.display = "block";
-            selling_fast_banner_heading.style.display = "block";
-        }else{
-            selling_fast_banner_title.style.display = "none";
-            selling_fast_banner_heading.style.display = "none";
-        }
-    });//event listener for Enable selling fast
+
+    if( corner_banner !== null ){
+        corner_banner.addEventListener('change',()=>{
+            // var checkbox_schedule = document.getElementById('fd_wc_offer_schedule');
+            if(corner_banner.checked==true){
+                selling_fast_banner_title.style.display = "block";
+                selling_fast_banner_heading.style.display = "block";
+            }else{
+                selling_fast_banner_title.style.display = "none";
+                selling_fast_banner_heading.style.display = "none";
+            }
+        });//event listener for Enable selling fast
+    }
+
 
 
     /**
@@ -166,16 +234,19 @@ const setOfferOptionsInVendor = ()=>{
     let fd_wc_offer_schedule = document.getElementById('fd_wc_offer_schedule');
     let schedule_date = document.getElementById('schedule_date');
     let schedule_time = document.getElementById('schedule_time');
-    fd_wc_offer_schedule.addEventListener('change',()=>{
-        // var checkbox_schedule = document.getElementById('fd_wc_offer_schedule');
-        if(fd_wc_offer_schedule.checked==true){
-            schedule_date.style.display = "block";
-            schedule_time.style.display = "block";
-        }else{
-            schedule_date.style.display = "none";
-            schedule_time.style.display = "none";
-        }
-    });//event listener for offer Scheduling
+    
+    if( fd_wc_offer_schedule !== null ){
+        fd_wc_offer_schedule.addEventListener('change',()=>{
+            // var checkbox_schedule = document.getElementById('fd_wc_offer_schedule');
+            if(fd_wc_offer_schedule.checked==true){
+                schedule_date.style.display = "block";
+                schedule_time.style.display = "block";
+            }else{
+                schedule_date.style.display = "none";
+                schedule_time.style.display = "none";
+            }
+        });//event listener for offer Scheduling
+    }
 
 
     /**
@@ -184,15 +255,20 @@ const setOfferOptionsInVendor = ()=>{
    let fd_wc_offer_expiry = document.getElementById('fd_wc_offer_expiry');
    let global_expiry = document.getElementById('global_expiry');
    let local_expiry = document.getElementById('local_expiry');
-   fd_wc_offer_expiry.addEventListener('change',()=>{
-       if(fd_wc_offer_expiry.checked==true){
-           global_expiry.style.display = "block";
-           local_expiry.style.display = "block";
-       }else{
-           global_expiry.style.display = "none";
-           local_expiry.style.display = "none";
-       }
-   });//event listener for offer expiry
+
+   if( fd_wc_offer_expiry !== null ){
+
+    fd_wc_offer_expiry.addEventListener('change',()=>{
+        if(fd_wc_offer_expiry.checked==true){
+            global_expiry.style.display = "block";
+            local_expiry.style.display = "block";
+        }else{
+            global_expiry.style.display = "none";
+            local_expiry.style.display = "none";
+        }
+    });//event listener for offer expiry
+
+   }
    
 
     /**
@@ -201,31 +277,66 @@ const setOfferOptionsInVendor = ()=>{
    let fd_wc_offer_voucher_expiry = document.getElementById('fd_wc_offer_voucher_expiry');
    let global_voucher_expiry = document.getElementById('global_voucher_expiry');
    let local_voucher_expiry = document.getElementById('local_voucher_expiry');
-   fd_wc_offer_voucher_expiry.addEventListener('change',()=>{
-       if(fd_wc_offer_voucher_expiry.checked==true){
-           global_voucher_expiry.style.display = "block";
-           local_voucher_expiry.style.display = "block";
-       }else{
-           global_voucher_expiry.style.display = "none";
-           local_voucher_expiry.style.display = "none";
-       }
-   });//event listener for Voucher expiry
+
+   if( fd_wc_offer_voucher_expiry !== null ){
+    
+    fd_wc_offer_voucher_expiry.addEventListener('change',()=>{
+        if(fd_wc_offer_voucher_expiry.checked==true){
+            global_voucher_expiry.style.display = "block";
+            local_voucher_expiry.style.display = "block";
+        }else{
+            global_voucher_expiry.style.display = "none";
+            local_voucher_expiry.style.display = "none";
+        }
+    });//event listener for Voucher expiry
+    
+   }
 
 
    let product_type = document.getElementById('product_type');
    let fd_wc_offer_options = document.getElementById('fd_wc_offer_options');
 
-   product_type.addEventListener('change',()=>{
-    if(product_type.value == "fd_wc_offer"){
-        fd_wc_offer_options.style.display = "block";
-    }else{
-        fd_wc_offer_options.style.display = "none";
-    }
-   });
+   if( product_type !== null){
+        product_type.addEventListener('change',()=>{
+            if(product_type.value == "fd_wc_offer"){
+                fd_wc_offer_options.style.display = "block";
+            }else{
+                fd_wc_offer_options.style.display = "none";
+            }
+        });
+   }
 
 
    
 
+}
+
+
+/**
+ * Helper function - gets variation with ajax
+ */
+let getVariationOptionsAjax = function (productId) {
+    return new Promise(function (resolve, reject) {
+        let data = new FormData();
+        data.append('action', 'fd_wc_get_linked_variations');
+        data.append('security', fd_ajax_obj.nonce);
+        data.append('product_id', productId);
+
+        fetch(fd_ajax_obj.ajax_url, {
+            method: "POST",
+            credentials: 'same-origin',
+            body: data
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            if (data.data.type == 'success') {
+                let variations = data.data.variations;
+                resolve(variations);
+            } else {
+                reject(false);
+            }
+        });
+    });
 }
 
 window.onload = setOfferOptionsInVendor();

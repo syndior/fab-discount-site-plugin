@@ -22,7 +22,7 @@
 
 ?>
 
-<?php if( !empty( $vouchers ) ):?>
+<?php if( !empty( $offer_vouchers ) ):?>
 
 <div class="fd_wc_order_claim_offer_wrapper" >
 
