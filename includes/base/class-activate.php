@@ -7,13 +7,6 @@ class FD_Activate
         flush_rewrite_rules();
 
         FD_Activate::generate_custom_database_tables();
-
-        // if ( ! get_term_by( 'slug', 'fd_wc_offer', 'product_type' ) ) {
-        //     wp_insert_term( 'fd_wc_offer', 'product_type' );
-        // }
-        // if ( ! get_term_by( 'slug', 'fd_wc_offer_variable', 'product_type' ) ) {
-        //     wp_insert_term( 'fd_wc_offer_variable', 'product_type' );
-        // }
     }
 
     private static function generate_custom_database_tables()
@@ -40,8 +33,6 @@ class FD_Activate
             `customer_id`           BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             `order_id`              BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
             `product_id`            BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
-            `variation_id`          BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
-            `product_type`          VARCHAR(60) NULL DEFAULT NULL,
             PRIMARY KEY  (fd_voucher_id)
             ) $charset_collate;";
         

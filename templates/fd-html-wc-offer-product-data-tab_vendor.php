@@ -25,7 +25,7 @@
     // $curre_time = date('H');
     $times = array(1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24);
     $display = "display:none";
-    if($product->is_type('fd_wc_offer') || $product->is_type('fd_wc_offer_variable')){
+    if($product->is_type('fd_wc_offer')){
         $display = "display:block";
     }
 ?>
@@ -189,7 +189,7 @@
 
         foreach( $products as $product ){
             $product = wc_get_product( $product->ID );
-            if( !$product->is_type( 'fd_wc_offer' ) && !$product->is_type( 'fd_wc_offer_variable' ) ){
+            if( !$product->is_type( 'fd_wc_offer' ) ){
                 $option['product_id']           = $product->get_ID();
                 $option['product_title']        = $product->get_title();
                 $option['product_type']         = $product->get_type();

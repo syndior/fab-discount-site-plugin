@@ -10,9 +10,6 @@ class FD_Woocommerce_Controller
         /* adds our custom product type extended class to be used with our product type*/
         add_filter( 'woocommerce_product_class', array( $this, 'add_woocommerce_product_class' ), 99, 2 );
         
-        /* Fix Variable product data-store issue */
-        add_filter( 'woocommerce_data_stores', array( $this, 'fix_variable_products_data_store_issue' ), 99, 2 );
-        
         /* add custom product product data tab */
         add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 9999, 1 );
 
@@ -37,9 +34,6 @@ class FD_Woocommerce_Controller
         /* adds back the add to cart buttons and product summary sections */
         add_action( 'woocommerce_fd_wc_offer_add_to_cart', array( $this, 'add_to_cart_template_include') );
         
-        /* load default woo functions for our custom variayion product type */
-        add_action( 'woocommerce_fd_wc_offer_variable_add_to_cart', 'woocommerce_variable_add_to_cart', 9999 );
-        add_action( 'woocommerce_add_to_cart_handler', array( $this, 'modify_add_to_cart_handler_for_variations' ), 9999 );
 
         /* adds custom button before the add to cart button to pay with store credit */
         add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_functionality_before_add_to_cart_button'), 10 );
@@ -73,17 +67,11 @@ class FD_Woocommerce_Controller
 
         /* Hook custom product tabs, Displayed on the product page */
         add_filter( 'woocommerce_product_tabs', array( $this, 'add_new_product_tabs' ) );
-
-        /* Fix for variations dropdowns */
-        add_action( 'woocommerce_before_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
-        add_action( 'woocommerce_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
-        add_action( 'woocommerce_after_single_variation', array( $this, 'load_woocommerce_variations_hook' ), 9 );
     }
 
     public function add_product_type_filter( $types )
     {
         $types[ 'fd_wc_offer' ]             = 'FD Offer';
-        $types[ 'fd_wc_offer_variable' ]    = 'FD Offer Variable';
         return $types;
     }
 
@@ -92,21 +80,8 @@ class FD_Woocommerce_Controller
         if ( $product_type == 'fd_wc_offer' ) {
             $classname = 'WC_Product_FD_Offer';
         }
-        
-        if ( $product_type == 'fd_wc_offer_variable' ) {
-            $classname = 'WC_Product_FD_Offer_Variable';
-        }
 
         return $classname;
-    }
-
-
-    public function fix_variable_products_data_store_issue( $stores )
-    {
-        if( !isset( $stores['product-fd_wc_offer_variable'] ) ){
-            $stores['product-fd_wc_offer_variable'] = 'WC_Product_Variable_Data_Store_CPT';
-        }
-        return $stores;
     }
 
 
@@ -118,15 +93,12 @@ class FD_Woocommerce_Controller
 
         //hide shipping tab
         $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer';
-        $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer_variable';
 
-        //adds back the variations tab
-        $original_tabs['variations']['class'][] = 'show_if_fd_wc_offer_variable';
 
         $fd_wc_offer_tab['fd_wc_offer'] = array(
             'label' => 'FD Offer Options',
             'target' => 'fd_wc_offer_options',
-            'class' => 'show_if_fd_wc_offer show_if_fd_wc_offer_variable'
+            'class' => 'show_if_fd_wc_offer'
         );
 
         $tabs = $this->insert_item_at_array_position( 0, $fd_wc_offer_tab, $original_tabs );
@@ -164,15 +136,6 @@ class FD_Woocommerce_Controller
                 jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_offer').show();
                 jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer').show();
                 jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer').show();
-                
-                jQuery('.inventory_options').addClass('show_if_fd_wc_offer_variable').show();
-                jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_offer_variable').show();
-                jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer_variable').show();
-                jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer_variable').show();
-            });
-
-            jQuery( 'body' ).on( 'woocommerce_added_attribute', function( event ){
-                jQuery('.woocommerce_attribute_data .enable_variation').addClass('show_if_fd_wc_offer_variable').show();
             });
         </script>
         <?php
@@ -217,14 +180,6 @@ class FD_Woocommerce_Controller
         }
     }
 
-    public function modify_add_to_cart_handler_for_variations( $handler )
-    {
-        if( $handler == 'fd_wc_offer_variable' ){
-            $handler = 'variable';
-        }
-        return $handler;
-    }
-
     public function add_to_cart_template_include()
     {
         global $post;
@@ -232,14 +187,6 @@ class FD_Woocommerce_Controller
 
         if( $product->get_type() == 'fd_wc_offer' ){
             do_action( 'woocommerce_simple_add_to_cart' );
-        }
-    }
-
-    public function load_woocommerce_variations_hook()
-    {
-        global $product;
-        if($product->get_type() == 'fd_wc_offer_variable'){
-            do_action( 'woocommerce_before_add_to_cart_quantity' );
         }
     }
 
@@ -406,7 +353,7 @@ class FD_Woocommerce_Controller
         if( $post->post_type == 'product' ){
             $product = wc_get_product($post->ID);
 
-            if( $product->get_type() == 'fd_wc_offer' || $product->get_type() == 'fd_wc_offer_variable' ){
+            if( $product->get_type() == 'fd_wc_offer' ){
                 $id             = 'fdscf_product_meta_box';
                 $title          = 'FD Offer Options';
                 $callback       = array( $this, 'print_meta_box_content');

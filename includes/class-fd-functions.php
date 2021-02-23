@@ -20,7 +20,6 @@ function fdscf_set_option_for_hero_section()
                 'orderby' => 'date',
                 'order' => 'DESC',
                 'type' => 'fd_wc_offer',
-                'type' => 'fd_wc_offer_variable',
             ));
 
             $product = $query->get_products()[0];

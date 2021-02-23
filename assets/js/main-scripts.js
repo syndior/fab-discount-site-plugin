@@ -216,7 +216,7 @@ const setOfferOptionsInVendor = ()=>{
    let fd_wc_offer_options = document.getElementById('fd_wc_offer_options');
 
    product_type.addEventListener('change',()=>{
-    if(product_type.value == "fd_wc_offer" || product_type.value == "fd_wc_offer_variable"){
+    if(product_type.value == "fd_wc_offer"){
         fd_wc_offer_options.style.display = "block";
     }else{
         fd_wc_offer_options.style.display = "none";

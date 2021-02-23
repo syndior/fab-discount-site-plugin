@@ -28,7 +28,7 @@ class FD_Vouchers_Controller
                 $product = $item->get_product();
                 $type = $product->get_type();
 
-                if( $type == "fd_wc_offer"  || $type == "fd_wc_offer_variable" ){
+                if( $type == "fd_wc_offer" ){
                     
                     $product_id = $item->get_product_id();
                     $product = $item->get_product();
