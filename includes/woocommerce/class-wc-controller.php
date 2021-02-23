@@ -75,7 +75,7 @@ class FD_Woocommerce_Controller
     public function add_product_type_filter( $types )
     {
         $types[ 'fd_wc_offer' ]             = 'FD Offer';
-        $types[ 'fd_wc_offer_variable' ]    = 'FD Offer Variable';
+        // $types[ 'fd_wc_offer_variable' ]    = 'FD Offer Variable';
         return $types;
     }
 
@@ -85,9 +85,9 @@ class FD_Woocommerce_Controller
             $classname = 'WC_Product_FD_Offer';
         }
         
-        if ( $product_type == 'fd_wc_offer_variable' ) {
-            $classname = 'WC_Product_FD_Offer_Variable';
-        }
+        // if ( $product_type == 'fd_wc_offer_variable' ) {
+        //     $classname = 'WC_Product_FD_Offer_Variable';
+        // }
 
         return $classname;
     }
@@ -95,7 +95,7 @@ class FD_Woocommerce_Controller
 
     public function fix_variable_products_data_store_issue( $stores )
     {
-        $stores['product-fd_wc_offer_variable'] = 'WC_Product_Variable_Data_Store_CPT';
+        // $stores['product-fd_wc_offer_variable'] = 'WC_Product_Variable_Data_Store_CPT';
         return $stores;
     }
 
@@ -108,15 +108,16 @@ class FD_Woocommerce_Controller
 
         //hide shipping tab
         $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer';
-        $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer_variable';
+        // $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer_variable';
 
         //adds back the variations tab
-        $original_tabs['variations']['class'][] = 'show_if_fd_wc_offer_variable';
+        // $original_tabs['variations']['class'][] = 'show_if_fd_wc_offer_variable';
 
         $fd_wc_offer_tab['fd_wc_offer'] = array(
             'label' => 'FD Offer Options',
             'target' => 'fd_wc_offer_options',
-            'class' => 'show_if_fd_wc_offer show_if_fd_wc_offer_variable'
+            'class' => 'show_if_fd_wc_offer'
+            // 'class' => 'show_if_fd_wc_offer show_if_fd_wc_offer_variable'
         );
 
         $tabs = $this->insert_item_at_array_position( 0, $fd_wc_offer_tab, $original_tabs );
@@ -155,15 +156,15 @@ class FD_Woocommerce_Controller
                 jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer').show();
                 jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer').show();
                 
-                jQuery('.inventory_options').addClass('show_if_fd_wc_offer_variable').show();
-                jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_offer_variable').show();
-                jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer_variable').show();
-                jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer_variable').show();
+                // jQuery('.inventory_options').addClass('show_if_fd_wc_offer_variable').show();
+                // jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_offer_variable').show();
+                // jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer_variable').show();
+                // jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer_variable').show();
             });
 
-            jQuery( 'body' ).on( 'woocommerce_added_attribute', function( event ){
-                jQuery('.woocommerce_attribute_data .enable_variation').addClass('show_if_fd_wc_offer_variable').show();
-            });
+            // jQuery( 'body' ).on( 'woocommerce_added_attribute', function( event ){
+            //     jQuery('.woocommerce_attribute_data .enable_variation').addClass('show_if_fd_wc_offer_variable').show();
+            // });
         </script>
         <?php
     }
@@ -192,9 +193,12 @@ class FD_Woocommerce_Controller
         $fd_product_meta['fd_wc_offer_voucher_use_global_expiry']   = ( $_POST['fd_wc_offer_voucher_use_global_expiry'] == 'fd_wc_offer_voucher_use_global_expiry_enabled' ) ? $_POST['fd_wc_offer_voucher_use_global_expiry'] : 'fd_wc_offer_voucher_use_global_expiry_disabled';
         $fd_product_meta['fd_wc_offer_voucher_expiry_date']         = ( isset( $_POST['fd_wc_offer_voucher_expiry_date'] ) && $_POST['fd_wc_offer_voucher_expiry_date'] > 0 ) ? $_POST['fd_wc_offer_voucher_expiry_date'] : 0;
         $fd_product_meta['fd_wc_offer_savings']         = 0;
+
+
          if(isset( $_POST['_regular_price'] ) && isset( $_POST['_sale_price'] ) ){
             $fd_product_meta['fd_wc_offer_savings'] = ($_POST['_sale_price']/$_POST['_regular_price'])*100;
-         } 
+         }
+          
          $fd_product_meta['fd_product_edit_note'] = "";
 
         if( count( $fd_product_meta ) > 0 ){
