@@ -135,7 +135,7 @@ public function show_vendor_product_extra_fields_edit_page($post, $post_id){
 
     <br>
     <?php
-    require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab_vendor.php' ); 
+    require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab-vendor.php' ); 
 
 }
 
