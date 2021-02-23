@@ -27,6 +27,9 @@ window.addEventListener('DOMContentLoaded', function(){
     let uploadBtns = document.querySelectorAll('.fd_upload_btn');
     let identity_success_msg = document.getElementById('identity_success_msg');
     let others_doc_success_msg = document.getElementById('others_doc_success_msg');
+    let proof_success_msg = document.getElementById('proof_success_msg');
+    let video_success_msg = document.getElementById('video_success_msg');
+    
     if( uploadBtns.length > 0 ){
         uploadBtns.forEach( function(btn){
             btn.addEventListener( 'click', function(e){
@@ -52,8 +55,12 @@ window.addEventListener('DOMContentLoaded', function(){
                         // console.log(btn.dataset.inputName);
                         if(btn.dataset.inputName == "identity_doc"){
                             identity_success_msg.innerHTML = message;
-                        }else{
+                        }else if(btn.dataset.inputName == "others_doc"){
                             others_doc_success_msg.innerHTML = message;
+                        }else if(btn.dataset.inputName == "fd_product_proof_of_stock"){
+                            proof_success_msg.innerHTML = message;
+                        }else if(btn.dataset.inputName == "fd_product_video"){
+                            video_success_msg.innerHTML = message;
                         }
                     }
 
