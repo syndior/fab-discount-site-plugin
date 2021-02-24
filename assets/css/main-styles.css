@@ -99,3 +99,9 @@
     padding: 20px!important;
     width: 100%!important;
 }
+.claim_individual_voucher{
+    padding: 10px!important;
+    background: transparent!important;
+    color: #3c3c3c!important;
+    border: none!important;
+}

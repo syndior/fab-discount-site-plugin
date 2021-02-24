@@ -29,7 +29,7 @@ class FD_Vendor_Product_Controller{
         if ( ! dokan_is_user_seller( get_current_user_id() ) ) {
             return;
         }
-        
+        $fd_product_meta = [];
         $fd_product_meta['fd_wc_corner_banner']                     = ( $postdata['fd_wc_corner_banner'] == 'fd_wc_corner_banner_enabled' ) ? $postdata['fd_wc_corner_banner'] : 'fd_wc_corner_banner_disabled';
         $fd_product_meta['fd_wc_corner_banner_title']               = ( isset( $postdata['fd_wc_corner_banner_title'] ) ) ? $postdata['fd_wc_corner_banner_title'] : '';
         $fd_product_meta['fd_wc_corner_banner_headind']             = ( isset( $postdata['fd_wc_corner_banner_headind'] ) ) ? $postdata['fd_wc_corner_banner_headind'] : '';
@@ -87,7 +87,6 @@ public function show_vendor_product_extra_fields_edit_page($post, $post_id){
 
 ?>
  <div class="gregcustom dokan-form-group">
-        <h1><?php echo $fd_wc_offer_savings?></h1>
         <label class="dokan-w3 dokan-control-label" for="">
         Edit Note <span style = "color:red">Please describe why do you want to edit it*</span>
         </label>

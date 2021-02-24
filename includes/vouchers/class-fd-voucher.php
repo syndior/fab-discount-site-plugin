@@ -377,6 +377,17 @@ class FD_Voucher
         return false;
     }
 
+    public static function get_current_customer_vouchers( int $customer_id )
+    {
+        global $wpdb;
+        $table_name = fdscf_vouchers_db_table_name;
+        $query = " SELECT * FROM  `{$table_name}` WHERE `customer_id` = $customer_id ORDER BY `created_at` DESC LIMIT 20";
+        $result = $wpdb->get_results( $query );
+        return $result;
+    }
+
+
+
     /**
      * Helper Function: Update Voucher Objects Porpertoes
      */

@@ -26,6 +26,7 @@ class FD_Vouchers_Controller
             foreach ( $order->get_items() as $item_id => $item ) {
                 $product = $item->get_product();
                 $type = $product->get_type();
+                $quantity = $item->get_quantity();
 
                 if( $type == "fd_wc_offer" ){
                     
@@ -69,21 +70,25 @@ class FD_Vouchers_Controller
                         $voucher_data['voucher_amount']     = $item->get_total();
                         $voucher_data['product_id']         = $product_id;
 
-                        $voucher = FD_Voucher::create_voucher($voucher_data);
+                        $meta_values = array();
+                        for ($i=0 ; $i < $quantity ; $i++) { 
+                            $voucher = FD_Voucher::create_voucher($voucher_data);   
+                            if( $voucher == false ){
+                                wp_die( 'An error occured while generating the voucher for this order' );
+                            }                             
+                            $meta_values[]     = $voucher->get_ID();                            
+                        }//generate vouchers equal to item quantity
 
-                        if( $voucher == false ){
-                            wp_die( 'An error occured while generating the voucher for this order' );
-                        }else{
-                            $meta_key       = '_fd_voucher_id';
-                            $meta_value     = $voucher->get_ID();
-                            wc_add_order_item_meta( $item_id, $meta_key ,$meta_value );
-                        }
+                        $meta_key       = '_fd_voucher_id';
+                        $meta_value = $meta_values;
+                        wc_add_order_item_meta( $item_id, $meta_key ,$meta_value );
+                        
 
 
 
                     }
 
-                }
+                }//$type == "fd_wc_offer"
 
             }
         }
