@@ -99,3 +99,101 @@
     padding: 20px!important;
     width: 100%!important;
 }
+
+/*
+ Styles for claim voucher form
+*/
+.fd_claim_voucher_form_wrapper{
+    width: 100%;
+    padding: 10px 10%;
+}
+form#fd_claim_voucher_form{
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.2);
+    padding: 20px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+form#fd_claim_voucher_form #fd_voucher_key{
+    padding: 16px 20px;
+    font-size: 22px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    outline: none !important;
+    text-align: center;
+}
+
+.fd_claim_voucher_btn{
+    padding: 20px;
+    line-height: 1em;
+    font-size: 24px;
+    text-transform: uppercase;
+    color: #ffffff;
+    border: none;
+    border-radius: 15px;
+    background-image: linear-gradient( 360deg, #2ed3a7, #56e289);
+    cursor: pointer;
+}
+
+.fd_claim_result_wrapper{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.2);
+}
+
+.fd_claim_voucher_result_item{
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    border: 1px dashed rgba(0,0,0,0.3);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.fd_claim_voucher_result_item .fd_claim_voucher_result_item_img{
+    width: 20%;
+    max-width: 20%;
+    margin-right: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+.fd_claim_voucher_result_item .fd_claim_voucher_result_item_img img{
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+
+.fd_claim_voucher_result_item_info{
+    flex-grow: 1;
+}
+.fd_claim_voucher_result_item_title{
+    color: #222322;
+    font-family: Open Sans,Arial,sans-serif;
+    line-height: 1.3em;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.fd_claim_voucher_result_item_status{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.fd_claim_voucher_result_item_status label{
+    color: #222322;
+    padding-right: 20px;
+}
+.fd_claim_voucher_result_item_status p{
+    text-transform: uppercase;
+}

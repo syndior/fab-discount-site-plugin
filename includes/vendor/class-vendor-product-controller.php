@@ -29,15 +29,16 @@ class FD_Vendor_Product_Controller{
         if ( ! dokan_is_user_seller( get_current_user_id() ) ) {
             return;
         }
-        
+
+        $fd_product_meta = [];
         $fd_product_meta['fd_wc_corner_banner']                     = ( $postdata['fd_wc_corner_banner'] == 'fd_wc_corner_banner_enabled' ) ? $postdata['fd_wc_corner_banner'] : 'fd_wc_corner_banner_disabled';
         $fd_product_meta['fd_wc_corner_banner_title']               = ( isset( $postdata['fd_wc_corner_banner_title'] ) ) ? $postdata['fd_wc_corner_banner_title'] : '';
         $fd_product_meta['fd_wc_corner_banner_headind']             = ( isset( $postdata['fd_wc_corner_banner_headind'] ) ) ? $postdata['fd_wc_corner_banner_headind'] : '';
         
         //scheduling 
         $fd_product_meta['fd_wc_offer_schedule']                     = ( $postdata['fd_wc_offer_schedule'] == 'enabled' ) ? $postdata['fd_wc_offer_schedule'] : 'disabled';
-        $fd_product_meta['fd_wc_offer_schedule_date']                     = ( isset( $postdata['fd_wc_offer_schedule_date'] ) ) ? $postdata['fd_wc_offer_schedule_date'] : '';
-        $fd_product_meta['fd_wc_offer_schedule_time']                     = ( isset( $postdata['fd_wc_offer_schedule_time'] ) ) ? $postdata['fd_wc_offer_schedule_time'] : '';
+        $fd_product_meta['fd_wc_offer_schedule_date']                = ( isset( $postdata['fd_wc_offer_schedule_date'] ) ) ? $postdata['fd_wc_offer_schedule_date'] : '';
+        $fd_product_meta['fd_wc_offer_schedule_time']                = ( isset( $postdata['fd_wc_offer_schedule_time'] ) ) ? $postdata['fd_wc_offer_schedule_time'] : '';
         
         
         $fd_product_meta['fd_wc_offer_expiry']                      = ( $postdata['fd_wc_offer_expiry'] == 'fd_wc_offer_expiry_enabled' ) ? $postdata['fd_wc_offer_expiry'] : 'fd_wc_offer_expiry_disabled';
@@ -48,9 +49,9 @@ class FD_Vendor_Product_Controller{
         $fd_product_meta['fd_wc_offer_voucher_expiry']              = ( $postdata['fd_wc_offer_voucher_expiry'] == 'fd_wc_offer_voucher_expiry_enabled' ) ? $postdata['fd_wc_offer_voucher_expiry'] : 'fd_wc_offer_voucher_expiry_disabled';
         $fd_product_meta['fd_wc_offer_voucher_use_global_expiry']   = ( $postdata['fd_wc_offer_voucher_use_global_expiry'] == 'fd_wc_offer_voucher_use_global_expiry_enabled' ) ? $postdata['fd_wc_offer_voucher_use_global_expiry'] : 'fd_wc_offer_voucher_use_global_expiry_disabled';
         $fd_product_meta['fd_wc_offer_voucher_expiry_date']         = ( isset( $postdata['fd_wc_offer_voucher_expiry_date'] ) && $postdata['fd_wc_offer_voucher_expiry_date'] > 0 ) ? $postdata['fd_wc_offer_voucher_expiry_date'] : 0;
-        $fd_product_meta['fd_product_edit_note']         = ( isset( $postdata['fd_product_edit_note'] ) ) ? $postdata['fd_product_edit_note'] : '';
-        $fd_product_meta['fd_product_proof_of_stock']         = ( isset( $postdata['fd_product_proof_of_stock'] ) ) ? $postdata['fd_product_proof_of_stock'] : '';
-        $fd_product_meta['fd_product_video']         = ( isset( $postdata['fd_product_video'] ) ) ? $postdata['fd_product_video'] : '';
+        $fd_product_meta['fd_product_edit_note']                    = ( isset( $postdata['fd_product_edit_note'] ) ) ? $postdata['fd_product_edit_note'] : '';
+        $fd_product_meta['fd_product_proof_of_stock']               = ( isset( $postdata['fd_product_proof_of_stock'] ) ) ? $postdata['fd_product_proof_of_stock'] : '';
+        $fd_product_meta['fd_product_video']                        = ( isset( $postdata['fd_product_video'] ) ) ? $postdata['fd_product_video'] : '';
 
         $fd_product_meta['fd_wc_offer_savings']        =  0;
          if(isset( $postdata['_regular_price'] ) && isset( $postdata['_sale_price'] ) ){

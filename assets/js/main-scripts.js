@@ -4,23 +4,34 @@ window.addEventListener('DOMContentLoaded', function(){
     /**
      * Order completed / Claim offer section
      */
-    let claimOfferBtn = document.querySelector('.fd_claim_offer_btn');
-    let voucherKeyWrapper = document.querySelector('.fd_offer_voucher_key_wrapper');
-    if( claimOfferBtn !== null && voucherKeyWrapper !== null){
-        claimOfferBtn.addEventListener( 'click', function(){
-            if( !voucherKeyWrapper.classList.contains('fd_offer_voucher_key_wrapper_show') ){
-                voucherKeyWrapper.style.display = 'block';
-                setTimeout( function(){
-                    voucherKeyWrapper.classList.add('fd_offer_voucher_key_wrapper_show');
-                },10);
-            }else{
-                voucherKeyWrapper.classList.remove('fd_offer_voucher_key_wrapper_show');
-                setTimeout( function(){
-                    voucherKeyWrapper.style.display = 'none';
-                },500);
+
+     let purchasedOfferItems = document.querySelectorAll('.fd_offer_details_wrapper');
+     if( purchasedOfferItems.length > 0 ){
+
+        purchasedOfferItems.forEach( function(offerItem){
+            let claimOfferBtn = offerItem.querySelector('.fd_claim_offer_btn');
+            let voucherKeyWrapper = offerItem.querySelector('.fd_offer_voucher_key_wrapper');
+
+            if( claimOfferBtn !== null && voucherKeyWrapper !== null){
+                claimOfferBtn.addEventListener( 'click', function(){
+                    if( !voucherKeyWrapper.classList.contains('fd_offer_voucher_key_wrapper_show') ){
+                        voucherKeyWrapper.style.display = 'block';
+                        setTimeout( function(){
+                            voucherKeyWrapper.classList.add('fd_offer_voucher_key_wrapper_show');
+                        },10);
+                    }else{
+                        voucherKeyWrapper.classList.remove('fd_offer_voucher_key_wrapper_show');
+                        setTimeout( function(){
+                            voucherKeyWrapper.style.display = 'none';
+                        },500);
+                    }
+                }, false );
             }
-        }, false );
-    }
+
+        } );
+
+     }
+    
 
 
 
@@ -133,12 +144,94 @@ window.addEventListener('DOMContentLoaded', function(){
         }
 
 
+
+        /**
+         * Hook eventlistener for claim voucher form
+         */
+        let claimVoucherForm = document.querySelector('#fd_claim_voucher_form');
+        if( claimVoucherForm !== null ){
+            let submitBtn = claimVoucherForm.querySelector('#fd_claim_voucher_submit');
+            submitBtn.addEventListener( 'click', function(e){
+                e.preventDefault();
+                
+                let voucherKey = claimVoucherForm.querySelector('#fd_voucher_key').value;
+
+                let data = new FormData();
+                data.append('action', 'claim_voucher_ajax_request_handler');
+                data.append('security', fd_ajax_obj.nonce);
+                data.append('voucher_key', voucherKey);
+
+                fetch(fd_ajax_obj.ajax_url, {
+                    method: "POST",
+                    credentials: 'same-origin',
+                    body: data
+                }).then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                    console.log(data);
+
+                    if( data.data.type === 'success' ){
+
+                        let response = data.data;
+                        if( response.voucher_status !== false ){
+
+                            let voucherResultWrapper = document.querySelector('.fd_claim_result_wrapper');
+                            let resultsWrapper = voucherResultWrapper.querySelector('.fd_claim_results');
+
+                            let voucherIsUnique = false;
+
+                            let vouchers = resultsWrapper.dataset.activeVouchers !== '' ? JSON.parse(resultsWrapper.dataset.activeVouchers) : {voucher_ids : []};
+                            if( vouchers.voucher_ids.indexOf(response.voucher_id) === -1 ){
+                                vouchers.voucher_ids.push(response.voucher_id);
+                                resultsWrapper.dataset.activeVouchers = JSON.stringify(vouchers);
+                                voucherIsUnique = true;
+                            }else{
+                                alert('This voucher already exists');
+                                voucherIsUnique = false;
+                            }
+
+                            if( voucherIsUnique == true ){
+                                let voucherResultsHTML = '';
+                                voucherResultsHTML += '<div class="fd_claim_voucher_result_item">';
+        
+                                voucherResultsHTML += '<div class="fd_claim_voucher_result_item_img">';
+                                voucherResultsHTML += `<img src="${ response.product_img }">`;
+                                voucherResultsHTML += '</div>';
+        
+                                voucherResultsHTML += '<div class="fd_claim_voucher_result_item_info">';
+        
+                                voucherResultsHTML += `<p class="fd_claim_voucher_result_item_title">${ response.product_name }</p>`;
+                                
+                                voucherResultsHTML += '<div class="fd_claim_voucher_result_item_status">';
+                                voucherResultsHTML += '<label>Voucher Status:</label>';
+                                voucherResultsHTML += `<p>${ response.voucher_status }</p>`;
+                                voucherResultsHTML += '</div>';
+                                
+                                voucherResultsHTML += '</div>';
+        
+                                voucherResultsHTML += '</div>';
+        
+                                resultsWrapper.innerHTML += voucherResultsHTML;
+                            }
+
+                        }else if( response.voucher_status == false ){
+                            alert('Invalid Voucher Key');
+                        }
+
+
+                    }
+
+                });
+
+            }, false );
+        }
+
 });
 
 
 //AJAX request function
 function makeAjaxRequest(requestObject) {
-    var data = new FormData();
+    let data = new FormData();
     data.append('action', 'fd_log_user_viewed_product');
     data.append('security', fd_ajax_obj.nonce);
     data.append('request_type', requestObject.requestType);
@@ -317,6 +410,7 @@ const setOfferOptionsInVendor = ()=>{
    
 
 }
+window.onload = setOfferOptionsInVendor();
 
 
 /**
@@ -345,5 +439,3 @@ let getVariationOptionsAjax = function (productId) {
         });
     });
 }
-
-window.onload = setOfferOptionsInVendor();

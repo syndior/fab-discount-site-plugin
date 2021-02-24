@@ -43,7 +43,7 @@
                     <tr>
                         <td>
                             <a href="<?php echo get_permalink( $product->get_id() );?>" class="fd_viewed_item_wrapper">
-                            <?php $product_img_url = ( wp_get_attachment_url($product->get_image_id()) ) ? wp_get_attachment_url($product->get_image_id()) : wc_placeholder_img_src() ; ?>
+                            <?php $product_img_url = ( wp_get_attachment_url($product->get_image_id()) ) ? wp_get_attachment_url($product->get_image_id()) : wc_placeholder_img_src(); ?>
                                 <div class="fd_viewed_item_img" style="background-image: url('<?php echo $product_img_url; ?>');"></div>
                                 <div class="fd_viewed_item_title">
                                     <p><?php echo $product->get_name();?></p>

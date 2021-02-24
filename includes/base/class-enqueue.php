@@ -24,15 +24,17 @@ class FD_Enqueue
 
                 //localize script if user logged in
                 //include ajax vars
+                $nonce_val = wp_create_nonce('ajax_check');
+                $js_object = array(
+                        'ajax_url' => admin_url( 'admin-ajax.php' ),
+                        'nonce'    => $nonce_val,
+                );
+
                 if( is_user_logged_in() ){
-                        $nonce_val = wp_create_nonce('ajax_check');
-                        $js_object = array(
-                                'ajax_url' => admin_url( 'admin-ajax.php' ),
-                                'nonce'    => $nonce_val,
-                                'user_id'  => get_current_user_id(),
-                        );
-                        wp_localize_script( 'fdscf-script', 'fd_ajax_obj', $js_object);
+                        $js_object['user_id'] = get_current_user_id();
                 }
+                
+                wp_localize_script( 'fdscf-script', 'fd_ajax_obj', $js_object);
         }
         
         public function enqueue_admin_files()
