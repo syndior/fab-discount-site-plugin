@@ -51,8 +51,7 @@
                         
                             <form  action="<?php echo $claim_voucher_page_url?>" method = "POST">
                               <input type="hidden" name="voucher_ids[]" value="<?php echo $value['voucher_id'];?>">
-                              <input type="submit" class="claim_individual_voucher" name = "claim_offers" value = "<?php echo $value['voucher_key'];?>">
-                              <!-- <p class="fd_offer_voucher_key"><?php //echo $value['voucher_key'];?></a> -->
+                              <input type="submit" class="claim_individual_voucher fd_offer_voucher_key" name = "claim_offers" value = "<?php echo $value['voucher_key'];?>">
                             </form>
                         <br>
                         <br>

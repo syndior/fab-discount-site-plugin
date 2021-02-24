@@ -6,6 +6,7 @@ class FD_Vouchers_Controller
     {
         /* create a new voucher on new order */
         add_action('woocommerce_checkout_order_processed',  array( $this, 'create_voucher_on_new_order' ) );
+        add_action('woocommerce_checkout_order_processed',  array( $this, 'mark_voucher_as_reedemed' ) );
 
         /* Generates claim voucher/offer form for fornt-end */
         add_shortcode( 'fd_claim_voucher_form', array( $this, 'print_claim_voucher_form' ) );
@@ -13,9 +14,20 @@ class FD_Vouchers_Controller
         /* Hook ajax request to handle voucher validation */
         add_action('wp_ajax_claim_voucher_ajax_request_handler',  array( $this, 'claim_voucher_ajax_request_handler' ) );
         add_action('wp_ajax_nopriv_claim_voucher_ajax_request_handler',  array( $this, 'claim_voucher_ajax_request_handler' ) );
+        
+        /* Modify product prices */
+        add_action('woocommerce_before_calculate_totals',  array( $this, 'modify_product_prices' ), 9999, 1 );
+        
+        /* add order item meta */
+        add_action('woocommerce_add_order_item_meta',  array( $this, 'add_order_item_meta_for_claimed_vouchers' ), 10, 2);
 
     }
 
+
+
+    /**
+     * 
+     */
     public function create_voucher_on_new_order( $order_id )
     {
         $order = wc_get_order( $order_id );
@@ -107,7 +119,7 @@ class FD_Vouchers_Controller
      * CLaim voucher form shortcode
      */
     public function print_claim_voucher_form()
-    {        
+    {
         $template = '';
         require_once ( fdscf_path . 'templates/fd-html-wc-claim-voucher-form.php' );
         return $template;
@@ -136,8 +148,10 @@ class FD_Vouchers_Controller
             if( $voucher_key_status !== false ){
                 
                 $voucher = $voucher_key_status;
-                $ajax_response['voucher_id'] = $voucher->get_id();
-                $ajax_response['voucher_status'] = $voucher->get_status();
+                $ajax_response['voucher_id']        = $voucher->get_id();
+                $ajax_response['voucher_status']    = $voucher->get_status();
+                $ajax_response['voucher_key']       = $voucher->get_key();
+                $ajax_response['voucher_amount']    = $voucher->get_amount();
                 $product = wc_get_product( $voucher->get_product_id() );
 
                 if( $product !== null && $product !== false ){
@@ -161,6 +175,73 @@ class FD_Vouchers_Controller
         wp_die();
     }
 
+    /**
+     * 
+     */
+    public function modify_product_prices( $cart )
+    {
+        if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
+        if ( did_action( 'woocommerce_before_calculate_totals' ) >= 2 ) return;
+
+        foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+            
+            $product = $cart_item['data'];
+            if( isset( $cart_item['voucher_id'] ) && isset( $cart_item['voucher_amount'] ) ){
+
+                $cart_item['data']->set_sold_individually( TRUE );
+                
+                $original_price = (float)$product->get_price();
+                $discount_price = (float)$cart_item['voucher_amount'];
+
+                if( $discount_price > $original_price ){
+                    $new_price = 0;
+                }else{
+                    $new_price = $original_price - $discount_price;
+                }
+
+                $cart_item['data']->set_price( $new_price );
+
+            }
+
+        }
+    }
+
+
+    /**
+     * 
+     */
+    public function add_order_item_meta_for_claimed_vouchers( $item_id, $values )
+    {
+        if( isset($values['voucher_id']) ){
+            wc_add_order_item_meta( $item_id, '_fd_voucher_id', $values['voucher_id'] );
+        }
+    }
+
+
+    /**
+     * 
+     */
+    public function mark_voucher_as_reedemed( $order_id )
+    {
+        $order = wc_get_order( $order_id );
+        if( $order !== false ){
+
+            foreach ( $order->get_items() as $item_id => $item ) {
+                
+                $product    = $item->get_product();
+                $voucher_id = $item->get_meta('_fd_voucher_id', true);
+                
+                if( isset($voucher_id) && $voucher_id !== null && $voucher_id !== false ){
+                    
+                    $voucher = new FD_Voucher($voucher_id);
+                    $voucher->update_status('redeemed');
+                    
+                }
+
+            }
+
+        }
+    }
     
 }
 

@@ -127,6 +127,7 @@ form#fd_claim_voucher_form #fd_voucher_key{
 }
 
 .fd_claim_voucher_btn{
+    width: 100%;
     padding: 20px;
     line-height: 1em;
     font-size: 24px;
@@ -184,18 +185,10 @@ form#fd_claim_voucher_form #fd_voucher_key{
     margin-bottom: 10px;
 }
 
-.fd_claim_voucher_result_item_status{
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-}
-
-.fd_claim_voucher_result_item_status label{
-    color: #222322;
-    padding-right: 20px;
-}
-.fd_claim_voucher_result_item_status p{
-    text-transform: uppercase;
+.fd_claim_voucher_result_item_data tr,
+.fd_claim_voucher_result_item_data td,
+.fd_claim_voucher_result_item_data th{
+    padding: 0 !important;
 }
 .claim_individual_voucher{
     padding: 10px!important;

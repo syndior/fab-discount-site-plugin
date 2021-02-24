@@ -193,6 +193,8 @@ window.addEventListener('DOMContentLoaded', function(){
                             if( voucherIsUnique == true ){
                                 let voucherResultsHTML = '';
                                 voucherResultsHTML += '<div class="fd_claim_voucher_result_item">';
+                                
+                                voucherResultsHTML += `<input type="hidden" name="fd_voucher_ids[]" value="${response.voucher_id}">`;
         
                                 voucherResultsHTML += '<div class="fd_claim_voucher_result_item_img">';
                                 voucherResultsHTML += `<img src="${ response.product_img }">`;
@@ -202,10 +204,24 @@ window.addEventListener('DOMContentLoaded', function(){
         
                                 voucherResultsHTML += `<p class="fd_claim_voucher_result_item_title">${ response.product_name }</p>`;
                                 
-                                voucherResultsHTML += '<div class="fd_claim_voucher_result_item_status">';
-                                voucherResultsHTML += '<label>Voucher Status:</label>';
-                                voucherResultsHTML += `<p>${ response.voucher_status }</p>`;
-                                voucherResultsHTML += '</div>';
+                                voucherResultsHTML += '<table class="fd_claim_voucher_result_item_data">';
+
+                                voucherResultsHTML += '<tr>';
+                                voucherResultsHTML += '<th>Status:</th>';
+                                voucherResultsHTML += `<td>${ response.voucher_status }</td>`;
+                                voucherResultsHTML += '</tr>';
+                                
+                                voucherResultsHTML += '<tr>';
+                                voucherResultsHTML += '<th>Amount:</th>';
+                                voucherResultsHTML += `<td>${ response.voucher_amount }</td>`;
+                                voucherResultsHTML += '</tr>';
+                                
+                                voucherResultsHTML += '<tr>';
+                                voucherResultsHTML += '<th>Key:</th>';
+                                voucherResultsHTML += `<td>${ response.voucher_key }</td>`;
+                                voucherResultsHTML += '</tr>';
+
+                                voucherResultsHTML += '</table>';
                                 
                                 voucherResultsHTML += '</div>';
         
