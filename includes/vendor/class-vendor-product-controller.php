@@ -88,7 +88,6 @@ public function show_vendor_product_extra_fields_edit_page($post, $post_id){
 
 ?>
  <div class="gregcustom dokan-form-group">
-        <h1><?php echo $fd_wc_offer_savings?></h1>
         <label class="dokan-w3 dokan-control-label" for="">
         Edit Note <span style = "color:red">Please describe why do you want to edit it*</span>
         </label>

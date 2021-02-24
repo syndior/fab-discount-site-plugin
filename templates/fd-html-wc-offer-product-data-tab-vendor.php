@@ -199,7 +199,6 @@
         ?>
         <div class="dokan-form-group">
             <label class= "form-label" for="fd_offer_linked_product">This Offer Applies to: </label>
-          
             <select name="fd_offer_linked_product" id="fd_offer_linked_product" class="select short" required="required">
                 <option>Select a value</option>
 

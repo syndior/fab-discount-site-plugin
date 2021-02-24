@@ -197,3 +197,9 @@ form#fd_claim_voucher_form #fd_voucher_key{
 .fd_claim_voucher_result_item_status p{
     text-transform: uppercase;
 }
+.claim_individual_voucher{
+    padding: 10px!important;
+    background: transparent!important;
+    color: #3c3c3c!important;
+    border: none!important;
+}
