@@ -229,13 +229,18 @@ class FD_Vouchers_Controller
             foreach ( $order->get_items() as $item_id => $item ) {
                 
                 $product    = $item->get_product();
-                $voucher_id = $item->get_meta('_fd_voucher_id', true);
+
+                if( $product->get_type() !== 'fd_wc_offer' ){
+
+                    $voucher_id = $item->get_meta('_fd_voucher_id', true);
                 
-                if( isset($voucher_id) && $voucher_id !== null && $voucher_id !== false ){
-                    
-                    $voucher = new FD_Voucher($voucher_id);
-                    $voucher->update_status('redeemed');
-                    
+                    if( isset($voucher_id) && $voucher_id !== null && $voucher_id !== false ){
+                        
+                        $voucher = new FD_Voucher($voucher_id);
+                        $voucher->update_status('redeemed');
+                        
+                    }
+
                 }
 
             }
