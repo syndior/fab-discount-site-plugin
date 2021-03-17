@@ -83,7 +83,7 @@
              * Ceckbox, if enable show top left banner on front-end
              */
             $value = $fd_wc_offer_schedule=='enabled'?'enabled':'disabled';
-            $checked = $fd_wc_offer_schedule == 'banner_enabled' ? 'checked' : '';
+            $checked = $fd_wc_offer_schedule == 'enabled' ? 'checked' : '';
             $field = '
             <div class="dokan-form-group">
                      <label class="form-label">Live offer after specific interval: </label>
@@ -107,20 +107,14 @@
 
 
             //schedule time     
-            $select_options="<option value = 0>Select Time</option>";
-            foreach($times as $time){
-                if(isset($fd_wc_offer_schedule_time)){
-                    $fd_wc_offer_schedule_time==$time?$select_options.='<option value='.$time.' selected>'.$time.'</option>':$select_options.='<option value='.$time.'>'.$time.'</option>';
-                }else{
-                    $select_options.='<option value='.$time.'>'.$time.'</option>';
-                }
-            }
+
+            
+            $value = isset($fd_wc_offer_schedule_time)?$fd_wc_offer_schedule_time:'';
+
             $field = '
             <div class="dokan-form-group" style = "'.$checked.'" id = "schedule_time">
             <label class="form-label">Set time for offer to go live: </label>
-            <select name = "fd_wc_offer_schedule_time" id = "fd_wc_offer_schedule_time">
-            '.$select_options.'
-            </select>
+            <input type="time" class="short " style="" name="fd_wc_offer_schedule_time" id="fd_wc_offer_schedule_time" value="'.$value.'">
             </div>    
             ';
             echo $field;   

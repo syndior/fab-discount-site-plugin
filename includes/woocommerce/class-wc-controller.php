@@ -4,7 +4,7 @@ class FD_Woocommerce_Controller
 {
     public function __construct()
     {
-
+        /*updating visibility of product*/
         add_filter('woocommerce_product_get_catalog_visibility',array( $this, 'fd_update_product_visibility' ),10,2);
 
         /* adds the custom product type's label in the products type dropdown */

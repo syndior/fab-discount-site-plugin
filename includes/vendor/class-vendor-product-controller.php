@@ -3,6 +3,9 @@
 class FD_Vendor_Product_Controller{
     public function __construct(){
 
+        /*updating visibility of product*/
+        add_filter('woocommerce_product_get_catalog_visibility',array( $this, 'fd_update_product_visibility' ),10,2);
+
         /* Add Custom Product Types to Vednor create new product dropdown */
         add_filter( 'dokan_product_types', array( $this, 'add_custom_product_type' ), 9999);
 
@@ -138,6 +141,21 @@ public function show_vendor_product_extra_fields_edit_page($post, $post_id){
     require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab-vendor.php' ); 
 
 }
+
+
+public function fd_update_product_visibility($value,$obj){
+
+    $product_id = $obj->get_id();
+    $schdule = get_post_meta($product_id,'fd_wc_offer_schedule',true);
+    if($schdule == "enabled"){
+        $value = "hidden";
+    }else{
+        $value = "visible";
+    }
+    return $value;
+    
+}
+
 
 
 }//class
