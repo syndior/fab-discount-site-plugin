@@ -231,19 +231,20 @@ class FD_Vouchers_Controller
                 
 
                 $product    = $item->get_product();
-                $product_type = $product->get_type();
-                
-                if($product_type == "simple"){
+
+
+                if( $product->get_type() !== 'fd_wc_offer' ){
 
                     $voucher_id = $item->get_meta('_fd_voucher_id', true);
+                
                     if( isset($voucher_id) && $voucher_id !== null && $voucher_id !== false ){
-                    
+                        
                         $voucher = new FD_Voucher($voucher_id);
                         $voucher->update_status('redeemed');
                         
-                    }// voucher id
-    
-                }//if product type
+                    }
+
+                }
                 
             }
 

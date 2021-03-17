@@ -82,17 +82,43 @@ window.addEventListener('DOMContentLoaded', function(){
 
 
     /**
-         * Loads variations data in the admin product option offer linked product dropdown
-         */
-        let selectedProduct = document.querySelector('#fd_offer_linked_product');
-        let selectedVariationOptions = document.querySelector('#fd_offer_linked_product_variation_wrapper');
-        if (selectedProduct !== null && selectedVariationOptions !== null) {
+     * Loads variations data in the admin product option offer linked product dropdown
+     */
+    let selectedProduct = document.querySelector('#fd_offer_linked_product');
+    let selectedVariationOptions = document.querySelector('#fd_offer_linked_product_variation_wrapper');
+    if (selectedProduct !== null && selectedVariationOptions !== null) {
 
-            /**
-             * Loads in variations on pageload
-             */
+        /**
+         * Loads in variations on pageload
+         */
+        let selectedElement = selectedProduct.options[selectedProduct.selectedIndex];
+        if (selectedElement.dataset.productType == 'variable') {
+            let productId = selectedElement.value;
+            getVariationOptionsAjax(productId).then(function (variations) {
+                let variationsDropdown = selectedVariationOptions.querySelector('#fd_offer_linked_product_variation');
+                variationsDropdown.innerHTML = '';
+                let defaultElement = `<option>Select a value</option>`;
+
+                variationsDropdown.innerHTML += defaultElement;
+                variations.forEach(function (option) {
+                    let selected = (variationsDropdown.dataset.currentValue == option.product_id) ? 'selected' : '';
+                    let optionELement = `<option value="${option.product_id}" ${selected}>${option.product_title}</option>`;
+                    variationsDropdown.innerHTML += optionELement;
+                });
+                selectedVariationOptions.style.display = 'block';
+            }, function (error) {
+                console.log(error);
+            });
+
+        }
+
+        /**
+         * Makes ajax call on input change event
+         */
+        selectedProduct.addEventListener('change', function () {
             let selectedElement = selectedProduct.options[selectedProduct.selectedIndex];
             if (selectedElement.dataset.productType == 'variable') {
+
                 let productId = selectedElement.value;
                 getVariationOptionsAjax(productId).then(function (variations) {
                     let variationsDropdown = selectedVariationOptions.querySelector('#fd_offer_linked_product_variation');
@@ -110,137 +136,144 @@ window.addEventListener('DOMContentLoaded', function(){
                     console.log(error);
                 });
 
+            } else {
+                selectedVariationOptions.style.display = 'none';
             }
 
-            /**
-             * Makes ajax call on input change event
-             */
-            selectedProduct.addEventListener('change', function () {
-                let selectedElement = selectedProduct.options[selectedProduct.selectedIndex];
-                if (selectedElement.dataset.productType == 'variable') {
-
-                    let productId = selectedElement.value;
-                    getVariationOptionsAjax(productId).then(function (variations) {
-                        let variationsDropdown = selectedVariationOptions.querySelector('#fd_offer_linked_product_variation');
-                        variationsDropdown.innerHTML = '';
-                        let defaultElement = `<option>Select a value</option>`;
-
-                        variationsDropdown.innerHTML += defaultElement;
-                        variations.forEach(function (option) {
-                            let selected = (variationsDropdown.dataset.currentValue == option.product_id) ? 'selected' : '';
-                            let optionELement = `<option value="${option.product_id}" ${selected}>${option.product_title}</option>`;
-                            variationsDropdown.innerHTML += optionELement;
-                        });
-                        selectedVariationOptions.style.display = 'block';
-                    }, function (error) {
-                        console.log(error);
-                    });
-
-                } else {
-                    selectedVariationOptions.style.display = 'none';
-                }
-
-            }, false);
-        }
+        }, false);
+    }
 
 
 
-        /**
-         * Hook eventlistener for claim voucher form
-         */
-        let claimVoucherForm = document.querySelector('#fd_claim_voucher_form');
-        if( claimVoucherForm !== null ){
-            let submitBtn = claimVoucherForm.querySelector('#fd_claim_voucher_submit');
-            submitBtn.addEventListener( 'click', function(e){
-                e.preventDefault();
-                
-                let voucherKey = claimVoucherForm.querySelector('#fd_voucher_key').value;
+    /**
+     * Hook eventlistener for claim voucher form
+     */
+    let claimVoucherForm = document.querySelector('#fd_claim_voucher_form');
+    if( claimVoucherForm !== null ){
+        let submitBtn = claimVoucherForm.querySelector('#fd_claim_voucher_submit');
+        submitBtn.addEventListener( 'click', function(e){
+            e.preventDefault();
+            
+            let voucherKey = claimVoucherForm.querySelector('#fd_voucher_key').value;
 
-                let data = new FormData();
-                data.append('action', 'claim_voucher_ajax_request_handler');
-                data.append('security', fd_ajax_obj.nonce);
-                data.append('voucher_key', voucherKey);
+            let data = new FormData();
+            data.append('action', 'claim_voucher_ajax_request_handler');
+            data.append('security', fd_ajax_obj.nonce);
+            data.append('voucher_key', voucherKey);
 
-                fetch(fd_ajax_obj.ajax_url, {
-                    method: "POST",
-                    credentials: 'same-origin',
-                    body: data
-                }).then(function (response) {
-                    return response.json();
-                }).then(function (data) {
-                    console.log(data);
+            fetch(fd_ajax_obj.ajax_url, {
+                method: "POST",
+                credentials: 'same-origin',
+                body: data
+            }).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                console.log(data);
 
-                    if( data.data.type === 'success' ){
+                if( data.data.type === 'success' ){
 
-                        let response = data.data;
-                        if( response.voucher_status !== false ){
+                    let response = data.data;
+                    if( response.voucher_status !== false ){
 
-                            let voucherResultWrapper = document.querySelector('.fd_claim_result_wrapper');
-                            let resultsWrapper = voucherResultWrapper.querySelector('.fd_claim_results');
+                        let voucherResultWrapper = document.querySelector('.fd_claim_result_wrapper');
+                        let resultsWrapper = voucherResultWrapper.querySelector('.fd_claim_results');
 
-                            let voucherIsUnique = false;
+                        let voucherIsUnique = false;
 
-                            let vouchers = resultsWrapper.dataset.activeVouchers !== '' ? JSON.parse(resultsWrapper.dataset.activeVouchers) : {voucher_ids : []};
-                            if( vouchers.voucher_ids.indexOf(response.voucher_id) === -1 ){
-                                vouchers.voucher_ids.push(response.voucher_id);
-                                resultsWrapper.dataset.activeVouchers = JSON.stringify(vouchers);
-                                voucherIsUnique = true;
-                            }else{
-                                alert('This voucher already exists');
-                                voucherIsUnique = false;
-                            }
-
-                            if( voucherIsUnique == true ){
-                                let voucherResultsHTML = '';
-                                voucherResultsHTML += '<div class="fd_claim_voucher_result_item">';
-                                
-                                voucherResultsHTML += `<input type="hidden" name="fd_voucher_ids[]" value="${response.voucher_id}">`;
-        
-                                voucherResultsHTML += '<div class="fd_claim_voucher_result_item_img">';
-                                voucherResultsHTML += `<img src="${ response.product_img }">`;
-                                voucherResultsHTML += '</div>';
-        
-                                voucherResultsHTML += '<div class="fd_claim_voucher_result_item_info">';
-        
-                                voucherResultsHTML += `<p class="fd_claim_voucher_result_item_title">${ response.product_name }</p>`;
-                                
-                                voucherResultsHTML += '<table class="fd_claim_voucher_result_item_data">';
-
-                                voucherResultsHTML += '<tr>';
-                                voucherResultsHTML += '<th>Status:</th>';
-                                voucherResultsHTML += `<td>${ response.voucher_status }</td>`;
-                                voucherResultsHTML += '</tr>';
-                                
-                                voucherResultsHTML += '<tr>';
-                                voucherResultsHTML += '<th>Amount:</th>';
-                                voucherResultsHTML += `<td>${ response.voucher_amount }</td>`;
-                                voucherResultsHTML += '</tr>';
-                                
-                                voucherResultsHTML += '<tr>';
-                                voucherResultsHTML += '<th>Key:</th>';
-                                voucherResultsHTML += `<td>${ response.voucher_key }</td>`;
-                                voucherResultsHTML += '</tr>';
-
-                                voucherResultsHTML += '</table>';
-                                
-                                voucherResultsHTML += '</div>';
-        
-                                voucherResultsHTML += '</div>';
-        
-                                resultsWrapper.innerHTML += voucherResultsHTML;
-                            }
-
-                        }else if( response.voucher_status == false ){
-                            alert('Invalid Voucher Key');
+                        let vouchers = resultsWrapper.dataset.activeVouchers !== '' ? JSON.parse(resultsWrapper.dataset.activeVouchers) : {voucher_ids : []};
+                        if( vouchers.voucher_ids.indexOf(response.voucher_id) === -1 ){
+                            vouchers.voucher_ids.push(response.voucher_id);
+                            resultsWrapper.dataset.activeVouchers = JSON.stringify(vouchers);
+                            voucherIsUnique = true;
+                        }else{
+                            alert('This voucher already exists');
+                            voucherIsUnique = false;
                         }
 
+                        if( voucherIsUnique == true ){
+                            let voucherResultsHTML = '';
+                            voucherResultsHTML += '<div class="fd_claim_voucher_result_item">';
+                            
+                            voucherResultsHTML += `<input type="hidden" name="fd_voucher_ids[]" value="${response.voucher_id}">`;
+    
+                            voucherResultsHTML += '<div class="fd_claim_voucher_result_item_img">';
+                            voucherResultsHTML += `<img src="${ response.product_img }">`;
+                            voucherResultsHTML += '</div>';
+    
+                            voucherResultsHTML += '<div class="fd_claim_voucher_result_item_info">';
+    
+                            voucherResultsHTML += `<p class="fd_claim_voucher_result_item_title">${ response.product_name }</p>`;
+                            
+                            voucherResultsHTML += '<table class="fd_claim_voucher_result_item_data">';
 
+                            voucherResultsHTML += '<tr>';
+                            voucherResultsHTML += '<th>Status:</th>';
+                            voucherResultsHTML += `<td>${ response.voucher_status }</td>`;
+                            voucherResultsHTML += '</tr>';
+                            
+                            voucherResultsHTML += '<tr>';
+                            voucherResultsHTML += '<th>Amount:</th>';
+                            voucherResultsHTML += `<td>${ response.voucher_amount }</td>`;
+                            voucherResultsHTML += '</tr>';
+                            
+                            voucherResultsHTML += '<tr>';
+                            voucherResultsHTML += '<th>Key:</th>';
+                            voucherResultsHTML += `<td>${ response.voucher_key }</td>`;
+                            voucherResultsHTML += '</tr>';
+
+                            voucherResultsHTML += '</table>';
+                            
+                            voucherResultsHTML += '</div>';
+    
+                            voucherResultsHTML += '</div>';
+    
+                            resultsWrapper.innerHTML += voucherResultsHTML;
+                        }
+
+                    }else if( response.voucher_status == false ){
+                        alert('Invalid Voucher Key');
                     }
 
-                });
 
-            }, false );
-        }
+                }
+
+            });
+
+        }, false );
+    }
+
+
+    /**
+     * User Account Dropdown Logic
+     */
+    let userDropDown = document.querySelector( '.fd_account_dropdown' );
+    let dropDownElement = document.querySelector( '.fd_account_dropdown_element' );
+    if( userDropDown !== null && dropDownElement !== null ){
+
+        dropDownElement.addEventListener( 'click', function(e){
+            e.stopPropagation();
+        }, false );
+
+        userDropDown.addEventListener( 'click', function(){
+            
+            if( dropDownElement.classList.contains('fd_account_dropdown_element_active') ){
+                dropDownElement.classList.remove('fd_account_dropdown_element_active');
+                setTimeout( function(){
+                    dropDownElement.style.display = 'none';
+                }, 300 );
+            }else{
+                dropDownElement.style.display = 'block';
+                setTimeout( function(){
+                    dropDownElement.classList.add('fd_account_dropdown_element_active');
+                }, 10 );
+            }
+
+            //logic for arrow animation
+            let dropdownArrow = userDropDown.querySelector( '.fd_dropdown_arrow' );
+            dropdownArrow.classList.toggle('fd_dropdown_arrow_rotate');
+
+        }, false );
+    }
 
 });
 

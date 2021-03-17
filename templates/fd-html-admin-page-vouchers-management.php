@@ -25,7 +25,7 @@
                         break;
                     case 'credit_transferred':
                         $wallet = new FD_Wallet( $voucher->get_customer_id() );
-                        if( !($wallet->convert_voucher_to_credit( $voucher->get_ID() ) !== false) ){
+                        if( $wallet->convert_voucher_to_credit( $voucher->get_ID() ) == false ){
                             echo "<script>alert('An Error occured while performing this action');</script>";
                         }
                         break;

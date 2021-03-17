@@ -1,4 +1,7 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit;
+    add_action( 'wp_loaded', function(){
+        var_dump(ABSPATH);
+    } );
     $voucher_result_item = '';
     $voucher_data = '';
     if( isset($_POST['voucher_ids']) && !empty($_POST['voucher_ids']) ){
@@ -66,7 +69,8 @@
 
     if( isset( $_POST['fd_request_type'] ) && isset( $_POST['fd_voucher_ids'] ) && $_POST['fd_request_type'] == 'fd_add_vouchers_to_cart' ){
         $voucher_ids = $_POST['fd_voucher_ids'];
-
+        
+        WC()->cart->empty_cart();
         foreach( $voucher_ids as $id ){
             $id = absint( $id );
 
@@ -93,23 +97,28 @@
                     $variation_id = $product->get_id();
                     
                 }
-                WC()->cart->add_to_cart(  $product_id, $qty, $variation_id, $variation = array(),$cart_item_data);
 
+                $added_to_cart_status = WC()->cart->add_to_cart(  $product_id, $qty, $variation_id, $variation = array(),$cart_item_data);
 
             }
 
         }
 
-    }
+        if( $added_to_cart_status !== false ){
 
-    ob_start();
+            $log =  wc_get_cart_url();
+            echo '<script>window.location.replace("'.$log.'");</script>';
+
+        }
+
+    }
 ?>
 <div class="fd_claim_voucher_form_wrapper">
     <form action="" id="fd_claim_voucher_form">
         <input type="text" name="fd_voucher_key" id="fd_voucher_key">
         <input type="submit" value="Check Voucher" class="fd_claim_voucher_btn" id="fd_claim_voucher_submit">
     </form>
-    <form action="/dev1/claim-voucher-page/" method="POST" class="fd_claim_result_wrapper">
+    <form action="<?=$_SERVER['REQUEST_URI'];?>" method="POST" class="fd_claim_result_wrapper">
         <div class="fd_claim_results" data-active-vouchers='<?=$voucher_data;?>'>
             <?=$voucher_result_item;?>
         </div>
