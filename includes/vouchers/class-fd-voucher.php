@@ -383,7 +383,16 @@ class FD_Voucher
         $table_name = fdscf_vouchers_db_table_name;
         $query = " SELECT * FROM  `{$table_name}` WHERE `customer_id` = $customer_id ORDER BY `created_at` DESC LIMIT 20";
         $result = $wpdb->get_results( $query );
-        return $result;
+        if( !empty( $result ) ){
+            $vouchers_array = array();
+            foreach( $result as $row ){
+                $voucher = new FD_Voucher( $row->fd_voucher_id );
+                $vouchers_array[] = array('fd_voucher_id'=>$row->fd_voucher_id,'fd_voucher_key'=>$voucher->get_key(),'expires_at'=>$row->expires_at);
+            }
+            return $vouchers_array;
+        }
+
+
     }
 
 
@@ -488,5 +497,19 @@ class FD_Voucher
         }
 
         return false;
+    }
+
+    /**
+     * helper to get all vouchers wrt "status" and "will_expire"
+     */
+    public static function get_all_vouchers_wrt_status(string $status='active', int $bool=1){
+        global $wpdb;
+        $status = $status;
+        $will_expire = $bool;
+        $table_name = fdscf_vouchers_db_table_name;
+
+        $sql = "SELECT * FROM `{$table_name}` WHERE `fd_voucher_status` = '$status' AND `will_expire`= $will_expire";
+        $result = $wpdb->get_results($sql);
+        return $result;
     }
 }

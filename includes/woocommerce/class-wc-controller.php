@@ -4,6 +4,9 @@ class FD_Woocommerce_Controller
 {
     public function __construct()
     {
+
+        add_filter('woocommerce_product_get_catalog_visibility',array( $this, 'fd_update_product_visibility' ),10,2);
+
         /* adds the custom product type's label in the products type dropdown */
         add_filter( 'product_type_selector', array( $this, 'add_product_type_filter' ), 10 );
 
@@ -152,8 +155,8 @@ class FD_Woocommerce_Controller
         
         //scheduling 
         $fd_product_meta['fd_wc_offer_schedule']                     = ( $_POST['fd_wc_offer_schedule'] == 'enabled' ) ? $_POST['fd_wc_offer_schedule'] : 'disabled';
-        $fd_product_meta['fd_wc_offer_schedule_date']                     = ( isset( $_POST['fd_wc_offer_schedule_date'] ) ) ? $_POST['fd_wc_offer_schedule_date'] : '';
-        $fd_product_meta['fd_wc_offer_schedule_time']                     = ( isset( $_POST['fd_wc_offer_schedule_time'] ) ) ? $_POST['fd_wc_offer_schedule_time'] : '';
+        $fd_product_meta['fd_wc_offer_schedule_date']                = ( isset( $_POST['fd_wc_offer_schedule_date'] ) ) ? $_POST['fd_wc_offer_schedule_date'] : '';
+        $fd_product_meta['fd_wc_offer_schedule_time']                = ( isset( $_POST['fd_wc_offer_schedule_time'] ) ) ? $_POST['fd_wc_offer_schedule_time'] : '';
         
         
         $fd_product_meta['fd_wc_offer_expiry']                      = ( $_POST['fd_wc_offer_expiry'] == 'fd_wc_offer_expiry_enabled' ) ? $_POST['fd_wc_offer_expiry'] : 'fd_wc_offer_expiry_disabled';
@@ -165,14 +168,25 @@ class FD_Woocommerce_Controller
         $fd_product_meta['fd_wc_offer_voucher_use_global_expiry']   = ( $_POST['fd_wc_offer_voucher_use_global_expiry'] == 'fd_wc_offer_voucher_use_global_expiry_enabled' ) ? $_POST['fd_wc_offer_voucher_use_global_expiry'] : 'fd_wc_offer_voucher_use_global_expiry_disabled';
         $fd_product_meta['fd_wc_offer_voucher_expiry_date']         = ( isset( $_POST['fd_wc_offer_voucher_expiry_date'] ) && $_POST['fd_wc_offer_voucher_expiry_date'] > 0 ) ? $_POST['fd_wc_offer_voucher_expiry_date'] : 0;
         $fd_product_meta['fd_wc_offer_savings']         = 0;
-         if(isset( $_POST['_regular_price'] ) && isset( $_POST['_sale_price'] ) ){
+
+
+        if(isset( $_POST['_regular_price'] ) && isset( $_POST['_sale_price'] ) ){
             $fd_product_meta['fd_wc_offer_savings'] = ($_POST['_sale_price']/$_POST['_regular_price'])*100;
          } 
          $fd_product_meta['fd_product_edit_note'] = "";
 
         if( count( $fd_product_meta ) > 0 ){
             $product = wc_get_product( $post_id );
+                    
+            //if schedule enabled then make visibility of offer/product hidden
+            if($_POST['fd_wc_offer_schedule'] == "enabled"){
+
+                $product->set_catalog_visibility('hidden');
+                $product->save();                
             
+            }//if enabled
+        
+        
             foreach( $fd_product_meta as $meta_field_key => $meta_field_value ){
 
                 $product->update_meta_data( $meta_field_key,  esc_attr( $meta_field_value ) );
@@ -182,6 +196,7 @@ class FD_Woocommerce_Controller
             $product->update_meta_data( 'fd_vendor_id',  esc_attr( get_current_user_id() ) );
 
             $product->save();
+                
         }
     }
 
@@ -490,6 +505,20 @@ class FD_Woocommerce_Controller
         
         echo '<h2>' . $product_tab['title'] . '</h2>';
         echo $tab_content;
+    }
+
+
+    public function fd_update_product_visibility($value,$obj){
+
+        $product_id = $obj->get_id();
+        $schdule = get_post_meta($product_id,'fd_wc_offer_schedule',true);
+        if($schdule == "enabled"){
+            $value = "hidden";
+        }else{
+            $value = "visible";
+        }
+        return $value;
+        
     }
 }
 

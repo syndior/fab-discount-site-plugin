@@ -22,7 +22,6 @@
     $fd_wc_offer_voucher_expiry_date        = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry_date', true );
 
     $current_date = date('Y-m-d');
-    // $curre_time = date('H');
 
     $times = array(1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24);
 
@@ -127,13 +126,14 @@
             $time_field = '
             <p class="form-field" id = "schedule_time" style = "'.$in_active_dom.'">
             <label for="fd_wc_offer_schedule_time">Set time for offer to go live: </label>
-            <select name = "fd_wc_offer_schedule_time" id = "fd_wc_offer_schedule_time">
-            '.$select_options.'
-            </select>
+            <input type="time" class="short " style="" name="fd_wc_offer_schedule_time" id="fd_wc_offer_schedule_time" value="'.$value.'">
             </p>    
             ';
              echo $time_field;   
-
+            //  <select name = "fd_wc_offer_schedule_time" id = "fd_wc_offer_schedule_time">
+            //  '.$select_options.'
+            //  </select>
+ 
             ?>
         <?php
 
