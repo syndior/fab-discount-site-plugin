@@ -2,13 +2,13 @@
 
 class FD_Transaction
 {
-    private $id;
-    private $type;
-    private $created_at;
-    private $voucher_id;
-    private $order_id;
-    private $user_id;
-    private $amount;
+    public $id;
+    public $type;
+    public $created_at;
+    public $voucher_id;
+    public $order_id;
+    public $user_id;
+    public $amount;
 
     public function __construct( int $transaction_id = 0 )
     {

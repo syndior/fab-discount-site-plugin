@@ -185,7 +185,8 @@ class FD_Wallet
 
                 return $wallet_data;
             }
-
+            //returning default wallet data
+            return $wallet_data;
         }
 
         return false;
