@@ -4,54 +4,55 @@
      */
     if( isset( $_POST['fd_wp_nonce'] ) && isset( $_POST['fd_voucher_id'] ) && isset( $_POST['fd_update_type'] ) ){
 
-        wp_verify_nonce( 'fd_voucher_mngmnt', $_POST['fd_wp_nonce'] );
+        if( wp_verify_nonce( $_POST['fd_wp_nonce'], 'fd_voucher_mngmnt' ) ){
 
-        $voucher_id = (int)$_POST['fd_voucher_id'];
-        $voucher = new FD_Voucher( $voucher_id );
-
-        if( $_POST['fd_update_type'] == 'fd_status_update' ){
-
-            if( isset( $_POST['fd_voucher_status'] ) ){
-                $status = $_POST['fd_voucher_status'];
-
-                switch ($status) {
-                    case 'active':
-                    case 'redeemed':
-                    case 'blocked':
-                    case 'expired':
-                        if( !( $voucher->update_status( $status ) !== false ) ){
+            $voucher_id = (int)$_POST['fd_voucher_id'];
+            $voucher = new FD_Voucher( $voucher_id );
+    
+            if( $_POST['fd_update_type'] == 'fd_status_update' ){
+    
+                if( isset( $_POST['fd_voucher_status'] ) ){
+                    $status = $_POST['fd_voucher_status'];
+    
+                    switch ($status) {
+                        case 'active':
+                        case 'redeemed':
+                        case 'blocked':
+                        case 'expired':
+                            if( !( $voucher->update_status( $status ) !== false ) ){
+                                echo "<script>alert('An Error occured while performing this action');</script>";
+                            }
+                            break;
+                        case 'credit_transferred':
+                            $wallet = new FD_Wallet( $voucher->get_customer_id() );
+                            if( $wallet->convert_voucher_to_credit( $voucher->get_ID() ) == false ){
+                                echo "<script>alert('An Error occured while performing this action');</script>";
+                            }
+                            break;
+                        
+                        default:
                             echo "<script>alert('An Error occured while performing this action');</script>";
-                        }
-                        break;
-                    case 'credit_transferred':
-                        $wallet = new FD_Wallet( $voucher->get_customer_id() );
-                        if( $wallet->convert_voucher_to_credit( $voucher->get_ID() ) == false ){
-                            echo "<script>alert('An Error occured while performing this action');</script>";
-                        }
-                        break;
-                    
-                    default:
-                        echo "<script>alert('An Error occured while performing this action');</script>";
-                        break;
+                            break;
+                    }
+    
                 }
-
-            }
-
-        }elseif ( $_POST['fd_update_type'] == 'fd_set_to_expire' ) {
-            if( isset( $_POST['fd_voucher_expiry_date'] ) ){
-
-                $expiry_date = $_POST['fd_voucher_expiry_date'];
-                $set_expire = true;
-                if( $voucher->set_to_expire( $set_expire, $expiry_date ) !== false ){
-                    echo "<script>alert('Voucher Updated!');</script>";
+    
+            }elseif ( $_POST['fd_update_type'] == 'fd_set_to_expire' ) {
+                if( isset( $_POST['fd_voucher_expiry_date'] ) ){
+    
+                    $expiry_date = $_POST['fd_voucher_expiry_date'];
+                    $set_expire = true;
+                    if( $voucher->set_to_expire( $set_expire, $expiry_date ) !== false ){
+                        echo "<script>alert('Voucher Updated!');</script>";
+                    }else{
+                        echo "<script>alert('An Error occured while performing this action');</script>";
+                    }
                 }else{
                     echo "<script>alert('An Error occured while performing this action');</script>";
                 }
-            }else{
-                echo "<script>alert('An Error occured while performing this action');</script>";
             }
-        }
 
+        }
 
     }
 

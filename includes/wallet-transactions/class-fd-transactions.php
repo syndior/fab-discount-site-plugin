@@ -174,7 +174,7 @@ class FD_Transaction
             global $wpdb;
             $table_name = fdscf_transactions_db_table_name;
 
-            $sql_query          = "SELECT * FROM `{$table_name}` WHERE `user_id` = %d ORDER BY `created_at` ASC;";
+            $sql_query          = "SELECT * FROM `{$table_name}` WHERE `user_id` = %d ORDER BY `created_at` DESC;";
             $prepared_query     = $wpdb->prepare( $sql_query, absint( $user_id ) );
             $results            = $wpdb->get_results( $prepared_query , OBJECT);
 

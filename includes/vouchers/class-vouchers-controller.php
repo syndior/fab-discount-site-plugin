@@ -16,7 +16,7 @@ class FD_Vouchers_Controller
         add_action('wp_ajax_nopriv_claim_voucher_ajax_request_handler',  array( $this, 'claim_voucher_ajax_request_handler' ) );
         
         /* Modify product prices */
-        add_action('woocommerce_before_calculate_totals',  array( $this, 'modify_product_prices' ), 9999, 1 );
+        add_action('woocommerce_before_calculate_totals',  array( $this, 'modify_product_prices' ), 10, 1 );
         
         /* add order item meta */
         add_action('woocommerce_add_order_item_meta',  array( $this, 'add_order_item_meta_for_claimed_vouchers' ), 10, 2);
@@ -188,16 +188,30 @@ class FD_Vouchers_Controller
             
             $product = $cart_item['data'];
             if( isset( $cart_item['voucher_id'] ) && isset( $cart_item['voucher_amount'] ) ){
-
+                
                 $cart_item['data']->set_sold_individually( TRUE );
                 
                 $original_price = (float)$product->get_price();
                 $discount_price = (float)$cart_item['voucher_amount'];
 
                 if( $discount_price > $original_price ){
-                    $new_price = 0;
+                    $new_price = 0.00;
                 }else{
                     $new_price = $original_price - $discount_price;
+                }
+
+                $cart_item['data']->set_price( $new_price );
+
+            }elseif ( isset( $cart_item['pay_with_wallet'] ) && $cart_item['pay_with_wallet'] == 'yes' ) {
+                
+
+                $original_price = (float)$cart_item['data']->get_price() * $cart_item['quantity'];
+                $wallet_balance = (float)$cart_item['wallet_balance'];
+
+                if( $wallet_balance > $original_price ){
+                    $new_price = 0.00;
+                }else{
+                    $new_price = $original_price - $wallet_balance;
                 }
 
                 $cart_item['data']->set_price( $new_price );
@@ -229,15 +243,14 @@ class FD_Vouchers_Controller
 
             foreach ( $order->get_items() as $item_id => $item ) {
                 
-
+                $pay_with_credit = $item->get_meta('_pay_with_wallet', true);
                 $product    = $item->get_product();
 
-
-                if( $product->get_type() !== 'fd_wc_offer' ){
+                if( $product->get_type() !== 'fd_wc_offer' && $pay_with_credit !== 'yes' ){
 
                     $voucher_id = $item->get_meta('_fd_voucher_id', true);
                 
-                    if( isset($voucher_id) && $voucher_id !== null && $voucher_id !== false ){
+                    if( isset($voucher_id) && $voucher_id !== null && $voucher_id !== false && $voucher_id !== '' ){
                         
                         $voucher = new FD_Voucher($voucher_id);
                         $voucher->update_status('redeemed');

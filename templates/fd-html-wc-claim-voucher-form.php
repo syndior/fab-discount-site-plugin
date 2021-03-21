@@ -1,7 +1,4 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit;
-    add_action( 'wp_loaded', function(){
-        var_dump(ABSPATH);
-    } );
     $voucher_result_item = '';
     $voucher_data = '';
     if( isset($_POST['voucher_ids']) && !empty($_POST['voucher_ids']) ){
@@ -106,8 +103,8 @@
 
         if( $added_to_cart_status !== false ){
 
-            $log =  wc_get_cart_url();
-            echo '<script>window.location.replace("'.$log.'");</script>';
+            $url =  wc_get_cart_url();
+            echo '<script>window.location.replace("'.$url.'");</script>';
 
         }
 
