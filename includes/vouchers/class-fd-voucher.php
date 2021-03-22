@@ -512,4 +512,23 @@ class FD_Voucher
         $result = $wpdb->get_results($sql);
         return $result;
     }
+
+    public static function get_status_string($status){
+        $voucher_status = "";
+        if($status=="active"){
+            $voucher_status =  "Active";
+        }elseif ($status=="credit_transferred") {
+            $voucher_status =  "Converted to Store Credit";
+        }elseif ($status=="credit_transferred") {
+            $voucher_status =  "Converted to Store Credit";
+        }elseif ($status=="redeemed") {
+            $voucher_status =  "Redeemed";
+        }elseif ($status=="blocked") {
+            $voucher_status =  "Blocked";
+        }elseif ($status=="expired") {
+            $voucher_status =  "Expired";
+        }
+
+        return $voucher_status;
+    }
 }

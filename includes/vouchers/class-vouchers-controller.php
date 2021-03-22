@@ -21,6 +21,9 @@ class FD_Vouchers_Controller
         /* add order item meta */
         add_action('woocommerce_add_order_item_meta',  array( $this, 'add_order_item_meta_for_claimed_vouchers' ), 10, 2);
 
+        /*voucher print short code*/
+        add_shortcode('fd_print_voucher', array($this,'fd_print_voucher'));
+
     }
 
 
@@ -264,6 +267,17 @@ class FD_Vouchers_Controller
         }
     }
     
+
+    /**
+     * print voucher short code
+     */
+
+    public function fd_print_voucher(){
+        $template = '';
+        require_once ( fdscf_path . 'templates/fd-html-print-voucher.php' );
+        return $template;
+     }//fd_print_voucher
+
 }
 
 new FD_Vouchers_Controller();

@@ -1,6 +1,12 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit;
 
     $vouchers_exists = true;
+    if(is_user_logged_in()){
+
+    //mailing voucher if getting request    
+    $email_obj = new FD_Emails();
+    $email_obj->customer_mail_voucher();
+    
     $current_user_id = get_current_user_id();
     $results =  FD_Voucher::get_current_customer_vouchers($current_user_id);
     $claim_voucher_page_id = get_field('set_claim_voucher_page','options');
@@ -43,8 +49,19 @@
                             </form>   
                         </td>
                         <td><?php echo $result['expires_at'];?></td>
-                        <td><a href="#">Print</a></td>
-                        <td><a href="#">Email</a></td>
+                        <td>
+                            <form action="/febDiscountLocal/print-voucher/" method = "POST">
+                                <input type="hidden" name="voucher_id" value = "<?php echo $result['fd_voucher_id']?>">
+                                <input type="submit" name = "print_voucher" style="background:transparent;border:none;cursor:pointer" value="Print">
+                            </form>
+                        </td>
+                        
+                        <td>
+                            <form method = "POST">
+                                <input type="hidden" name="voucher_id" value = "<?php echo $result['fd_voucher_id']?>">
+                                <input type="submit" name = "email_voucher" style="background:transparent;border:none;cursor:pointer" value="Email">
+                            </form>
+                         </td>
                         <td><a href="#">Convert to credit</a></td>
                     </tr>
 
@@ -52,6 +69,8 @@
             </tbody>
         </table>
 
-    <?php endif; ?>
+    <?php endif;
+    }//is_user_logged_in
+    ?>
 
 </div>

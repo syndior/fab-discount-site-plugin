@@ -60,6 +60,7 @@
 }
 
 .fd_claim_offer_btn{
+    /* code */
 }
 
 .fd_offer_voucher_key_wrapper{
@@ -195,4 +196,27 @@ form#fd_claim_voucher_form #fd_voucher_key{
     background: transparent!important;
     color: #3c3c3c!important;
     border: none!important;
+}
+
+.fd_text_center{
+    text-align: center!important;
+}
+
+.fd_p20{
+    padding: 20px!important;
+}
+.fd_alert_success{
+    background: green!important;
+    color: white!important;
+    padding: 20px!important;
+    text-align: center!important;
+    margin-bottom: 20px!important;
+}
+
+.fd_alert_danger{
+    background: red!important;
+    color: white!important;
+    padding: 20px!important;
+    text-align: center!important;
+    margin-bottom: 20px!important;
 }
