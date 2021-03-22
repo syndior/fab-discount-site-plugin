@@ -50,7 +50,7 @@
                         </td>
                         <td><?php echo $result['expires_at'];?></td>
                         <td>
-                            <form action="/febDiscountLocal/print-voucher/" method = "POST">
+                            <form action="/dev1/print-voucher/" method="POST">
                                 <input type="hidden" name="voucher_id" value = "<?php echo $result['fd_voucher_id']?>">
                                 <input type="submit" name = "print_voucher" style="background:transparent;border:none;cursor:pointer" value="Print">
                             </form>

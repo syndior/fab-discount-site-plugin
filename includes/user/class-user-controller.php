@@ -39,6 +39,11 @@ class FD_User_Controller
 
                     if( !empty( $users_viewed_products ) ){
                         if( !in_array( $product_id, $users_viewed_products ) ){
+                            
+                            if( count( $users_viewed_products ) >= 10 ){
+                                unset( $users_viewed_products[0] );
+                            }
+
                             $users_viewed_products = array_merge( $users_viewed_products,  array($product_id) );
                         }else{
                             $response['product_viewed'] = true;
