@@ -11,10 +11,20 @@
             $voucher_status = FD_Voucher::get_status_string($voucher->get_status());         
             $created_at = date("M-d-Y H:i:s",strtotime($voucher->get_created_date()));
             $expires_at = date("M-d-Y H:i:s",strtotime($voucher->get_expiry_date()));
-
+            
+            $claim_guide = "";
+            $claim_guide_enabled = get_field('claim_voucher_steps','option');
+            if($claim_guide_enabled){
+                $claim_guide = get_field("enter_steps_to_claim_voucher","option");
+            }
     ?>
 
         <h3 class="fd_text_center fd_p20">Voucher Details</h3>
+
+        <p class = "claim_guide">
+            <?=$claim_guide?>
+        </p>
+        
         <table id = "table_print_voucher" >
             <tr>
                 <th>Voucher Key</th>

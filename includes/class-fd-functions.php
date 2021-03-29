@@ -23,12 +23,39 @@ function fdscf_set_option_for_hero_section()
                     array(
                         'taxonomy' => 'product_type',
                         'field'    => 'slug',
-                        'terms'    => array('fd_wc_offer'),
+                        'terms'    => 'fd_wc_offer',
                     ),
-                ),
+                ),  
             ));
 
             $product = $query->get_products()[0];
+
+            // changings
+            $product_id = $product->get_id();
+            $product_created_at = $product->get_date_created();
+            
+            $offer_expiry = get_post_meta($product_id,'fd_wc_offer_expiry',true);
+            $global_expiry = get_post_meta($product_id,'fd_wc_offer_use_global_expiry',true);
+            $expiry_date = "";
+            if($offer_expiry == "fd_wc_offer_expiry_enabled"){
+                $offer_expiry = "fd_wc_offer_expiry_enabled";
+                if($global_expiry == "fd_wc_offer_use_global_expiry_enabled"){
+                
+                    $expiry_days = round(get_field('global_offer_expiry','options'));
+                    
+                }else{
+    
+                    $expiry_days = get_post_meta($product_id,'fd_wc_offer_expiry_date',true);
+                
+                }
+                $plus_days = " +".$expiry_days." day";
+                $expiry_date = strtotime(date("Y-m-d H:i:s", strtotime($product_created_at)) . $plus_days);
+                $expiry_date = date('Y-m-d H:i:s',$expiry_date);
+    
+            }//offer Expiry
+            // changings
+            
+            
             //product initials
             $product_img_url = ( wp_get_attachment_url($product->get_image_id()) ) ? wp_get_attachment_url($product->get_image_id()) : wc_placeholder_img_src() ;
             $product_description = $product->get_description();
@@ -36,6 +63,7 @@ function fdscf_set_option_for_hero_section()
             $product_url = get_permalink($product->get_id());
             $product_name = $product->get_name();
             $sold_qty = $product->get_sold_individually();
+            
             if($sold_qty == ""){
                 $sold_qty=0;
             }
@@ -69,51 +97,40 @@ function fdscf_set_option_for_hero_section()
                 $product_sale_price =$currency_symbol.$product_sale_price;
                 $product_actual_price = $currency_symbol.$product_actual_price;
 
-            }elseif($product->is_type('fd_wc_offer_variable')) {
-                //goal is that we have to filter max saving percentage values
-                $product_actual_price_array = array();// (1) in this we will save all all actual prices
-                $product_sale_prices_array = array();// (2) in this we will save all all sales prices
-                $savings_array = array();// (3) in this we will save all saving percentages
-
-                $product_ids = $product->get_children();
-                foreach ($product_ids as $key => $product_id) {
-                    $variab_product = wc_get_product($product_id);
-                    $regular_price = $variab_product->get_regular_price();
-                    $sale_price = $variab_product->get_sale_price();
-                    
-                    $product_actual_price_array[$key] = $regular_price;//saving actual prices in this array related to (1)
-                    $product_sale_prices_array[$key] = $sale_price;//saving sales prices in this array related to (2)
-
-                    //checking whether both prices are inserted or not
-                    if($regular_price != "" && $sale_price!=""){
-                        $savings_array[$key] = (int)(100-(($sale_price/$regular_price)*100));//saving off percentage in this array related to (3)
-                    }else{
-                        $savings_array[$key] = 0;//saving off percentage in this array related to (3)     
-                    }//if els for calculating percentage of saving
-                
-                }//foreach for variations
-
-                //cehcking if saving array has some values
-                if(sizeof($savings_array)>0){
-                    $saving_percentage = (int)max($savings_array);//(3);
-                    $saving_percentage_key = array_search($saving_percentage,$savings_array);//(3)getting index of that highest savings for sale and actual price  
-                    $product_sale_price = $currency_symbol.$product_sale_prices_array[$saving_percentage_key];//(2)getting value of that sale price which is having highest percentage of saving  
-                    $product_actual_price = $currency_symbol.$product_actual_price_array[$saving_percentage_key];//(2)getting value of that sale price which is having highest percentage of saving  
-                    
-                }else {
-                    $saving_percentage=0;
-                    $product_sale_price='';
-                    $product_actual_price='';
-                }
-            }//main else to process fd_wc_offer_variable
-            
+            }
     
         } //if featured product
         else {
-            $static_product_id = fdscf_get_acf_option("select_static_product_to_show_on_home_page");
+            $product_id = fdscf_get_acf_option("select_static_product_to_show_on_home_page");
 
-            $product = wc_get_product($static_product_id);
+            $product = wc_get_product($product_id);
+    
+            
+            // changings
+            $product_created_at = $product->get_date_created();
+            
+            $offer_expiry = get_post_meta($product_id,'fd_wc_offer_expiry',true);
+            $global_expiry = get_post_meta($product_id,'fd_wc_offer_use_global_expiry',true);
+            $expiry_date = "";
+            if($offer_expiry == "fd_wc_offer_expiry_enabled"){
                 
+                if($global_expiry == "fd_wc_offer_use_global_expiry_enabled"){
+                
+                    $expiry_days = round(get_field('global_offer_expiry','options'));
+                    
+                }else{
+    
+                    $expiry_days = get_post_meta($product_id,'fd_wc_offer_expiry_date',true);
+                
+                }
+                $plus_days = " +".$expiry_days." day";
+                $expiry_date = strtotime(date("Y-m-d H:i:s", strtotime($product_created_at)) . $plus_days);
+                $expiry_date = date('Y-m-d H:i:s',$expiry_date);
+    
+            }//offer Expiry
+            // changings
+
+
             //product initials
             $product_img_url = ( wp_get_attachment_url($product->get_image_id()) ) ? wp_get_attachment_url($product->get_image_id()) : wc_placeholder_img_src() ;
             $product_description = $product->get_description();
@@ -156,44 +173,7 @@ function fdscf_set_option_for_hero_section()
                 $product_sale_price =$currency_symbol.$product_sale_price;
                 $product_actual_price = $currency_symbol.$product_actual_price;
 
-            }elseif($product->is_type('fd_wc_offer_variable')) {
-                //goal is that we have to filter max saving percentage values
-                $product_actual_price_array = array();// (1) in this we will save all all actual prices
-                $product_sale_prices_array = array();// (2) in this we will save all all sales prices
-                $savings_array = array();// (3) in this we will save all saving percentages
-
-                $product_ids = $product->get_children();
-                foreach ($product_ids as $key => $product_id) {
-                    $variab_product = wc_get_product($product_id);
-                    $regular_price = $variab_product->get_regular_price();
-                    $sale_price = $variab_product->get_sale_price();
-                    
-                    $product_actual_price_array[$key] = $regular_price;//saving actual prices in this array related to (1)
-                    $product_sale_prices_array[$key] = $sale_price;//saving sales prices in this array related to (2)
-
-                    //checking whether both prices are inserted or not
-                    if($regular_price != "" && $sale_price!=""){
-                        $savings_array[$key] = (int)(100-(($sale_price/$regular_price)*100));//saving off percentage in this array related to (3)
-                    }else{
-                        $savings_array[$key] = 0;//saving off percentage in this array related to (3)     
-                    }//if els for calculating percentage of saving
-                
-                }//foreach for variations
-
-                //cehcking if saving array has some values
-                if(sizeof($savings_array)>0){
-                    $saving_percentage = (int)max($savings_array);//(3);
-                    $saving_percentage_key = array_search($saving_percentage,$savings_array);//(3)getting index of that highest savings for sale and actual price  
-                    $product_sale_price = $currency_symbol.$product_sale_prices_array[$saving_percentage_key];//(2)getting value of that sale price which is having highest percentage of saving  
-                    $product_actual_price = $currency_symbol.$product_actual_price_array[$saving_percentage_key];//(2)getting value of that sale price which is having highest percentage of saving  
-                    
-                }else {
-                    $saving_percentage=0;
-                    $product_sale_price='';
-                    $product_actual_price='';
-                }
-            }//main else to process fd_wc_offer_variable
-
+            }
 
 
         } //if static product
@@ -207,6 +187,8 @@ function fdscf_set_option_for_hero_section()
         update_option('fdscf_hero_product_description', $product_description);
         update_option('fdscf_hero_product_sold_count', $sold_qty);
         update_option('fdscf_hero_product_stock_status', $stock_status);
+        update_option('fdscf_hero_product_expiry_date', $expiry_date);
+        update_option('fdscf_hero_product_offer_expiry', $offer_expiry);
 
     } //if section enabled
 

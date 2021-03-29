@@ -220,3 +220,7 @@ form#fd_claim_voucher_form #fd_voucher_key{
     text-align: center!important;
     margin-bottom: 20px!important;
 }
+
+.text-success{
+    color: green!important;
+}

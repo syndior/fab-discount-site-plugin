@@ -185,6 +185,14 @@ class FD_Woocommerce_Controller
         $fd_product_meta['fd_wc_offer_voucher_expiry_date']         = ( isset( $_POST['fd_wc_offer_voucher_expiry_date'] ) && $_POST['fd_wc_offer_voucher_expiry_date'] > 0 ) ? $_POST['fd_wc_offer_voucher_expiry_date'] : 0;
         $fd_product_meta['fd_wc_offer_savings']         = 0;
 
+        // Cancellation Policy
+        $fd_product_meta['fd_wc_offer_voucher_cancellation_policy']                     =  isset( $_POST['fd_wc_offer_voucher_cancellation_policy'] ) ? $_POST['fd_wc_offer_voucher_cancellation_policy'] : ""; 
+
+        // for delivery cost
+        $fd_product_meta['fd_wc_offer_voucher_delivery_cost']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_cost'] ) ? $_POST['fd_wc_offer_voucher_delivery_cost'] : 0; 
+
+        // estimated delivery time
+        $fd_product_meta['fd_wc_offer_voucher_delivery_time']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_time'] ) ? $_POST['fd_wc_offer_voucher_delivery_time'] : ""; 
 
         if(isset( $_POST['_regular_price'] ) && isset( $_POST['_sale_price'] ) ){
             $fd_product_meta['fd_wc_offer_savings'] = ($_POST['_sale_price']/$_POST['_regular_price'])*100;
