@@ -337,7 +337,7 @@ class FD_Voucher
     /**
      * Helper Function: get all vouchers from DB
      */
-    public static function get_vouchers( int $page_no = 0, int $items_per_page = 0 )
+    public static function get_vouchers( int $page_no = 0, int $items_per_page = 0, bool $filter = false, array $filter_args = array() )
     {
         global $wpdb;
         $table_name = fdscf_vouchers_db_table_name;
@@ -351,7 +351,180 @@ class FD_Voucher
             $total_records = (int)$vouchers_count[0][0];
             $total_pages = ceil( $total_records / $items_per_page );
 
-            $query = " SELECT * FROM  `{$table_name}` ORDER BY `created_at` DESC LIMIT {$offset}, {$items_per_page};";
+            if( $filter == false ){
+
+                $query = " SELECT * FROM  `{$table_name}` ORDER BY `created_at` DESC LIMIT {$offset}, {$items_per_page};";
+
+            }elseif( $filter == true ) {
+
+                $defaults = array(
+                    'voucher_id'        => NULL,
+                    'customer_id'       => NULL,
+                    'vendor_id'         => NULL,
+                    'product_id'        => NULL,
+                    'order_id'          => NULL,
+                    'voucher_key'       => NULL,
+                    'voucher_amount'    => NULL,
+                    'voucher_status'    => NULL,
+                    'expiry_start'      => NULL,
+                    'expiry_end'        => NULL,
+                    'created_start'     => NULL,
+                    'created_end'       => NULL,
+                    'updated_start'     => NULL,
+                    'updated_end'       => NULL,
+                    'order_by'          => 'created_at',
+                    'order_type'        => 'DESC',
+                );
+
+                $query_counter  = 0;
+                $query_args     = wp_parse_args( $filter_args, $defaults );
+                
+                $query =    "SELECT * FROM `{$table_name}` WHERE ";
+
+                if( isset( $query_args["voucher_id"] ) ){
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+                    $query .= " `fd_voucher_id` = {$query_args["voucher_id"]} ";
+                    $query_counter++;
+
+                }
+                
+                if( isset( $query_args["customer_id"] ) ){
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+                    $query .= " `customer_id` = {$query_args["customer_id"]} ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["vendor_id"] ) ){
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+                    $query .= " `vendor_id` = {$query_args["vendor_id"]} ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["product_id"] ) ){
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+                    $query .= " `product_id` = {$query_args["product_id"]} ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["order_id"] ) ){
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+                    $query .= " `order_id` = {$query_args["order_id"]} ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["voucher_key"] ) ){
+
+                    $voucher_key = $query_args["voucher_key"];
+                    $voucher_key = preg_replace('/-/i', '', $voucher_key);
+                    $voucher_key = strtolower( $voucher_key );
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+                    $query .= " `fd_voucher_key` = '{$voucher_key}' ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["voucher_amount"] ) ){
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+                    $query .= " `voucher_amount` = {$query_args["voucher_amount"]} ";
+                    $query_counter++;
+
+                }
+                
+                if( isset( $query_args["voucher_status"] ) || isset( $query_args["expiry_start"] ) || isset( $query_args["expiry_end"] ) ){
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+
+                    $status = $query_args["voucher_status"];
+                    if( isset( $query_args["expiry_start"] ) || isset( $query_args["expiry_end"] ) ){
+                        $status = 'active';
+                    }
+
+                    $query .= " `fd_voucher_status` = '{$status}' ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["expiry_start"] ) ) {
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+
+                    $start_date = date( "Y-m-d H:i:s", strtotime( $query_args["expiry_start"] ) );
+
+                    $query .= " `expires_at` >= '{$start_date}' ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["expiry_end"] ) ) {
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+
+                    $end_date = date( "Y-m-d H:i:s", strtotime( $query_args["expiry_end"] ) );
+
+                    $query .= " `expires_at` <= '{$end_date}' ";
+                    $query_counter++;
+
+                }
+
+
+                if( isset( $query_args["created_start"] ) ) {
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+
+                    $start_date = date( "Y-m-d H:i:s", strtotime( $query_args["created_start"] ) );
+
+                    $query .= " `created_at` >= '{$start_date}' ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["created_end"] ) ) {
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+
+                    $start_date = date( "Y-m-d H:i:s", strtotime( $query_args["created_end"] ) );
+
+                    $query .= " `created_at` <= '{$start_date}' ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["updated_start"] ) ) {
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+
+                    $start_date = date( "Y-m-d H:i:s", strtotime( $query_args["updated_start"] ) );
+
+                    $query .= " `updated_at` >= '{$start_date}' ";
+                    $query_counter++;
+
+                }
+
+                if( isset( $query_args["updated_end"] ) ) {
+
+                    $query .= ( $query_counter > 0 ) ? " AND " : "";
+
+                    $start_date = date( "Y-m-d H:i:s", strtotime( $query_args["updated_end"] ) );
+
+                    $query .= " `updated_at` <= '{$start_date}' ";
+                    $query_counter++;
+
+                }
+                
+
+            }
+
             $result = $wpdb->get_results( $query, OBJECT );
 
             if( !empty( $result ) ){
