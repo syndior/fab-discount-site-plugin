@@ -5,6 +5,12 @@ function fdscf_get_acf_option(string $field_key = '')
     return get_field($field_key, 'option');
 }
 
+function fdscf_get_product_meta(string $meta_key = ""){
+    global $post;
+    $post_id = $post->ID;
+    $value = get_post_meta($post_id,$meta_key,true);
+    return $value; 
+}
 function fdscf_set_option_for_hero_section()
 {
 
