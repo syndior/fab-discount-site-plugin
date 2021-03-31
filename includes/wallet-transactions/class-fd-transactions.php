@@ -2,13 +2,13 @@
 
 class FD_Transaction
 {
-    private $id;
-    private $type;
-    private $created_at;
-    private $voucher_id;
-    private $order_id;
-    private $user_id;
-    private $amount;
+    public $id;
+    public $type;
+    public $created_at;
+    public $voucher_id;
+    public $order_id;
+    public $user_id;
+    public $amount;
 
     public function __construct( int $transaction_id = 0 )
     {
@@ -174,7 +174,7 @@ class FD_Transaction
             global $wpdb;
             $table_name = fdscf_transactions_db_table_name;
 
-            $sql_query          = "SELECT * FROM `{$table_name}` WHERE `user_id` = %d ORDER BY `created_at` ASC;";
+            $sql_query          = "SELECT * FROM `{$table_name}` WHERE `user_id` = %d ORDER BY `created_at` DESC;";
             $prepared_query     = $wpdb->prepare( $sql_query, absint( $user_id ) );
             $results            = $wpdb->get_results( $prepared_query , OBJECT);
 

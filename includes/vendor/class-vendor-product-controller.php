@@ -3,6 +3,8 @@
 class FD_Vendor_Product_Controller{
     public function __construct(){
 
+        /*updating visibility of product*/
+        add_filter('woocommerce_product_get_catalog_visibility',array( $this, 'fd_update_product_visibility' ),10,2);
 
         /* Add Custom Product Types to Vednor create new product dropdown */
         add_filter( 'dokan_product_types', array( $this, 'add_custom_product_type' ), 9999);
@@ -14,29 +16,32 @@ class FD_Vendor_Product_Controller{
         add_action('dokan_product_edit_after_product_tags',array($this,'show_vendor_product_extra_fields_edit_page'),99,2);
 
     }
+
+
     /* Add Custom Product Types to Vednor create new product dropdown */
     public function add_custom_product_type( $product_types )
     {
+        unset( $product_types['grouped'] );
         $product_types['fd_wc_offer'] =  'FD Offer';
-        $product_types['fd_wc_offer_variable'] =  'FD Offer Variable';
         return $product_types;
     }
 
-
     //svave extra fields from vendor product
-    public function save_vendor_product_extra_fields($product_id, $postdata){
+    public function save_vendor_product_extra_fields($product_id, $postdata)
+    {
         if ( ! dokan_is_user_seller( get_current_user_id() ) ) {
             return;
         }
-        
+
+        $fd_product_meta = [];
         $fd_product_meta['fd_wc_corner_banner']                     = ( $postdata['fd_wc_corner_banner'] == 'fd_wc_corner_banner_enabled' ) ? $postdata['fd_wc_corner_banner'] : 'fd_wc_corner_banner_disabled';
         $fd_product_meta['fd_wc_corner_banner_title']               = ( isset( $postdata['fd_wc_corner_banner_title'] ) ) ? $postdata['fd_wc_corner_banner_title'] : '';
         $fd_product_meta['fd_wc_corner_banner_headind']             = ( isset( $postdata['fd_wc_corner_banner_headind'] ) ) ? $postdata['fd_wc_corner_banner_headind'] : '';
         
         //scheduling 
         $fd_product_meta['fd_wc_offer_schedule']                     = ( $postdata['fd_wc_offer_schedule'] == 'enabled' ) ? $postdata['fd_wc_offer_schedule'] : 'disabled';
-        $fd_product_meta['fd_wc_offer_schedule_date']                     = ( isset( $postdata['fd_wc_offer_schedule_date'] ) ) ? $postdata['fd_wc_offer_schedule_date'] : '';
-        $fd_product_meta['fd_wc_offer_schedule_time']                     = ( isset( $postdata['fd_wc_offer_schedule_time'] ) ) ? $postdata['fd_wc_offer_schedule_time'] : '';
+        $fd_product_meta['fd_wc_offer_schedule_date']                = ( isset( $postdata['fd_wc_offer_schedule_date'] ) ) ? $postdata['fd_wc_offer_schedule_date'] : '';
+        $fd_product_meta['fd_wc_offer_schedule_time']                = ( isset( $postdata['fd_wc_offer_schedule_time'] ) ) ? $postdata['fd_wc_offer_schedule_time'] : '';
         
         
         $fd_product_meta['fd_wc_offer_expiry']                      = ( $postdata['fd_wc_offer_expiry'] == 'fd_wc_offer_expiry_enabled' ) ? $postdata['fd_wc_offer_expiry'] : 'fd_wc_offer_expiry_disabled';
@@ -47,9 +52,19 @@ class FD_Vendor_Product_Controller{
         $fd_product_meta['fd_wc_offer_voucher_expiry']              = ( $postdata['fd_wc_offer_voucher_expiry'] == 'fd_wc_offer_voucher_expiry_enabled' ) ? $postdata['fd_wc_offer_voucher_expiry'] : 'fd_wc_offer_voucher_expiry_disabled';
         $fd_product_meta['fd_wc_offer_voucher_use_global_expiry']   = ( $postdata['fd_wc_offer_voucher_use_global_expiry'] == 'fd_wc_offer_voucher_use_global_expiry_enabled' ) ? $postdata['fd_wc_offer_voucher_use_global_expiry'] : 'fd_wc_offer_voucher_use_global_expiry_disabled';
         $fd_product_meta['fd_wc_offer_voucher_expiry_date']         = ( isset( $postdata['fd_wc_offer_voucher_expiry_date'] ) && $postdata['fd_wc_offer_voucher_expiry_date'] > 0 ) ? $postdata['fd_wc_offer_voucher_expiry_date'] : 0;
-        $fd_product_meta['fd_product_edit_note']         = ( isset( $postdata['fd_product_edit_note'] ) ) ? $postdata['fd_product_edit_note'] : '';
-        $fd_product_meta['fd_product_proof_of_stock']         = ( isset( $postdata['fd_product_proof_of_stock'] ) ) ? $postdata['fd_product_proof_of_stock'] : '';
-        $fd_product_meta['fd_product_video']         = ( isset( $postdata['fd_product_video'] ) ) ? $postdata['fd_product_video'] : '';
+        $fd_product_meta['fd_product_edit_note']                    = ( isset( $postdata['fd_product_edit_note'] ) ) ? $postdata['fd_product_edit_note'] : '';
+        $fd_product_meta['fd_product_proof_of_stock']               = ( isset( $postdata['fd_product_proof_of_stock'] ) ) ? $postdata['fd_product_proof_of_stock'] : '';
+        $fd_product_meta['fd_product_video']                        = ( isset( $postdata['fd_product_video'] ) ) ? $postdata['fd_product_video'] : '';
+
+        // Cancellation Policy
+        $fd_product_meta['fd_wc_offer_voucher_cancellation_policy']               =  isset( $_POST['fd_wc_offer_voucher_cancellation_policy'] ) ? $_POST['fd_wc_offer_voucher_cancellation_policy'] : ""; 
+
+        // for delivery cost
+        $fd_product_meta['fd_wc_offer_voucher_delivery_cost']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_cost'] ) ? $_POST['fd_wc_offer_voucher_delivery_cost'] : 0; 
+
+        // estimated delivery time
+        $fd_product_meta['fd_wc_offer_voucher_delivery_time']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_time'] ) ? $_POST['fd_wc_offer_voucher_delivery_time'] : ""; 
+        
 
         $fd_product_meta['fd_wc_offer_savings']        =  0;
          if(isset( $postdata['_regular_price'] ) && isset( $postdata['_sale_price'] ) ){
@@ -72,33 +87,7 @@ class FD_Vendor_Product_Controller{
             $product->save();
         }
 
-
-
-        // if ( ! empty( $postdata['fd_product_edit_note'] ) ) {
-        //     update_post_meta( $product_id, 'fd_product_edit_note', $postdata['fd_product_edit_note'] );
-        // }
-
     }
-
-
-// public function show_vendor_product_extra_fields_edit_page($post, $post_id){
-// $fd_product_edit_note = get_post_meta( $post_id, 'fd_product_edit_note', true );
-
-// $fields = '';
-// $fields.='
-// <div class="dokan-form-group">
-// <label>Edit Note <span style = "color:red">Please describe why do you want to edit it*</span></label>
-// <textarea class="dokan-form-control" name="fd_product_edit_note" placeholder="Edit Note" required >'.$fd_product_edit_note.'</textarea>
-// </div>
-// <div class="dokan-form-group">
-// <label>Proof Of Stock <span style = "color:red">Please attach any document as a proof of stock*</span></label>
-// <input type= "file" class="dokan-form-control" name="fd_product_proof_of_stock"/>
-// </div>
-
-// ';
-// echo $fields;
-// echo require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab_vendor.php' ); 
-// }
 
 // Add extra field in seller settings
 public function show_vendor_product_extra_fields_edit_page($post, $post_id){
@@ -112,7 +101,6 @@ public function show_vendor_product_extra_fields_edit_page($post, $post_id){
 
 ?>
  <div class="gregcustom dokan-form-group">
-        <h1><?php echo $fd_wc_offer_savings?></h1>
         <label class="dokan-w3 dokan-control-label" for="">
         Edit Note <span style = "color:red">Please describe why do you want to edit it*</span>
         </label>
@@ -160,13 +148,26 @@ public function show_vendor_product_extra_fields_edit_page($post, $post_id){
 
     <br>
     <?php
-    require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab_vendor.php' ); 
+    require_once ( fdscf_path . 'templates/fd-html-wc-offer-product-data-tab-vendor.php' ); 
 
+}
+
+
+public function fd_update_product_visibility($value,$obj){
+
+    $product_id = $obj->get_id();
+    $schdule = get_post_meta($product_id,'fd_wc_offer_schedule',true);
+    if($schdule == "enabled"){
+        $value = "hidden";
+    }else{
+        $value = "visible";
+    }
+    return $value;
+    
 }
 
 
 
 }//class
 new FD_Vendor_Product_Controller();
-
 ?>

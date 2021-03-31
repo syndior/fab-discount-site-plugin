@@ -70,7 +70,7 @@ class FD_Admin_Pages
         foreach ($products as $key => $product) {
             $product = wc_get_product($product->ID);
             
-            if($product->is_type('fd_wc_offer') || $product->is_type('fd_wc_offer_variable')){
+            if($product->is_type('fd_wc_offer')){
                 $label = $product->get_title();
                 $value = $product->get_ID();
                 $field['choices'][$value] = $label; 

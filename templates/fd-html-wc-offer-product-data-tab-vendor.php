@@ -21,11 +21,22 @@
     $fd_wc_offer_voucher_use_global_expiry  = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_use_global_expiry', true );
     $fd_wc_offer_voucher_expiry_date        = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry_date', true );
 
+    //cancellation policy
+    $fd_wc_offer_voucher_cancellation_policy = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_cancellation_policy', true );
+
+    //Delivery Cost
+    $fd_wc_offer_voucher_delivery_cost = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_delivery_cost', true );
+
+    //estimated delivery time
+    $fd_wc_offer_voucher_delivery_time = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_delivery_time', true );
+
+
+
     $current_date = date('Y-m-d');
     // $curre_time = date('H');
     $times = array(1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24);
     $display = "display:none";
-    if($product->is_type('fd_wc_offer') || $product->is_type('fd_wc_offer_variable')){
+    if($product->is_type('fd_wc_offer')){
         $display = "display:block";
     }
 ?>
@@ -83,7 +94,7 @@
              * Ceckbox, if enable show top left banner on front-end
              */
             $value = $fd_wc_offer_schedule=='enabled'?'enabled':'disabled';
-            $checked = $fd_wc_offer_schedule == 'banner_enabled' ? 'checked' : '';
+            $checked = $fd_wc_offer_schedule == 'enabled' ? 'checked' : '';
             $field = '
             <div class="dokan-form-group">
                      <label class="form-label">Live offer after specific interval: </label>
@@ -107,20 +118,14 @@
 
 
             //schedule time     
-            $select_options="<option value = 0>Select Time</option>";
-            foreach($times as $time){
-                if(isset($fd_wc_offer_schedule_time)){
-                    $fd_wc_offer_schedule_time==$time?$select_options.='<option value='.$time.' selected>'.$time.'</option>':$select_options.='<option value='.$time.'>'.$time.'</option>';
-                }else{
-                    $select_options.='<option value='.$time.'>'.$time.'</option>';
-                }
-            }
+
+            
+            $value = isset($fd_wc_offer_schedule_time)?$fd_wc_offer_schedule_time:'';
+
             $field = '
             <div class="dokan-form-group" style = "'.$checked.'" id = "schedule_time">
             <label class="form-label">Set time for offer to go live: </label>
-            <select name = "fd_wc_offer_schedule_time" id = "fd_wc_offer_schedule_time">
-            '.$select_options.'
-            </select>
+            <input type="time" class="short " style="" name="fd_wc_offer_schedule_time" id="fd_wc_offer_schedule_time" value="'.$value.'">
             </div>    
             ';
             echo $field;   
@@ -186,20 +191,21 @@
 
         $products = get_posts($args);
         $select_options = array();
+        
 
         foreach( $products as $product ){
             $product = wc_get_product( $product->ID );
-            if( !$product->is_type( 'fd_wc_offer' ) && !$product->is_type( 'fd_wc_offer_variable' ) ){
+            if( !$product->is_type( 'fd_wc_offer' ) ){
                 $option['product_id']           = $product->get_ID();
                 $option['product_title']        = $product->get_title();
                 $option['product_type']         = $product->get_type();
                 $select_options[]               = $option;
             }
         }
+
         ?>
         <div class="dokan-form-group">
             <label class= "form-label" for="fd_offer_linked_product">This Offer Applies to: </label>
-          
             <select name="fd_offer_linked_product" id="fd_offer_linked_product" class="select short" required="required">
                 <option>Select a value</option>
 
@@ -271,6 +277,46 @@
         ?>
 
 
+        <?php
+        /**
+         * text input, for estimated delivery time
+        */
+        $value = isset( $fd_wc_offer_voucher_delivery_time ) ? $fd_wc_offer_voucher_delivery_time : "2-3 days";
+
+        $field = '
+        <div class="dokan-form-group">
+        <label class="form-label"> Estimated Delivery Time :  </label>
+        <input type="text" class="short " style="" name="fd_wc_offer_voucher_delivery_time" id="fd_wc_offer_voucher_delivery_time" value="'.$value.'">
+        </div>    
+        ';
+        echo $field;   
+        ?>
+
+        <?php
+        /**
+         * number input, for delivery cost
+        */
+        $value = isset( $fd_wc_offer_voucher_delivery_cost ) ? $fd_wc_offer_voucher_delivery_cost : 0;
+
+        $field = '
+        <div class="dokan-form-group">
+        <label class="form-label"> Estimated Delivery Cost :  </label>
+        <input type="text" class="short " style="" name="fd_wc_offer_voucher_delivery_cost" id="fd_wc_offer_voucher_delivery_cost" value="'.$value.'">
+        </div>    
+        ';
+        echo $field;   
+        ?>
+
+
+        <?php
+
+        /**
+         * text input, for Cancellation Policy
+         */
+        $content = isset( $fd_wc_offer_voucher_cancellation_policy ) ? $fd_wc_offer_voucher_cancellation_policy : "";
+        echo "  <p>Cancellation Policy : </p> <br>";
+        wp_editor( $content, 'fd_wc_offer_voucher_cancellation_policy' );
+        ?>
 
 
     </div>
