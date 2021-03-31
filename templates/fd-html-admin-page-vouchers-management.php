@@ -248,6 +248,9 @@
                                         case 'blocked':
                                             echo 'Blocked';
                                             break;
+                                        case 'refund_request':
+                                            echo 'Requested Refund';
+                                            break;    
                                     }
                                 ?>
                             </td>
@@ -291,6 +294,7 @@
                                         <option  <?=( $voucher->get_status() == "redeemed" ) ? 'selected' : '';?> value="redeemed">Redeemed</option>
                                         <option  <?=( $voucher->get_status() == "blocked" ) ? 'selected' : '';?> value="blocked">Blocked</option>
                                         <option  <?=( $voucher->get_status() == "expired" ) ? 'selected' : '';?> value="expired">Expired</option>
+                                        <option  <?=( $voucher->get_status() == "refund_request" ) ? 'selected' : '';?> value="refund_request">Refund Request</option>
                                     </select>
                                     <input type="hidden" name="fd_update_type" value="fd_status_update">
                                     <input type="hidden" name="fd_voucher_id" value="<?=$voucher->get_ID()?>">

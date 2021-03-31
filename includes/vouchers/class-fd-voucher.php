@@ -135,13 +135,13 @@ class FD_Voucher
     public function update_status(  string $status = '' )
     {
         if( strlen( $status ) > 0 ){
-            if( $status == 'active' || $status == 'redeemed' || $status == 'credit_transferred' || $status == 'expired' || $status == 'blocked' ){
+            if( $status == 'active' || $status == 'redeemed' || $status == 'credit_transferred' || $status == 'expired' || $status == 'blocked' || $status == 'refund_request' ){
                 global $wpdb;
                 $table_name = fdscf_vouchers_db_table_name;
 
                 $data = array();
                 $data['fd_voucher_status']  = $status;
-                $data['will_expire']        = ($status == 'active' || $status == 'blocked') ? true : false;
+                $data['will_expire']        = ($status == 'active' || $status == 'blocked' || $status == 'refund_request') ? true : false;
 
                 if( $status == 'expired' ||  $status == 'redeemed'){
                     $expired_value = true;
@@ -560,7 +560,7 @@ class FD_Voucher
             $vouchers_array = array();
             foreach( $result as $row ){
                 $voucher = new FD_Voucher( $row->fd_voucher_id );
-                $vouchers_array[] = array('fd_voucher_id'=>$row->fd_voucher_id,'fd_voucher_key'=>$voucher->get_key(),'expires_at'=>$row->expires_at);
+                $vouchers_array[] = array('fd_voucher_id'=>$row->fd_voucher_id,'fd_voucher_key'=>$voucher->get_key(),'expires_at'=>$row->expires_at,'status'=>$voucher->get_status());
             }
             return $vouchers_array;
         }
@@ -700,6 +700,8 @@ class FD_Voucher
             $voucher_status =  "Blocked";
         }elseif ($status=="expired") {
             $voucher_status =  "Expired";
+        }elseif ($status=="refund_request") {
+            $voucher_status =  "Requested Refund";
         }
 
         return $voucher_status;

@@ -113,7 +113,7 @@ class FD_Wallet
 
             $voucher = new FD_Voucher( $voucher_id );
 
-            if( $voucher->get_customer_id() == $this->user_id && ( $voucher->get_status() == 'active' || $voucher->get_status() == 'blocked' ) ){
+            if( $voucher->get_customer_id() == $this->user_id && ( $voucher->get_status() == 'active' || $voucher->get_status() == 'blocked' || $voucher->get_status() == 'refund_request' ) ){
                 
                 $voucher->update_status('credit_transferred');
 

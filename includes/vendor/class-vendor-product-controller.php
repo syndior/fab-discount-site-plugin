@@ -56,6 +56,16 @@ class FD_Vendor_Product_Controller{
         $fd_product_meta['fd_product_proof_of_stock']               = ( isset( $postdata['fd_product_proof_of_stock'] ) ) ? $postdata['fd_product_proof_of_stock'] : '';
         $fd_product_meta['fd_product_video']                        = ( isset( $postdata['fd_product_video'] ) ) ? $postdata['fd_product_video'] : '';
 
+        // Cancellation Policy
+        $fd_product_meta['fd_wc_offer_voucher_cancellation_policy']               =  isset( $_POST['fd_wc_offer_voucher_cancellation_policy'] ) ? $_POST['fd_wc_offer_voucher_cancellation_policy'] : ""; 
+
+        // for delivery cost
+        $fd_product_meta['fd_wc_offer_voucher_delivery_cost']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_cost'] ) ? $_POST['fd_wc_offer_voucher_delivery_cost'] : 0; 
+
+        // estimated delivery time
+        $fd_product_meta['fd_wc_offer_voucher_delivery_time']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_time'] ) ? $_POST['fd_wc_offer_voucher_delivery_time'] : ""; 
+        
+
         $fd_product_meta['fd_wc_offer_savings']        =  0;
          if(isset( $postdata['_regular_price'] ) && isset( $postdata['_sale_price'] ) ){
             $fd_product_meta['fd_wc_offer_savings'] = ($postdata['_sale_price']/$postdata['_regular_price'])*100;
