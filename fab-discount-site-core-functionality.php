@@ -83,6 +83,8 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
             require_once ( fdscf_path . 'includes/wallet-transactions/test.php' );
             require_once ( fdscf_path . 'includes/vendor/class-vendor-controller.php' );
             require_once ( fdscf_path . 'includes/vendor/class-vendor-product-controller.php' );
+            require_once ( fdscf_path . 'includes/base/class-emails.php' );
+
             
 
         }

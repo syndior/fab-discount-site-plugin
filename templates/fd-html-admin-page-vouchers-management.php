@@ -4,54 +4,55 @@
      */
     if( isset( $_POST['fd_wp_nonce'] ) && isset( $_POST['fd_voucher_id'] ) && isset( $_POST['fd_update_type'] ) ){
 
-        wp_verify_nonce( 'fd_voucher_mngmnt', $_POST['fd_wp_nonce'] );
+        if( wp_verify_nonce( $_POST['fd_wp_nonce'], 'fd_voucher_mngmnt' ) ){
 
-        $voucher_id = (int)$_POST['fd_voucher_id'];
-        $voucher = new FD_Voucher( $voucher_id );
-
-        if( $_POST['fd_update_type'] == 'fd_status_update' ){
-
-            if( isset( $_POST['fd_voucher_status'] ) ){
-                $status = $_POST['fd_voucher_status'];
-
-                switch ($status) {
-                    case 'active':
-                    case 'redeemed':
-                    case 'blocked':
-                    case 'expired':
-                        if( !( $voucher->update_status( $status ) !== false ) ){
+            $voucher_id = (int)$_POST['fd_voucher_id'];
+            $voucher = new FD_Voucher( $voucher_id );
+    
+            if( $_POST['fd_update_type'] == 'fd_status_update' ){
+    
+                if( isset( $_POST['fd_voucher_status'] ) ){
+                    $status = $_POST['fd_voucher_status'];
+    
+                    switch ($status) {
+                        case 'active':
+                        case 'redeemed':
+                        case 'blocked':
+                        case 'expired':
+                            if( !( $voucher->update_status( $status ) !== false ) ){
+                                echo "<script>alert('An Error occured while performing this action');</script>";
+                            }
+                            break;
+                        case 'credit_transferred':
+                            $wallet = new FD_Wallet( $voucher->get_customer_id() );
+                            if( $wallet->convert_voucher_to_credit( $voucher->get_ID() ) == false ){
+                                echo "<script>alert('An Error occured while performing this action');</script>";
+                            }
+                            break;
+                        
+                        default:
                             echo "<script>alert('An Error occured while performing this action');</script>";
-                        }
-                        break;
-                    case 'credit_transferred':
-                        $wallet = new FD_Wallet( $voucher->get_customer_id() );
-                        if( !($wallet->convert_voucher_to_credit( $voucher->get_ID() ) !== false) ){
-                            echo "<script>alert('An Error occured while performing this action');</script>";
-                        }
-                        break;
-                    
-                    default:
-                        echo "<script>alert('An Error occured while performing this action');</script>";
-                        break;
+                            break;
+                    }
+    
                 }
-
-            }
-
-        }elseif ( $_POST['fd_update_type'] == 'fd_set_to_expire' ) {
-            if( isset( $_POST['fd_voucher_expiry_date'] ) ){
-
-                $expiry_date = $_POST['fd_voucher_expiry_date'];
-                $set_expire = true;
-                if( $voucher->set_to_expire( $set_expire, $expiry_date ) !== false ){
-                    echo "<script>alert('Voucher Updated!');</script>";
+    
+            }elseif ( $_POST['fd_update_type'] == 'fd_set_to_expire' ) {
+                if( isset( $_POST['fd_voucher_expiry_date'] ) ){
+    
+                    $expiry_date = $_POST['fd_voucher_expiry_date'];
+                    $set_expire = true;
+                    if( $voucher->set_to_expire( $set_expire, $expiry_date ) !== false ){
+                        echo "<script>alert('Voucher Updated!');</script>";
+                    }else{
+                        echo "<script>alert('An Error occured while performing this action');</script>";
+                    }
                 }else{
                     echo "<script>alert('An Error occured while performing this action');</script>";
                 }
-            }else{
-                echo "<script>alert('An Error occured while performing this action');</script>";
             }
-        }
 
+        }
 
     }
 
@@ -70,6 +71,51 @@
         $vouchers_exists    = true;
         $vouchers           = $results['vouchers'];
         $pagination         = $results['pagination'];
+    }
+
+
+    /**
+     * Handle Voucher Filters
+     */
+    if( isset( $_POST['fd_wp_nonce'] ) && isset( $_POST['fd_request_type'] ) && $_POST['fd_request_type'] == 'filter' ){
+
+        if( wp_verify_nonce( $_POST['fd_wp_nonce'], 'fd_voucher_filter' ) ){
+
+            if( $_POST['submit'] == 'fd_add_filter' ){
+
+                $filter         = true;
+                $filter_args    = array(
+                    'voucher_id'        => ( isset( $_POST['voucher_id'] )              && $_POST['voucher_id'] !== ''              ) ? $_POST['voucher_id']              : NULL ,
+                    'customer_id'       => ( isset( $_POST['customer_id'] )             && $_POST['customer_id'] !== ''             ) ? $_POST['customer_id']             : NULL ,
+                    'vendor_id'         => ( isset( $_POST['vendor_id'] )               && $_POST['vendor_id'] !== ''               ) ? $_POST['vendor_id']               : NULL ,
+                    'product_id'        => ( isset( $_POST['product_id'] )              && $_POST['product_id'] !== ''              ) ? $_POST['product_id']              : NULL ,
+                    'order_id'          => ( isset( $_POST['order_id'] )                && $_POST['order_id'] !== ''                ) ? $_POST['order_id']                : NULL ,
+                    'voucher_key'       => ( isset( $_POST['voucher_key'] )             && $_POST['voucher_key'] !== ''             ) ? $_POST['voucher_key']             : NULL ,
+                    'voucher_amount'    => ( isset( $_POST['voucher_amount'] )          && $_POST['voucher_amount'] !== ''          ) ? $_POST['voucher_amount']          : NULL ,
+                    'voucher_status'    => ( isset( $_POST['voucher_status'] )          && $_POST['voucher_status'] !== ''          ) ? $_POST['voucher_status']          : NULL ,
+                    'expiry_start'      => ( isset( $_POST['voucher_expiry_min'] )      && $_POST['voucher_expiry_min'] !== ''      ) ? $_POST['voucher_expiry_min']      : NULL ,
+                    'expiry_end'        => ( isset( $_POST['voucher_expiry_max'] )      && $_POST['voucher_expiry_max'] !== ''      ) ? $_POST['voucher_expiry_max']      : NULL ,
+                    'created_start'     => ( isset( $_POST['voucher_created_at_min'] )  && $_POST['voucher_created_at_min'] !== ''  ) ? $_POST['voucher_created_at_min']  : NULL ,
+                    'created_end'       => ( isset( $_POST['voucher_created_at_max'] )  && $_POST['voucher_created_at_max'] !== ''  ) ? $_POST['voucher_created_at_max']  : NULL ,
+                    'updated_start'     => ( isset( $_POST['voucher_last_upated_min'] ) && $_POST['voucher_last_upated_min'] !== '' ) ? $_POST['voucher_last_upated_min'] : NULL ,
+                    'updated_end'       => ( isset( $_POST['voucher_last_upated_max'] ) && $_POST['voucher_last_upated_max'] !== '' ) ? $_POST['voucher_last_upated_max'] : NULL ,
+                );
+    
+                $results = FD_Voucher::get_vouchers( $page_no, $item_per_page, $filter, $filter_args );
+                $vouchers_exists = false;
+                $vouchers = null;
+                $pagination = null;
+                
+                if( $results !== false && !empty($results['vouchers']) ){
+                    $vouchers_exists    = true;
+                    $vouchers           = $results['vouchers'];
+                    $pagination         = $results['pagination'];
+                }
+
+            }
+
+        }
+
     }
 
 ?>
@@ -95,6 +141,82 @@
                     <th>Creation Date</th>
                     <th>Last Updates</th>
                     <th>Actions</th>
+                </tr>
+
+                <tr>
+                    <form method="POST" id="fd_filter_form">
+                        <input form="fd_filter_form" type="hidden" name="fd_wp_nonce" value="<?=wp_create_nonce('fd_voucher_filter')?>">
+                        <input form="fd_filter_form" type="hidden" name="fd_request_type" value="filter">
+                    </form>
+                    <td>
+                        <input form="fd_filter_form" type="number" min="1" name="voucher_id" id="" style="width:70px;">
+                    </td>
+                    <td>
+                        <input form="fd_filter_form" type="number" min="1" name="customer_id" id="" style="width:70px;">
+                    </td>
+                    <td>
+                        <input form="fd_filter_form" type="number" min="1" name="vendor_id" id="" style="width:70px;">
+                    </td>
+                    <td>
+                        <input form="fd_filter_form" type="number" min="1" name="product_id" id="" style="width:70px;">
+                    </td>
+                    <td>
+                        <input form="fd_filter_form" type="number" min="1" name="order_id" id="" style="width:70px;">
+                    </td>
+                    <td>
+                        <input form="fd_filter_form" type="text" name="voucher_key" id="">
+                    </td>
+                    <td>
+                        <input form="fd_filter_form" type="number" min="0" name="voucher_amount" id="" style="width:70px;">
+                    </td>
+                    <td>
+                        <select form="fd_filter_form" name="voucher_status" id="">
+                            <option value="">Select Status</option>
+                            <option value="active">Active</option>
+                            <option value="credit_transferred">Convert to Store Credit</option>
+                            <option value="redeemed">Redeemed</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div style="display: inline-flex; flex-direction: column; width: 49%;">
+                            <label for="">Start</label>
+                            <input form="fd_filter_form" type="date" name="voucher_expiry_min" id="">
+                        </div>
+                        
+                        <div style="display: inline-flex; flex-direction: column; width: 49%;">
+                            <label for="">End</label>
+                            <input form="fd_filter_form" type="date" name="voucher_expiry_max" id="">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: inline-flex; flex-direction: column; width: 49%;">
+                            <label for="">Start</label>
+                            <input form="fd_filter_form" type="date" name="voucher_created_at_min" id="">
+                        </div>
+                        
+                        <div style="display: inline-flex; flex-direction: column; width: 49%;">
+                            <label for="">End</label>
+                            <input form="fd_filter_form" type="date" name="voucher_created_at_max" id="">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: inline-flex; flex-direction: column; width: 49%;">
+                            <label for="">Start</label>
+                            <input form="fd_filter_form" type="date" name="voucher_last_upated_min" id="">
+                        </div>
+                        
+                        <div style="display: inline-flex; flex-direction: column; width: 49%;">
+                            <label for="">End</label>
+                            <input form="fd_filter_form" type="date" name="voucher_last_upated_max" id="">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display:flex; flex-direction: row; align-items: stretch;">
+                            <button form="fd_filter_form" type="submit" name="submit" value="fd_add_filter" style="width: 78%;margin: auto; padding: 10px 16px;">Search</button>
+                        </div>
+                    </td>
                 </tr>
 
                 <tbody>
@@ -126,6 +248,9 @@
                                         case 'blocked':
                                             echo 'Blocked';
                                             break;
+                                        case 'refund_request':
+                                            echo 'Requested Refund';
+                                            break;    
                                     }
                                 ?>
                             </td>
@@ -169,6 +294,7 @@
                                         <option  <?=( $voucher->get_status() == "redeemed" ) ? 'selected' : '';?> value="redeemed">Redeemed</option>
                                         <option  <?=( $voucher->get_status() == "blocked" ) ? 'selected' : '';?> value="blocked">Blocked</option>
                                         <option  <?=( $voucher->get_status() == "expired" ) ? 'selected' : '';?> value="expired">Expired</option>
+                                        <option  <?=( $voucher->get_status() == "refund_request" ) ? 'selected' : '';?> value="refund_request">Refund Request</option>
                                     </select>
                                     <input type="hidden" name="fd_update_type" value="fd_status_update">
                                     <input type="hidden" name="fd_voucher_id" value="<?=$voucher->get_ID()?>">

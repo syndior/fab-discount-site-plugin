@@ -4,6 +4,9 @@ class FD_Woocommerce_Controller
 {
     public function __construct()
     {
+        /*updating visibility of product*/
+        add_filter('woocommerce_product_get_catalog_visibility',array( $this, 'fd_update_product_visibility' ),10,2);
+
         /* adds the custom product type's label in the products type dropdown */
         add_filter( 'product_type_selector', array( $this, 'add_product_type_filter' ), 10 );
 
@@ -34,9 +37,11 @@ class FD_Woocommerce_Controller
         /* adds back the add to cart buttons and product summary sections */
         add_action( 'woocommerce_fd_wc_offer_add_to_cart', array( $this, 'add_to_cart_template_include') );
         
+        /* adds custom button after the add to cart button to pay with store credit */
+        add_action( 'woocommerce_after_add_to_cart_button', array( $this, 'add_functionality_after_add_to_cart_button'), 10 );
 
-        /* adds custom button before the add to cart button to pay with store credit */
-        add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_functionality_before_add_to_cart_button'), 10 );
+        /* Register new endpoint to use for My Account pages */
+        add_action( 'woocommerce_before_single_product', array( $this, 'proccess_custom_add_to_cart_method' ) );
 
         /* inlude page js that logs users product view */
         add_action( 'woocommerce_after_single_product', array( $this, 'enqueue_user_product_view_log_script' ) );
@@ -64,9 +69,23 @@ class FD_Woocommerce_Controller
 
         /* Custom Hook: Add in claim offer feater after successfull checkout */
         add_action( 'fdscf_checkout_order_processed_claim_offer', array( $this, 'add_in_claim_offer_feature' ) );
-
+        
         /* Hook custom product tabs, Displayed on the product page */
         add_filter( 'woocommerce_product_tabs', array( $this, 'add_new_product_tabs' ) );
+        
+        /* add custom total row to show remaining store credit */
+        add_filter( 'woocommerce_get_order_item_totals', array( $this, 'add_custom_order_total_rows' ), 10, 2 );
+        
+        /* add custom total row to show remaining store credit */
+        add_action( 'woocommerce_cart_totals_after_order_total', array( $this, 'print_custom_total_rows' ), 10 );
+        add_action( 'woocommerce_review_order_after_order_total', array( $this, 'print_custom_total_rows' ), 10 );
+
+        /* add order item meta */
+        add_action('woocommerce_add_order_item_meta',  array( $this, 'add_order_item_meta_for_pay_with_store_credit_order' ), 10, 2);
+        
+        /* modify wallet amount if order is proccessedd */
+        add_action('woocommerce_checkout_order_processed',  array( $this, 'modify_wallet_totals' ) );
+        
     }
 
     public function add_product_type_filter( $types )
@@ -152,8 +171,8 @@ class FD_Woocommerce_Controller
         
         //scheduling 
         $fd_product_meta['fd_wc_offer_schedule']                     = ( $_POST['fd_wc_offer_schedule'] == 'enabled' ) ? $_POST['fd_wc_offer_schedule'] : 'disabled';
-        $fd_product_meta['fd_wc_offer_schedule_date']                     = ( isset( $_POST['fd_wc_offer_schedule_date'] ) ) ? $_POST['fd_wc_offer_schedule_date'] : '';
-        $fd_product_meta['fd_wc_offer_schedule_time']                     = ( isset( $_POST['fd_wc_offer_schedule_time'] ) ) ? $_POST['fd_wc_offer_schedule_time'] : '';
+        $fd_product_meta['fd_wc_offer_schedule_date']                = ( isset( $_POST['fd_wc_offer_schedule_date'] ) ) ? $_POST['fd_wc_offer_schedule_date'] : '';
+        $fd_product_meta['fd_wc_offer_schedule_time']                = ( isset( $_POST['fd_wc_offer_schedule_time'] ) ) ? $_POST['fd_wc_offer_schedule_time'] : '';
         
         
         $fd_product_meta['fd_wc_offer_expiry']                      = ( $_POST['fd_wc_offer_expiry'] == 'fd_wc_offer_expiry_enabled' ) ? $_POST['fd_wc_offer_expiry'] : 'fd_wc_offer_expiry_disabled';
@@ -165,14 +184,33 @@ class FD_Woocommerce_Controller
         $fd_product_meta['fd_wc_offer_voucher_use_global_expiry']   = ( $_POST['fd_wc_offer_voucher_use_global_expiry'] == 'fd_wc_offer_voucher_use_global_expiry_enabled' ) ? $_POST['fd_wc_offer_voucher_use_global_expiry'] : 'fd_wc_offer_voucher_use_global_expiry_disabled';
         $fd_product_meta['fd_wc_offer_voucher_expiry_date']         = ( isset( $_POST['fd_wc_offer_voucher_expiry_date'] ) && $_POST['fd_wc_offer_voucher_expiry_date'] > 0 ) ? $_POST['fd_wc_offer_voucher_expiry_date'] : 0;
         $fd_product_meta['fd_wc_offer_savings']         = 0;
-         if(isset( $_POST['_regular_price'] ) && isset( $_POST['_sale_price'] ) ){
+
+        // Cancellation Policy
+        $fd_product_meta['fd_wc_offer_voucher_cancellation_policy']                     =  isset( $_POST['fd_wc_offer_voucher_cancellation_policy'] ) ? $_POST['fd_wc_offer_voucher_cancellation_policy'] : ""; 
+
+        // for delivery cost
+        $fd_product_meta['fd_wc_offer_voucher_delivery_cost']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_cost'] ) ? $_POST['fd_wc_offer_voucher_delivery_cost'] : 0; 
+
+        // estimated delivery time
+        $fd_product_meta['fd_wc_offer_voucher_delivery_time']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_time'] ) ? $_POST['fd_wc_offer_voucher_delivery_time'] : ""; 
+
+        if(isset( $_POST['_regular_price'] ) && isset( $_POST['_sale_price'] ) ){
             $fd_product_meta['fd_wc_offer_savings'] = ($_POST['_sale_price']/$_POST['_regular_price'])*100;
          } 
          $fd_product_meta['fd_product_edit_note'] = "";
 
         if( count( $fd_product_meta ) > 0 ){
             $product = wc_get_product( $post_id );
+                    
+            //if schedule enabled then make visibility of offer/product hidden
+            if($_POST['fd_wc_offer_schedule'] == "enabled"){
+
+                $product->set_catalog_visibility('hidden');
+                $product->save();                
             
+            }//if enabled
+        
+        
             foreach( $fd_product_meta as $meta_field_key => $meta_field_value ){
 
                 $product->update_meta_data( $meta_field_key,  esc_attr( $meta_field_value ) );
@@ -182,6 +220,7 @@ class FD_Woocommerce_Controller
             $product->update_meta_data( 'fd_vendor_id',  esc_attr( get_current_user_id() ) );
 
             $product->save();
+                
         }
     }
 
@@ -195,9 +234,69 @@ class FD_Woocommerce_Controller
         }
     }
 
-    public function add_functionality_before_add_to_cart_button()
+
+    public function add_functionality_after_add_to_cart_button()
     {
-        require_once ( fdscf_path . 'templates/fd-html-before-add-to-cart-custom-options.php' );
+        require_once ( fdscf_path . 'templates/fd-html-after-add-to-cart-custom-options.php' );
+    }
+
+
+    public function proccess_custom_add_to_cart_method()
+    {
+        /**
+         * Handle Pay with store credit request 
+         */
+        if( isset( $_POST['fd_pay_with_credit'] ) && $_POST['fd_pay_with_credit'] == 'fd_custom_add_to_cart' && isset( $_POST['fd_wp_nonce'] ) ){
+
+            if( wp_verify_nonce( $_POST['fd_wp_nonce'], 'fd_custom_add_to_cart' ) ){
+
+                global $post; 
+                $product = wc_get_product( $post->ID );
+                if( $product->get_type() == 'fd_wc_offer' ){
+
+                    $user_id = get_current_user_id();
+                    $wallet = new FD_Wallet( $user_id );
+
+                    $original_product_id = get_post_meta( $product->get_id(), 'fd_offer_linked_product', true );
+                    $original_product = wc_get_product( $original_product_id );
+
+                    WC()->cart->empty_cart();
+                    
+                    $cart_item_data = array(
+                        'pay_with_wallet'   => 'yes',
+                        'wallet_balance'    => $wallet->get_balance(),
+                    );
+                    
+                    switch( $original_product->get_type() ){
+                        case 'simple':
+                            $product_id = $original_product->get_id();
+                            $variation_id = 0;
+                            $cart_item_data['credit_required'] = $original_product->get_price();
+                            break;
+
+                        case 'variable':
+                            $product_id     = $original_product->get_id();
+                            $variation_id   = get_post_meta( $product->get_id(), 'fd_offer_linked_product_variation', true );
+                            $variation      = wc_get_product( $variation_id );
+                            $cart_item_data['credit_required'] = $variation->get_price();
+                            break;
+                    }
+                    
+                    $qty = isset( $_POST['quantity'] ) ? $_POST['quantity'] : 1;
+                    $added_to_cart_status = WC()->cart->add_to_cart(  $product_id, $qty, $variation_id, $variation = array(), $cart_item_data);
+
+                    if( $added_to_cart_status !== false ){
+
+                        $url =  wc_get_cart_url();
+                        echo '<script>window.location.replace("'.$url.'");</script>';
+            
+                    }
+
+                }
+
+            }
+
+        }
     }
 
 
@@ -492,6 +591,124 @@ class FD_Woocommerce_Controller
         echo $tab_content;
     }
 
+
+    public function fd_update_product_visibility($value,$obj){
+
+        $product_id = $obj->get_id();
+        $schdule = get_post_meta($product_id,'fd_wc_offer_schedule',true);
+        if($schdule == "enabled"){
+            $value = "hidden";
+        }else{
+            $value = "visible";
+        }
+        return $value;
+        
+    }
+
+
+    public function add_custom_order_total_rows( $total_rows, $order )
+    {
+        $user_id = get_current_user_id();
+        $wallet = new FD_Wallet( $user_id );
+
+        foreach ( $order->get_items() as $item_key => $item ){
+
+            $product = $item['data'];
+
+            if( isset( $cart_item['pay_with_wallet'] ) && $cart_item['pay_with_wallet'] == 'yes' ){
+
+                $credit_used = ( $cart_item['credit_required'] > $cart_item['wallet_balance'] ) ? $cart_item['wallet_balance'] : $cart_item['credit_required'] ;
+                $credit_remaining = ( $cart_item['credit_required'] > $cart_item['wallet_balance'] ) ? 0 : ( $cart_item['wallet_balance'] - $cart_item['credit_required'] );
+
+                $total_rows['fd_credit_used'] = array(
+                    'label' => 'Credit Used',
+                    'value' => wc_price( (float)$credit_used ),
+                );
+
+                $total_rows['fd_remaining_credit'] = array(
+                    'label' => 'Remaining Credit',
+                    'value' => wc_price( (float)$credit_remaining ),
+                );
+            }
+
+        }
+
+        return $total_rows;
+    }
+
+
+    public function print_custom_total_rows()
+    {
+        if( !WC()->cart->is_empty() ){
+
+            $user_id = get_current_user_id();
+            $wallet = new FD_Wallet( $user_id );
+
+            foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ){
+
+                $product = $cart_item['data'];
+                if( isset( $cart_item['pay_with_wallet'] ) && $cart_item['pay_with_wallet'] == 'yes' ){
+
+                    $credit_used = ( $cart_item['credit_required'] > $cart_item['wallet_balance'] ) ? $cart_item['wallet_balance'] : $cart_item['credit_required'] ;
+                    $credit_remaining = ( $cart_item['credit_required'] > $cart_item['wallet_balance'] ) ? 0 : ( $cart_item['wallet_balance'] - $cart_item['credit_required'] );
+
+                    ?>
+                    <tr class="order-total">
+                        <th>Credit Used</th>
+                        <td><?php echo wc_price( (float)$credit_used ); ?></td>
+                    </tr>
+                    <tr class="order-total">
+                        <th>Remaining Credit</th>
+                        <td><?php echo wc_price( (float)$credit_remaining ); ?></td>
+                    </tr>
+                    <?php
+                }
+
+            }
+
+        }
+    }
+
+
+    public function add_order_item_meta_for_pay_with_store_credit_order( $item_id, $values )
+    {
+        if( isset($values['pay_with_wallet']) ){
+            wc_add_order_item_meta( $item_id, '_pay_with_wallet', $values['pay_with_wallet'] );
+        }
+        
+        if( isset($values['credit_required']) ){
+            wc_add_order_item_meta( $item_id, '_credit_required', $values['credit_required'] );
+        }
+    }
+
+    public function modify_wallet_totals( $order_id )
+    {
+        $order = wc_get_order( $order_id );
+        if( $order !== false ){
+
+            foreach ( $order->get_items() as $item_id => $item ) {
+                
+                $pay_with_credit = $item->get_meta('_pay_with_wallet', true);
+                
+                if( $pay_with_credit == 'yes' ){
+
+                    $user_id = get_current_user_id();
+                    $wallet = new FD_Wallet( $user_id );
+
+                    $credit_required = (float)$item->get_meta('_credit_required', true);
+                    $wallet_balance = $wallet->get_balance();
+
+                    $credit_used = ( $credit_required > $wallet_balance ) ? $wallet_balance : $credit_required ;
+
+                    $update_type = 'purchase';
+                    $wallet->update_balance( $update_type, $credit_used );
+
+                }
+                
+            }
+
+        }
+    }
 }
 
 new FD_Woocommerce_Controller();

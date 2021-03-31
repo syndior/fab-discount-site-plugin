@@ -21,8 +21,16 @@
     $fd_wc_offer_voucher_use_global_expiry  = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_use_global_expiry', true );
     $fd_wc_offer_voucher_expiry_date        = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_expiry_date', true );
 
+    //cancellation policy
+    $fd_wc_offer_voucher_cancellation_policy = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_cancellation_policy', true );
+
+    //Delivery Cost
+    $fd_wc_offer_voucher_delivery_cost = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_delivery_cost', true );
+
+    //estimated delivery time
+    $fd_wc_offer_voucher_delivery_time = get_post_meta( $product->get_id(), 'fd_wc_offer_voucher_delivery_time', true );
+
     $current_date = date('Y-m-d');
-    // $curre_time = date('H');
 
     $times = array(1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24);
 
@@ -109,7 +117,7 @@
             $date_field = '
             <p class="form-field" id = "schedule_date" style = "'.$in_active_dom.'">
             <label for="fd_wc_offer_schedule_date">Set Date for offer to go live: </label>
-            <input type="date" class="short " style="" name="fd_wc_offer_schedule_date" id="fd_wc_offer_schedule_date" value="'.$value.'" min="'.$current_date.'">
+            <input type="date" class="short " style="" name="fd_wc_offer_schedule_date" id="fd_wc_offer_schedule_date" value="'.$value.'">
             </p>    
             ';
              echo $date_field;   
@@ -127,13 +135,14 @@
             $time_field = '
             <p class="form-field" id = "schedule_time" style = "'.$in_active_dom.'">
             <label for="fd_wc_offer_schedule_time">Set time for offer to go live: </label>
-            <select name = "fd_wc_offer_schedule_time" id = "fd_wc_offer_schedule_time">
-            '.$select_options.'
-            </select>
+            <input type="time" class="short " style="" name="fd_wc_offer_schedule_time" id="fd_wc_offer_schedule_time" value="'.$value.'">
             </p>    
             ';
              echo $time_field;   
-
+            //  <select name = "fd_wc_offer_schedule_time" id = "fd_wc_offer_schedule_time">
+            //  '.$select_options.'
+            //  </select>
+ 
             ?>
         <?php
 
@@ -289,5 +298,47 @@
 
         ?>
 
+<?php
+
+/**
+ * text input, for estimated delivery time
+ */
+$args = array(
+    'id' => 'fd_wc_offer_voucher_delivery_time',
+    'label' => 'Estimated Delivery Time: ',
+    'value' => ( isset( $fd_wc_offer_voucher_delivery_time ) ? $fd_wc_offer_voucher_delivery_time : "2-3 days" ),
+    'placeholder' => '',
+    'type' => 'text'
+);
+woocommerce_wp_text_input($args);
+
+?>
+
+
+<?php
+
+/**
+ * number input, for delivery cost
+ */
+$args = array(
+    'id' => 'fd_wc_offer_voucher_delivery_cost',
+    'label' => 'Estimated Delivery Cost: ',
+    'value' => ( isset( $fd_wc_offer_voucher_delivery_cost ) ? $fd_wc_offer_voucher_delivery_cost : 0 ),
+    'placeholder' => '',
+    'type' => 'textarea'
+);
+woocommerce_wp_text_input($args);
+
+?>
+
+<?php
+
+/**
+ * text input, for Cancellation Policy
+ */
+$content = isset( $fd_wc_offer_voucher_cancellation_policy ) ? $fd_wc_offer_voucher_cancellation_policy : "";
+echo "  <p>Cancellation Policy : </p> <br>";
+wp_editor( $content, 'fd_wc_offer_voucher_cancellation_policy' );
+?>
     </div>
  </div>

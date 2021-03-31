@@ -1,6 +1,11 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit;
 
     $transactions_exists = true;
+    $user_id = get_current_user_id();
+    $transactions = FD_Transaction::get_user_transactions( $user_id );
+    if(!is_array($transactions)){
+        $transactions_exists = false;
+    }
 
 ?>
 
@@ -22,24 +27,37 @@
             <thead>
                 <tr>
                     <th>No#</th>
-                    <th>Item</th>
-                    <th>Transactions ID</th>
-                    <th>Transactions Type</th>
-                    <th>Actions</th>
+                    <th>Transaction ID</th>
+                    <th>Transaction Type</th>
+                    <th>Transaction Date</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <?php for( $i = 1; $i <= 10; $i++ ):?>
+                <?php foreach ($transactions as $key => $transaction) { ?>
                     <tr>
-                        <td><?=$i?></td>
-                        <td><a href="#"><?="Item no $i"?></a></td>
-                        <td>1234</td>
-                        <td>Purchase</td>
+                        <td><?=$key+1?></td>
+                        <td><?=$transaction->id?></td>
+                        <td>
+                            <?php
+                            if($transaction->type == "purchase"){
+                                echo "purchase";
+                            }elseif($transaction->type == "voucher_credited"){
+                                echo "Voucher Credited";
+                            }elseif($transaction->type == "credit_addition"){
+                                echo "Credit Addition";
+                            }elseif($transaction->type == "credit_deduction"){
+                                echo "Credit Deduction";
+                            }
+                            ?>
+                        
+                        </td>
+                        <td><?=$transaction->created_at;?></td>
                         <td>
                             <small><a href="#">Report a problem</a></small>
                         </td>
                     </tr>
-                <?php endfor;?>
+                <?php }//end foreach;?>
             </tbody>
         </table>
 
