@@ -70,6 +70,7 @@
                         </td>
                         <td><?php echo $result['expires_at'];?></td>
                         <td>
+
                             <form action="<?php echo $print_voucher_page_url;?>" method = "POST">
                                 <input type="hidden" name="voucher_id" value = "<?php echo $result['fd_voucher_id']?>">
                                 <input type="submit" name = "print_voucher" style="background:transparent;border:none;cursor:pointer" value="Print">

@@ -269,13 +269,13 @@ class FD_Woocommerce_Controller
                     
                     switch( $original_product->get_type() ){
                         case 'simple':
-                            $product_id = $product->get_id();
+                            $product_id = $original_product->get_id();
                             $variation_id = 0;
-                            $cart_item_data['credit_required'] = $product->get_price();
+                            $cart_item_data['credit_required'] = $original_product->get_price();
                             break;
 
                         case 'variable':
-                            $product_id     = $product->get_id();
+                            $product_id     = $original_product->get_id();
                             $variation_id   = get_post_meta( $product->get_id(), 'fd_offer_linked_product_variation', true );
                             $variation      = wc_get_product( $variation_id );
                             $cart_item_data['credit_required'] = $variation->get_price();

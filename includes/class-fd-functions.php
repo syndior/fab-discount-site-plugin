@@ -13,10 +13,14 @@ function fdscf_get_product_meta(string $meta_key = ""){
 }
 function fdscf_set_option_for_hero_section()
 {
+    if( is_home() ){
 
-    $section_enabled = fdscf_get_acf_option("enable_hero_section_for_featured_or_static_product");
-    $featured_or_static = fdscf_get_acf_option("static_or_featured_product");
-    
+        $section_enabled = fdscf_get_acf_option("enable_hero_section_for_featured_or_static_product");
+        $featured_or_static = fdscf_get_acf_option("static_or_featured_product");
+        
+        if ((int)$section_enabled == 1) {
+            if ($featured_or_static == "featured") {
+
     if ((int)$section_enabled == 1) {
         if ($featured_or_static == "featured") {
 
@@ -196,10 +200,9 @@ function fdscf_set_option_for_hero_section()
         update_option('fdscf_hero_product_expiry_date', $expiry_date);
         update_option('fdscf_hero_product_offer_expiry', $offer_expiry);
 
-    } //if section enabled
+    }
 
 }
-// add_action('wp_head', 'fdscf_set_option_for_hero_section');
 add_action('init', 'fdscf_set_option_for_hero_section');
 
 function fdscf_get_hero_product_option(string $field_key = '')
