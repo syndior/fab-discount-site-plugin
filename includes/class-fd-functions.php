@@ -18,9 +18,6 @@ function fdscf_set_option_for_hero_section()
         $section_enabled = fdscf_get_acf_option("enable_hero_section_for_featured_or_static_product");
         $featured_or_static = fdscf_get_acf_option("static_or_featured_product");
         
-        if ((int)$section_enabled == 1) {
-            if ($featured_or_static == "featured") {
-
     if ((int)$section_enabled == 1) {
         if ($featured_or_static == "featured") {
 
@@ -202,6 +199,7 @@ function fdscf_set_option_for_hero_section()
 
     }
 
+ }
 }
 add_action('init', 'fdscf_set_option_for_hero_section');
 
