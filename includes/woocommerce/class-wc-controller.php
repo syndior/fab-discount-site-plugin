@@ -188,13 +188,13 @@ class FD_Woocommerce_Controller
 
 
         // Cancellation Policy
-        $fd_product_meta['fd_wc_offer_voucher_cancellation_policy']                     =  isset( $_POST['fd_wc_offer_voucher_cancellation_policy'] ) ? $_POST['fd_wc_offer_voucher_cancellation_policy'] : ""; 
+        $fd_product_meta['fd_wc_offer_voucher_cancellation_policy']                     =  (isset( $_POST['fd_wc_offer_voucher_cancellation_policy'] ) && $_POST['fd_wc_offer_voucher_cancellation_policy']!="" ) ? $_POST['fd_wc_offer_voucher_cancellation_policy'] : "no policy"; 
 
         // for delivery cost
-        $fd_product_meta['fd_wc_offer_voucher_delivery_cost']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_cost'] ) ? $_POST['fd_wc_offer_voucher_delivery_cost'] : 0; 
+        $fd_product_meta['fd_wc_offer_voucher_delivery_cost']                     =  (isset( $_POST['fd_wc_offer_voucher_delivery_cost'] ) && $_POST['fd_wc_offer_voucher_delivery_cost'] !== "" )? $_POST['fd_wc_offer_voucher_delivery_cost'] : 0; 
 
         // estimated delivery time
-        $fd_product_meta['fd_wc_offer_voucher_delivery_time']                     =  isset( $_POST['fd_wc_offer_voucher_delivery_time'] ) ? $_POST['fd_wc_offer_voucher_delivery_time'] : ""; 
+        $fd_product_meta['fd_wc_offer_voucher_delivery_time']                     =  (isset( $_POST['fd_wc_offer_voucher_delivery_time'] ) && $_POST['fd_wc_offer_voucher_delivery_time'] !== "" )? $_POST['fd_wc_offer_voucher_delivery_time'] : "2-3 days"; 
 
         if(isset( $_POST['_regular_price'] ) && isset( $_POST['_sale_price'] ) ){
             $fd_product_meta['fd_wc_offer_savings'] = ($_POST['_sale_price']/$_POST['_regular_price'])*100;
@@ -219,8 +219,11 @@ class FD_Woocommerce_Controller
                 $product->update_meta_data( $meta_field_key,  esc_attr( $meta_field_value ) );
 
             }
-
-            $product->update_meta_data( 'fd_vendor_id',  esc_attr( get_current_user_id() ) );
+            
+            $vendor_id = (int)$product->get_meta('fd_vendor_id');
+            if($vendor_id=="" || $vendor_id==0 || $vendor_id==null){
+                $product->update_meta_data( 'fd_vendor_id',  esc_attr( get_current_user_id() ) );
+            }
 
             $product->save();
                 
