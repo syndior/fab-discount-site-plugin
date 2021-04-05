@@ -2,13 +2,20 @@
 
 function fdscf_get_acf_option(string $field_key = '')
 {
-    return get_field($field_key, 'option');
+    $value = get_field($field_key, 'option');
+    if($value == "" || $value == null || $value == false){
+        $value == "";
+    } 
+    return $value;
 }
 
 function fdscf_get_product_meta(string $meta_key = ""){
     global $post;
     $post_id = $post->ID;
     $value = get_post_meta($post_id,$meta_key,true);
+    if($value == "" || $value == null || $value == false){
+        $value = "";
+    }
     return $value; 
 }
 function fdscf_set_option_for_hero_section()
@@ -89,7 +96,7 @@ function fdscf_set_option_for_hero_section()
             }//if managing stock
             //checking stock
 
-            if($product->is_type('fd_wc_offer')){
+            if($product->get_type()=='fd_wc_offer'){
 
                 $product_actual_price = $product->get_price()?$product->get_price():'';
                 $product_sale_price = $product->get_sale_price()?$product->get_sale_price():'';
@@ -166,7 +173,7 @@ function fdscf_set_option_for_hero_section()
             //checking stock
 
 
-            if($product->is_type('fd_wc_offer')){
+            if($product->get_type()=='fd_wc_offer'){
 
                 $product_actual_price = $product->get_price()?$product->get_price():'';
                 $product_sale_price = $product->get_sale_price()?$product->get_sale_price():'';
@@ -205,7 +212,11 @@ add_action('init', 'fdscf_set_option_for_hero_section');
 
 function fdscf_get_hero_product_option(string $field_key = '')
 {
-    return get_option($field_key);
+    $value = get_option($field_key);
+    if($value == "" || $value == null || $value == false){
+        $value == "";
+    }
+    return $value;
 }
 
 function fd_product_stock_status(){
@@ -238,8 +249,9 @@ function fd_product_sold(){
 
 function fd_product_saving_percentage(){
     global $post;
+    $savings = 0;
     $product = wc_get_product($post->ID);
-    if($product->is_type('fd_wc_offer')){
+    if($product->get_type()=='fd_wc_offer'){
         $regular_price = $product->get_regular_price();
         $sale_price = $product->get_sale_price();
         if($regular_price != "" && $sale_price!=""){
@@ -247,28 +259,73 @@ function fd_product_saving_percentage(){
         }else{
             $savings = 0;
         }
-    }elseif ($product->is_type('fd_wc_offer_variable')) {
-        $savings_array = array();
-        $product_ids = $product->get_children();
-        foreach ($product_ids as $key => $product_id) {
-            $variab_product = wc_get_product($product_id);
-            $regular_price = $variab_product->get_regular_price();
-            $sale_price = $variab_product->get_sale_price();
-            if($regular_price != "" && $sale_price!=""){
-                $savings_array[$key] = (int)(100-(($sale_price/$regular_price)*100));     
-            }else{
-                $savings_array[$key] = 0;     
-            }
-        }
+    }
 
-        if(sizeof($savings_array)>0){
-            $savings = max($savings_array);
-        }else {
-            $savings=0;
-        }
-
+    if($savings == "" || $savings == null ||$savings == false){
+        $savings = 0;
     }
     echo $savings;
 }
 
+function fd_product_price(string $type = "regular"){
+    global $post;
+    $price = "";
+    $product = wc_get_product($post->ID);
+    if($product->get_type()=='fd_wc_offer'){
+    
+        if($type == "regular"){
+            $price = get_woocommerce_currency_symbol().$product->get_regular_price();
+        }else{
+            $price = get_woocommerce_currency_symbol().$product->get_sale_price();
+        }
+        return $price;      
+}
+}
 
+function fd_seller_profile_picture(){
+
+    global $post;
+	
+	$product = wc_get_product($post->ID);
+	$vendor_id = (int)$product->get_meta('fd_vendor_id');
+	$store_info  = dokan_get_store_info( $vendor_id );
+	$vendor_profile_attachment_id = $store_info['gravatar'];
+	$vendor_profile_picture = wp_get_attachment_url( $vendor_profile_attachment_id );	
+    if($vendor_profile_picture == null || $vendor_profile_picture == false ){    
+        $vendor_profile_picture = fdscf_url."/assets/images/vendor-default-icon.png";
+    }
+    return $vendor_profile_picture;
+    
+}
+
+function fd_seller_name(){
+
+    global $post;
+	
+    $product = wc_get_product($post->ID);
+	$vendor_id = (int)$product->get_meta('fd_vendor_id');
+	$vendor = new WP_User($vendor_id);
+    $vendorName = $vendor->display_name;
+	if($vendorName == null || $vendorName == false){
+        $vendorName = "anonymous";
+    }
+    echo $vendorName;
+}
+
+
+function fd_seller_store_name(){
+
+    global $post;
+	
+	$product = wc_get_product($post->ID);
+	$vendor_id = (int)$product->get_meta('fd_vendor_id');
+	$store_info  = dokan_get_store_info( $vendor_id );
+	$store_name =$store_info['store_name'];
+    if($store_name == null || $store_name == false){
+        $store_name = "anonymous";
+    }
+	return $store_name;
+
+}
+
+?>

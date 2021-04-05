@@ -79,10 +79,10 @@ class FD_Vendor_Product_Controller{
                 if ( ! empty( $fd_product_meta[$meta_field_key] ) ) {
                     update_post_meta( $product_id, $meta_field_key, esc_attr( $meta_field_value ) );
                 }
-
-                // $product->update_meta_data( $meta_field_key,  esc_attr( $meta_field_value ) );
-
             }
+
+            $product->update_meta_data( 'fd_vendor_id',  esc_attr( get_current_user_id() ) );
+
 
             $product->save();
         }
