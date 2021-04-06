@@ -274,7 +274,6 @@ window.addEventListener('DOMContentLoaded', function(){
 
         }, false );
     }
-
 });
 
 
@@ -488,3 +487,49 @@ let getVariationOptionsAjax = function (productId) {
         });
     });
 }
+
+jQuery(document).ready(function($){
+    /**
+     * Set nav menu as slider for mobile devices
+     */
+    console.log(document.documentElement.clientWidth);
+    if( document.documentElement.clientWidth < 768 ){
+        
+        $('.fd_menu_item_slider .menu-header-menu-container > ul').slick({
+            infinite: true,
+            speed: 300,
+            slidesToShow: 1,
+            variableWidth: true
+        });
+    }
+    
+});
+
+/**
+ * Set loop item rows as sliders
+ */
+document.addEventListener( 'DOMContentLoaded', function () {
+
+    var elms = document.getElementsByClassName( 'splide' );
+    if( elms.length > 0 ){
+
+        for ( var i = 0, len = elms.length; i < len; i++ ) {
+            new Splide( elms[ i ], {
+                type   : 'loop',
+                pagination : false,
+                perPage: 4,
+                perMove: 1,
+                gap: 30,
+                padding: '1em',
+                breakpoints: {
+                    768: {
+                        perPage: 1,
+                    },
+                }
+        
+            } ).mount();
+        }
+
+    }
+
+} );

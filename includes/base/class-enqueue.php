@@ -35,6 +35,17 @@ class FD_Enqueue
                 }
                 
                 wp_localize_script( 'fdscf-script', 'fd_ajax_obj', $js_object);
+
+                //load slick-slider files
+                wp_enqueue_style( 'fdscf-slick-styles', fdscf_url . 'assets/slick/slick.css', array(), '1.0.0');
+                wp_enqueue_style( 'fdscf-slick-theme-styles', fdscf_url . 'assets/slick/slick-theme.css', array(), '1.0.0');
+                wp_enqueue_script( 'fdscf-slick-script', fdscf_url . 'assets/slick/slick.min.js',  array('jquery'),'1.0.0',true);
+                
+                //load splide-slider files
+                wp_enqueue_style( 'fdscf-splide-theme-styles', fdscf_url . 'assets/splide/css/splide-default.min.css', array(), '1.0.0');
+                wp_enqueue_style( 'fdscf-splide-styles', fdscf_url . 'assets/splide/css/splide.min.css', array(), '1.0.0');
+                wp_enqueue_script( 'fdscf-splide-script', fdscf_url . 'assets/splide/js/splide.min.js',  array(),'1.0.0',true);
+
         }
         
         public function enqueue_admin_files()
