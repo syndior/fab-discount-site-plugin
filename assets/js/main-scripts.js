@@ -241,39 +241,6 @@ window.addEventListener('DOMContentLoaded', function(){
 
         }, false );
     }
-
-
-    /**
-     * User Account Dropdown Logic
-     */
-    let userDropDown = document.querySelector( '.fd_account_dropdown' );
-    let dropDownElement = document.querySelector( '.fd_account_dropdown_element' );
-    if( userDropDown !== null && dropDownElement !== null ){
-
-        dropDownElement.addEventListener( 'click', function(e){
-            e.stopPropagation();
-        }, false );
-
-        userDropDown.addEventListener( 'click', function(){
-            
-            if( dropDownElement.classList.contains('fd_account_dropdown_element_active') ){
-                dropDownElement.classList.remove('fd_account_dropdown_element_active');
-                setTimeout( function(){
-                    dropDownElement.style.display = 'none';
-                }, 300 );
-            }else{
-                dropDownElement.style.display = 'block';
-                setTimeout( function(){
-                    dropDownElement.classList.add('fd_account_dropdown_element_active');
-                }, 10 );
-            }
-
-            //logic for arrow animation
-            let dropdownArrow = userDropDown.querySelector( '.fd_dropdown_arrow' );
-            dropdownArrow.classList.toggle('fd_dropdown_arrow_rotate');
-
-        }, false );
-    }
 });
 
 
@@ -487,49 +454,3 @@ let getVariationOptionsAjax = function (productId) {
         });
     });
 }
-
-jQuery(document).ready(function($){
-    /**
-     * Set nav menu as slider for mobile devices
-     */
-    console.log(document.documentElement.clientWidth);
-    if( document.documentElement.clientWidth < 768 ){
-        
-        $('.fd_menu_item_slider .menu-header-menu-container > ul').slick({
-            infinite: true,
-            speed: 300,
-            slidesToShow: 1,
-            variableWidth: true
-        });
-    }
-    
-});
-
-/**
- * Set loop item rows as sliders
- */
-document.addEventListener( 'DOMContentLoaded', function () {
-
-    var elms = document.getElementsByClassName( 'splide' );
-    if( elms.length > 0 ){
-
-        for ( var i = 0, len = elms.length; i < len; i++ ) {
-            new Splide( elms[ i ], {
-                type   : 'loop',
-                pagination : false,
-                perPage: 4,
-                perMove: 1,
-                gap: 30,
-                padding: '1em',
-                breakpoints: {
-                    768: {
-                        perPage: 1,
-                    },
-                }
-        
-            } ).mount();
-        }
-
-    }
-
-} );

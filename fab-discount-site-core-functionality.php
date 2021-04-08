@@ -69,7 +69,7 @@ if( !class_exists( 'FD_CORE_PLUGIN_CLASS' ) ){
             if( is_admin() ){
                 require_once ( fdscf_path . 'includes/admin/class-admin-pages.php' );
             }
-            require_once ( fdscf_path . 'includes/class-fd-functions.php' );
+            require_once ( fdscf_path . 'includes/fd-functions.php' );
             require_once ( fdscf_path . 'includes/base/class-enqueue.php' );
             require_once ( fdscf_path . 'includes/base/class-settings-links.php' );
             require_once ( fdscf_path . 'includes/base/class-wp-cron.php' );
