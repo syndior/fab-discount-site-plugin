@@ -9,10 +9,17 @@ class FD_Woocommerce_Controller
 
         /* adds the custom product type's label in the products type dropdown */
         add_filter( 'product_type_selector', array( $this, 'add_product_type_filter' ), 10 );
+        add_filter( 'wcfm_product_types', array( $this, 'add_product_type_filter' ), 10 );
 
         /* adds our custom product type extended class to be used with our product type*/
         add_filter( 'woocommerce_product_class', array( $this, 'add_woocommerce_product_class' ), 99, 2 );
+
+        /* Fix Variable product data-store issue */
+        add_filter( 'woocommerce_data_stores', array( $this, 'fix_variable_products_data_store_issue' ), 99, 2 );
         
+        /* Add FD Variable product support in WCFM */
+        add_filter( 'wcfm_variable_product_types', array( $this, 'add_variable_product_support_in_wccfm' ), 9999 );
+
         /* add custom product product data tab */
         add_filter( 'woocommerce_product_data_tabs', array( $this, 'modify_woocommerce_product_data_tabs' ), 9999, 1 );
 
@@ -90,7 +97,9 @@ class FD_Woocommerce_Controller
 
     public function add_product_type_filter( $types )
     {
+        $types                              = array();
         $types[ 'fd_wc_offer' ]             = 'FD Offer';
+        $types[ 'fd_wc_offer_variable' ]    = 'FD Offer Variable';
 
         return $types;
     }
@@ -101,9 +110,27 @@ class FD_Woocommerce_Controller
             $classname = 'WC_Product_FD_Offer';
         }
 
+        if ( $product_type == 'fd_wc_offer_variable' ) {
+            $classname = 'WC_Product_FD_Offer_Variable';
+        }
+
         return $classname;
     }
 
+
+    public function fix_variable_products_data_store_issue( $stores )
+    {
+        $stores['product-fd_wc_offer_variable'] = 'WC_Product_Variable_Data_Store_CPT';
+        return $stores;
+    }
+
+
+    public function add_variable_product_support_in_wccfm( $wcfm_variable_product_types )
+    {
+        $wcfm_variable_product_types[] = 'fd_wc_offer_variable';
+        return $wcfm_variable_product_types;
+        
+    }
 
 
     public function modify_woocommerce_product_data_tabs( $original_tabs )
@@ -111,6 +138,8 @@ class FD_Woocommerce_Controller
         //enable the general tab for custom product types
         $original_tabs['general']['class'][] = 'show_if_simple';
         $original_tabs['general']['class'][] = 'show_if_fd_wc_offer';
+        $original_tabs['general']['class'][] = 'fd_wc_offer_variable';
+        $original_tabs['variations']['class'][] = 'fd_wc_offer_variable';
 
         //hide shipping tab
         $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer';
