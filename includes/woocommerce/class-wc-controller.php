@@ -10,6 +10,7 @@ class FD_Woocommerce_Controller
         /* adds the custom product type's label in the products type dropdown */
         add_filter( 'product_type_selector', array( $this, 'add_product_type_filter' ), 10 );
         add_filter( 'wcfm_product_types', array( $this, 'add_product_type_filter' ), 10 );
+        $this->add_product_type_taxonomy();
 
         /* adds our custom product type extended class to be used with our product type*/
         add_filter( 'woocommerce_product_class', array( $this, 'add_woocommerce_product_class' ), 99, 2 );
@@ -104,6 +105,19 @@ class FD_Woocommerce_Controller
         return $types;
     }
 
+
+    public function add_product_type_taxonomy()
+    {
+        if ( ! get_term_by( 'slug', 'fd_wc_offer', 'product_type' ) ) {
+            wp_insert_term( 'fd_wc_offer', 'product_type' );
+        }
+        
+        if ( ! get_term_by( 'slug', 'fd_wc_offer_variable', 'product_type' ) ) {
+            wp_insert_term( 'fd_wc_offer_variable', 'product_type' );
+        }
+    }
+
+
     public function add_woocommerce_product_class( $classname, $product_type )
     {
         if ( $product_type == 'fd_wc_offer' ) {
@@ -136,13 +150,12 @@ class FD_Woocommerce_Controller
     public function modify_woocommerce_product_data_tabs( $original_tabs )
     {
         //enable the general tab for custom product types
-        $original_tabs['general']['class'][] = 'show_if_simple';
-        $original_tabs['general']['class'][] = 'show_if_fd_wc_offer';
-        $original_tabs['general']['class'][] = 'fd_wc_offer_variable';
-        $original_tabs['variations']['class'][] = 'fd_wc_offer_variable';
+        // $original_tabs['general']['class'][]    = 'show_if_simple';
+        $original_tabs['general']['class'][]        = 'show_if_fd_wc_offer';
+        $original_tabs['variations']['class'][]     = 'show_if_fd_wc_offer_variable';
 
         //hide shipping tab
-        $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer';
+        // $original_tabs['shipping']['class'][] = 'hide_if_fd_wc_offer';
 
         $fd_wc_offer_tab['fd_wc_offer'] = array(
             'label' => 'FD Offer Options',
@@ -150,9 +163,10 @@ class FD_Woocommerce_Controller
             'class' => 'show_if_fd_wc_offer'
         );
 
-        $tabs = $this->insert_item_at_array_position( 0, $fd_wc_offer_tab, $original_tabs );
+        // $tabs = $this->insert_item_at_array_position( 0, $fd_wc_offer_tab, $original_tabs );
 
-        return $tabs;
+        // return $tabs;
+        return $original_tabs;
     }
 
     public function add_woocommerce_product_data_panels()
@@ -163,7 +177,7 @@ class FD_Woocommerce_Controller
 
     public function add_woocommerce_general_tab_fix_html()
     {
-        echo '<div class="options_group show_if_fd_wc_offer clear"></div>';
+        echo '<div class="options_group show_if_fd_wc_offer show_if_fd_wc_offer_variable clear"></div>';
     }
 
 
@@ -178,13 +192,12 @@ class FD_Woocommerce_Controller
                 //for Price tab
                 jQuery('.product_data_tabs .general_tab').addClass('show_if_fd_wc_offer').show();
                 jQuery('#general_product_data .pricing').addClass('show_if_fd_wc_offer').show();
-                
-
                 //for Inventory tab
                 jQuery('.inventory_options').addClass('show_if_fd_wc_offer').show();
                 jQuery('#inventory_product_data ._manage_stock_field').addClass('show_if_fd_wc_offer').show();
                 jQuery('#inventory_product_data ._sold_individually_field').parent().addClass('show_if_fd_wc_offer').show();
                 jQuery('#inventory_product_data ._sold_individually_field').addClass('show_if_fd_wc_offer').show();
+            });
         </script>
         <?php
     }

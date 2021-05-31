@@ -314,3 +314,5 @@ class FD_Shortcodes
     }
 
 }
+
+new FD_Shortcodes();
