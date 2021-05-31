@@ -3,7 +3,7 @@
  * Plugin Name:       Fab Discount Core Site Functionality
  * Plugin URI:        https://kristall.io/
  * Description:       Handles the Fab Discount site core functionality
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 5.5
  * Requires PHP:      7.2
  * Author:            Kristall Studios
