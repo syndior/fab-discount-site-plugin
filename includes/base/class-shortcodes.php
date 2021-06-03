@@ -37,6 +37,13 @@ class FD_Shortcodes
             'post_status'   => 'publish',
             'orderby'       => 'date',
             'order'         => 'DESC',
+            'tax_query'     => array(
+                array(
+                    'taxonomy' => 'product_type',
+                    'field'    => 'slug',
+                    'terms'    => array( 'fd_wc_offer', 'fd_wc_offer_variable' ),
+                ),
+            ),
         );
 
         if( $type == 'trending' ){
@@ -52,6 +59,30 @@ class FD_Shortcodes
         $products_array = get_posts( $args );
 
         if( !empty($products_array) ){
+
+            // splide slider options
+            $slider_options = array(
+                'perPage'       => (int)$columns,
+                'perMove'       => 1,
+                'arrows'        => ($controls == 'true' ? true : false),
+                'pagination'    => ($type == 'trending' ? false : true),
+                'keyboard'      => ($type == 'trending' ? false : true),
+                'drag'          => ($type == 'trending' ? false : true),
+                'gap'           => 60,
+                'padding'       => 40,
+                'breakpoints'   => array(
+                    '480' =>array(
+                        'perPage'   => 1,
+                        'arrows'    => false,
+                        'autoplay'  => true,
+                    ),
+                    '768' => array(
+                        'perPage' => 2,
+                    ),
+                ),
+            );
+    
+            $slider_options_json = json_encode($slider_options);
 
             //set slider type class on parent element
             switch( $type ){
@@ -73,18 +104,20 @@ class FD_Shortcodes
             }
 
             $output .= '<div class="fd_product_slider_wrapper '. $slider_class .'">';
-            $output .= '<div class="splide">';
+            $output .= '<div class="splide" data-splide=\''.$slider_options_json.'\'>';
             $output .= '<div class="splide__track">';
             $output .= '<div class="splide__list">';
             foreach( $products_array as $product ){
 
-                $product_id = '1';
-                $product_url = '#';
-                $product_featured = true;
+                $product_id         = $product->ID;
+                $wc_product         = wc_get_product( $product->ID );
+                $product_url        = get_permalink( $product->ID );
+                $product_featured   = true;
+                $product_img_url    = ( wp_get_attachment_url($wc_product->get_image_id()) ) ? wp_get_attachment_url($wc_product->get_image_id()) : wc_placeholder_img_src();
 
-                $output .= '<a class="splide__slide fd_slider_item" href="'.$product_url.'">';
+                $output .= '<div class="splide__slide fd_slider_item">';
             
-                    $output .= '<div class="fd_slider_item_image">';
+                    $output .= '<div class="fd_slider_item_image" style="background-image: url(\''.$product_img_url.'\');">';
                         if( $product_featured == true ){
                             $output .= '<div class="fd_slider_item_featured_element"></div>';
                         }
@@ -100,7 +133,7 @@ class FD_Shortcodes
                         $title_alignment = 'text-align: center;';
                     }
 
-                    $output .= '<h3 class="fd_slider_item_title" style="'.$title_alignment.'">Product Title</h3>';
+                    $output .= '<h3 class="fd_slider_item_title" style="'.$title_alignment.'">'. $wc_product->get_title() .'</h3>';
 
                     if( $type == 'trending' ){
                         $output .= '<p class="fd_slider_item_except">lorem ipsum placeholder text</p>';
@@ -114,15 +147,16 @@ class FD_Shortcodes
                         $output .= do_shortcode( '[fd_product_badges show_borders="false" limit="3" product_id="'.$product_id.'"]' );
                     }
 
-                    $output .= '<a class="fd_slider_item_btn" href="#">View Discount</a>';
+                    $output .= '<a class="fd_slider_item_btn" href="'.$product_url.'">View Discount</a>';
                 
-                $output .= '</a>';
+                $output .= '</div>';
 
             }
             $output .= '</div>';
             $output .= '</div>';
             $output .= '</div>';
 
+            $veiw_all_btn = ( $veiw_all_btn == 'false' ? false : true );
             if( $veiw_all_btn == true ){
 
                 $view_all_link = '#';

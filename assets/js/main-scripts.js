@@ -454,3 +454,21 @@ let getVariationOptionsAjax = function (productId) {
         });
     });
 }
+
+
+/**
+ * Mount Splide Sliders
+ */
+window.addEventListener( 'DOMContentLoaded', function(){
+
+    //init splide slider
+	let splidSliders = document.querySelectorAll('.splide');
+	if (splidSliders.length > 0) {
+
+		splidSliders.forEach(function (slider) {
+			new Splide(slider).mount();
+		});
+
+	}
+
+}, false );
